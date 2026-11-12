@@ -45,5 +45,5 @@ VALUES
 -- Images
 INSERT OR REPLACE INTO product_images (id, product_id, url, alt_text, sort_order, is_primary)
 VALUES 
-('img_test_001', 'prod_test_001', '/images/products/cube-1.svg', '3D Printed Test Token ₹1', 1, 1),
-('img_test_002', 'prod_test_002', '/images/products/caddy-1.svg', 'Mini Tactile Keychain ₹5', 1, 1);
+('img_test_001', 'prod_test_001', '/images/products/token-1.jpg', '3D Printed Test Token ₹1', 0, 1),
+('img_test_002', 'prod_test_002', '/images/products/keychain-1.jpg', 'Mini Tactile Keychain ₹5', 0, 1);

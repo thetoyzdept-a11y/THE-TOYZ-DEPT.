@@ -528,3 +528,21 @@ adminRouter.post("/upload", async (c) => {
     return c.json({ error: "Upload failed", message: err.message }, 500);
   }
 });
+
+// ── 9. Compliance & Inquiries Management ──────────────────────────────
+adminRouter.get("/compliance-records", async (c) => {
+  try {
+    const inquiries = await c.env.DB
+      .prepare("SELECT * FROM contact_inquiries ORDER BY created_at DESC LIMIT 50")
+      .all();
+    const grievances = await c.env.DB
+      .prepare("SELECT * FROM grievances ORDER BY created_at DESC LIMIT 50")
+      .all();
+    return c.json({
+      inquiries: inquiries.results || [],
+      grievances: grievances.results || [],
+    });
+  } catch (err: any) {
+    return c.json({ inquiries: [], grievances: [] });
+  }
+});

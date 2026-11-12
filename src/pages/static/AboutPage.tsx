@@ -22,6 +22,28 @@ export function AboutPage() {
           </p>
         </div>
 
+        {/* Visual Studio Gallery Showcase */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="card-brutal p-2 bg-cream-light overflow-hidden">
+            <div className="aspect-square overflow-hidden border border-ink">
+              <img src="/images/products/dragon-1.jpg" alt="Articulated 3D Prints" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+            </div>
+            <p className="font-mono text-[11px] font-bold text-center uppercase pt-2 text-ink">Articulated Precision Mechanics</p>
+          </div>
+          <div className="card-brutal p-2 bg-cream-light overflow-hidden">
+            <div className="aspect-square overflow-hidden border border-ink">
+              <img src="/images/products/dock-1.jpg" alt="Brutalist Desk Gear" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+            </div>
+            <p className="font-mono text-[11px] font-bold text-center uppercase pt-2 text-ink">Brutalist Desk Tools</p>
+          </div>
+          <div className="card-brutal p-2 bg-cream-light overflow-hidden">
+            <div className="aspect-square overflow-hidden border border-ink">
+              <img src="/images/products/planter-1.jpg" alt="Architectural Planters" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+            </div>
+            <p className="font-mono text-[11px] font-bold text-center uppercase pt-2 text-ink">Architectural Decor</p>
+          </div>
+        </div>
+
         {/* Brand Story & Mission */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-6 text-sm sm:text-base font-body leading-relaxed text-ink/85">

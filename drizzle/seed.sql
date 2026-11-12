@@ -7,9 +7,20 @@ VALUES
   'usr_admin_001',
   'admin@thetoyzdept.in',
   'toyz_salt_admin:bb3ae1275372a80cdefecff8244c9679cafca6b609f762a42307ec61a7ab583d',
-  'Arjun',
-  'Mehta',
-  '+91 98765 43210',
+  'Abhishek',
+  'H',
+  '+91 90194 65897',
+  'admin',
+  1,
+  1
+),
+(
+  'usr_admin_owner',
+  'thetoyzdept@gmail.com',
+  'toyz_salt_admin:bb3ae1275372a80cdefecff8244c9679cafca6b609f762a42307ec61a7ab583d',
+  'Abhishek',
+  'H',
+  '+91 90194 65897',
   'admin',
   1,
   1
@@ -228,17 +239,17 @@ VALUES
 -- 4. Product Images
 INSERT OR REPLACE INTO product_images (id, product_id, url, alt_text, sort_order, is_primary)
 VALUES
-('img_001_1', 'prod_001', '/images/products/dragon-1.svg', 'Articulated Cyber Dragon - Coiled Stance', 0, 1),
-('img_001_2', 'prod_001', '/images/products/dragon-2.svg', 'Articulated Cyber Dragon - Close-up Scales', 1, 0),
-('img_002_1', 'prod_002', '/images/products/rex-1.svg', 'Mecha Flexi Rex - Standing Profile', 0, 1),
-('img_003_1', 'prod_003', '/images/products/serpent-1.svg', 'Articulated Crystal Serpent - Coiled', 0, 1),
-('img_004_1', 'prod_004', '/images/products/planter-1.svg', 'Brutalist Concrete Planter on Oak Desk', 0, 1),
-('img_005_1', 'prod_005', '/images/products/dock-1.svg', 'Cyberpunk Cable Dock with USB-C Cables', 0, 1),
-('img_006_1', 'prod_006', '/images/products/stand-1.svg', 'Isometric Headphone Stand Front View', 0, 1),
-('img_007_1', 'prod_007', '/images/products/mount-1.svg', 'Modular Magnetic Wall Mounts Installed', 0, 1),
-('img_008_1', 'prod_008', '/images/products/cube-1.svg', 'Kinetic Fidget Gear Cube in Hand', 0, 1),
-('img_009_1', 'prod_009', '/images/products/wolf-1.svg', 'Low-Poly Geometric Wolf Bust Angle', 0, 1),
-('img_010_1', 'prod_010', '/images/products/caddy-1.svg', 'Bauhaus Architectural Pen Caddy Filled', 0, 1);
+('img_001_1', 'prod_001', '/images/products/dragon-1.jpg', 'Articulated Cyber Dragon - Coiled Stance', 0, 1),
+('img_001_2', 'prod_001', '/images/products/dragon-1.jpg', 'Articulated Cyber Dragon - Close-up Scales', 1, 0),
+('img_002_1', 'prod_002', '/images/products/rex-1.jpg', 'Mecha Flexi Rex - Standing Profile', 0, 1),
+('img_003_1', 'prod_003', '/images/products/serpent-1.jpg', 'Articulated Crystal Serpent - Coiled', 0, 1),
+('img_004_1', 'prod_004', '/images/products/planter-1.jpg', 'Brutalist Concrete Planter on Oak Desk', 0, 1),
+('img_005_1', 'prod_005', '/images/products/dock-1.jpg', 'Cyberpunk Cable Dock with USB-C Cables', 0, 1),
+('img_006_1', 'prod_006', '/images/products/stand-1.jpg', 'Isometric Headphone Stand Front View', 0, 1),
+('img_007_1', 'prod_007', '/images/products/mount-1.jpg', 'Modular Magnetic Wall Mounts Installed', 0, 1),
+('img_008_1', 'prod_008', '/images/products/cube-1.jpg', 'Kinetic Fidget Gear Cube in Hand', 0, 1),
+('img_009_1', 'prod_009', '/images/products/wolf-1.jpg', 'Low-Poly Geometric Wolf Bust Angle', 0, 1),
+('img_010_1', 'prod_010', '/images/products/caddy-1.jpg', 'Bauhaus Architectural Pen Caddy Filled', 0, 1);
 
 -- 5. Product Variants & Inventory
 INSERT OR REPLACE INTO product_variants (id, product_id, name, sku, color, size, price_modifier, stock, low_stock_threshold, is_active)
@@ -419,9 +430,9 @@ VALUES
 ('timezone', 'Asia/Kolkata'),
 ('free_shipping_threshold', '99900'), -- Free shipping above ₹999
 ('standard_shipping_rate', '9900'),   -- Standard shipping ₹99
-('tax_rate_percent', '18'),            -- 18% GST (already factored or displayed)
-('contact_email', 'support@thetoyzdept.in'),
-('contact_phone', '+91 80 4123 9900'),
-('address', 'THE TOYZ DEPT. Studio, 88 Creative Industrial Hub, Indiranagar, Bengaluru, KA 560038'),
+('tax_rate_percent', '0'),             -- GST Exempt (Turnover below ₹20L under Sec 22 CGST Act)
+('contact_email', 'thetoyzdept@gmail.com'),
+('contact_phone', '+91 90194 65897'),
+('address', 'MIG 146, KHB Colony, Rajiv Gandhi Nagar, Gadag, Karnataka 582101, India'),
 ('social_instagram', 'https://instagram.com/thetoyzdept'),
 ('social_twitter', 'https://twitter.com/thetoyzdept');

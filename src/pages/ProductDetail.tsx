@@ -278,7 +278,7 @@ export function ProductDetailPage() {
                   </span>
                 )}
                 <span className="font-mono text-xs text-lime-darker font-bold">
-                  (Inclusive of all GST)
+                  Net Final Price • GST Exempt
                 </span>
               </div>
             </div>
@@ -642,6 +642,31 @@ export function ProductDetailPage() {
             </div>
           </div>
         )}
+        {/* Sticky Mobile Add-to-Cart Bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-cream border-t-2 border-ink p-3 shadow-brutal-lg flex items-center justify-between gap-3">
+          <div>
+            <span className="font-mono text-[10px] text-ink-muted uppercase block leading-none">Total</span>
+            <span className="font-display font-black text-lg text-ink">{formatINR(currentPrice)}</span>
+          </div>
+          <div className="flex items-center gap-2 flex-1 justify-end">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+              className="btn-primary py-2.5 px-3.5 text-xs uppercase"
+            >
+              Add +
+            </button>
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={isOutOfStock}
+              className="btn-dark py-2.5 px-3.5 text-xs uppercase"
+            >
+              Buy Now
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

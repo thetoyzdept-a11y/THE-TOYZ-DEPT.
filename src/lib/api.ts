@@ -120,6 +120,7 @@ export const api = {
   getAdminSettings: () => request<{ settings: Record<string, string> }>("/admin/settings"),
   saveAdminSettings: (data: Record<string, string>) =>
     request<any>("/admin/settings", { method: "POST", body: JSON.stringify(data) }),
+  getAdminComplianceRecords: () => request<{ inquiries: any[]; grievances: any[] }>("/admin/compliance-records"),
 
   // Shiprocket Shipping & Tracking
   checkShippingServiceability: (pincode: string) =>
