@@ -159,6 +159,7 @@ export function AdminDashboardPage() {
   };
 
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [savingProduct, setSavingProduct] = useState(false);
 
   const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: "create" | "edit") => {
     const file = e.target.files?.[0];
@@ -242,6 +243,7 @@ export function AdminDashboardPage() {
   const handleQuickEditSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickEditProduct) return;
+    setSavingProduct(true);
     try {
       const pricePaise = Math.round(parseFloat(editPrice) * 100);
       const stockNum = parseInt(editStock, 10);
@@ -250,9 +252,9 @@ export function AdminDashboardPage() {
         name: quickEditProduct.name,
         slug: quickEditProduct.slug,
         basePrice: pricePaise,
-        categoryId: quickEditProduct.category_id,
-        material: editColor || quickEditProduct.material,
-        description: quickEditProduct.description,
+        categoryId: quickEditProduct.category_id || undefined,
+        material: editColor || quickEditProduct.material || undefined,
+        description: quickEditProduct.description || undefined,
         status: editStatus,
         isFeatured: quickEditProduct.is_featured,
         image: editImage || undefined,
@@ -261,7 +263,9 @@ export function AdminDashboardPage() {
 
       const invRow = inventory.find((i) => i.product_id === quickEditProduct.id);
       if (invRow && !isNaN(stockNum)) {
-        await api.updateAdminInventory(invRow.variant_id, stockNum);
+        await api.updateAdminInventory(invRow.variant_id, stockNum).catch((err) => {
+          console.warn("Inventory variant sync skipped", err);
+        });
       }
 
       setQuickEditProduct(null);
@@ -269,6 +273,8 @@ export function AdminDashboardPage() {
       alert("Product details, photo, and inventory updated successfully!");
     } catch (err: any) {
       alert("Failed to update product: " + err.message);
+    } finally {
+      setSavingProduct(false);
     }
   };
 
@@ -1921,6 +1927,11 @@ export function AdminDashboardPage() {
                         placeholder="Or paste image URL"
                         className="w-full bg-cream-light border border-ink p-1.5 text-[10px]"
                       />
+                      {uploadingImage && (
+                        <p className="text-[10px] text-lime-darker font-bold flex items-center gap-1 animate-pulse">
+                          <RefreshCw className="w-3 h-3 animate-spin" /> Uploading image to Cloudflare R2...
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -1990,8 +2001,22 @@ export function AdminDashboardPage() {
                 </div>
 
                 <div className="flex gap-2 pt-2 border-t border-ink/20">
-                  <button type="submit" className="btn-primary flex-1 py-2 text-xs uppercase">
-                    Save Changes
+                  <button
+                    type="submit"
+                    disabled={savingProduct || uploadingImage}
+                    className="btn-primary flex-1 py-2 text-xs uppercase flex items-center justify-center gap-1.5"
+                  >
+                    {uploadingImage ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Uploading Photo...
+                      </>
+                    ) : savingProduct ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Saving Changes...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </button>
                   <button
                     type="button"

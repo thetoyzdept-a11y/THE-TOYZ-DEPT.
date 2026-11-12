@@ -133,9 +133,19 @@ adminRouter.post("/products", async (c) => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `)
       .bind(
-        productId, data.name, data.slug, data.description || null, data.shortDescription || null,
-        data.categoryId || null, data.basePrice, data.comparePrice || null, data.material || null,
-        data.dimensions || null, data.weight || null, data.status, data.isFeatured ? 1 : 0
+        productId,
+        data.name ?? null,
+        data.slug ?? null,
+        data.description ?? null,
+        data.shortDescription ?? null,
+        data.categoryId ?? null,
+        data.basePrice,
+        data.comparePrice ?? null,
+        data.material ?? null,
+        data.dimensions ?? null,
+        data.weight ?? null,
+        data.status ?? "draft",
+        data.isFeatured ? 1 : 0
       )
       .run();
 
@@ -186,7 +196,7 @@ adminRouter.put("/products/:id", async (c) => {
           short_description = COALESCE(?, short_description),
           category_id = COALESCE(?, category_id),
           base_price = COALESCE(?, base_price),
-          compare_price = ?,
+          compare_price = COALESCE(?, compare_price),
           material = COALESCE(?, material),
           dimensions = COALESCE(?, dimensions),
           weight = COALESCE(?, weight),
@@ -196,10 +206,18 @@ adminRouter.put("/products/:id", async (c) => {
         WHERE id = ?
       `)
       .bind(
-        body.name, body.slug, body.description, body.shortDescription, body.categoryId,
-        body.basePrice, body.comparePrice !== undefined ? body.comparePrice : null,
-        body.material, body.dimensions, body.weight, body.status,
-        body.isFeatured !== undefined ? (body.isFeatured ? 1 : 0) : null,
+        body.name ?? null,
+        body.slug ?? null,
+        body.description ?? null,
+        body.shortDescription ?? null,
+        body.categoryId ?? null,
+        body.basePrice !== undefined && body.basePrice !== null ? body.basePrice : null,
+        body.comparePrice !== undefined && body.comparePrice !== null ? body.comparePrice : null,
+        body.material ?? null,
+        body.dimensions ?? null,
+        body.weight !== undefined && body.weight !== null ? body.weight : null,
+        body.status ?? null,
+        body.isFeatured !== undefined && body.isFeatured !== null ? (body.isFeatured ? 1 : 0) : null,
         id
       )
       .run();
