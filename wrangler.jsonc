@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "the-toyz-dept",
+  "main": "server/index.ts",
+  "compatibility_date": "2024-11-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "html_handling": "auto-trailing-slash"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "toyz-dept-db",
+      "database_id": "toyz-dept-local-db",
+      "migrations_dir": "drizzle/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "toyz-dept-assets"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "development",
+    "SITE_URL": "http://localhost:5173",
+    "SESSION_SECRET": "the-toyz-dept-dev-session-secret-min-32-chars-long",
+    "RAZORPAY_KEY_ID": "",
+    "RAZORPAY_KEY_SECRET": "",
+    "RAZORPAY_WEBHOOK_SECRET": ""
+  }
+}
