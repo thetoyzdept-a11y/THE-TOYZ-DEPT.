@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { Env, Variables } from "../types";
 import { requireAuth, getCookie } from "../auth";
+import { getRazorpayCredentials, verifyRazorpaySignature } from "./razorpay";
 
 export const checkoutRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -38,23 +39,7 @@ const CheckoutSchema = z.object({
   customerNotes: z.string().optional(),
 });
 
-// Helper: HMAC SHA-256 for Razorpay signature verification
-async function verifyRazorpaySignature(orderId: string, paymentId: string, signature: string, secret: string): Promise<boolean> {
-  const enc = new TextEncoder();
-  const data = `${orderId}|${paymentId}`;
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signatureBytes = await crypto.subtle.sign("HMAC", key, enc.encode(data));
-  const computedHex = Array.from(new Uint8Array(signatureBytes))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return computedHex === signature;
-}
+// Helper: verifyRazorpaySignature imported from ./razorpay
 
 // POST /api/checkout/create-order
 checkoutRouter.post("/create-order", async (c) => {
@@ -213,35 +198,45 @@ checkoutRouter.post("/create-order", async (c) => {
     // Setup Razorpay Order (or Mock if credentials not supplied)
     let razorpayOrderId = "order_mock_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
     let isMockPayment = true;
+    const { keyId, keySecret } = getRazorpayCredentials(c);
 
-    if (c.env.RAZORPAY_KEY_ID && c.env.RAZORPAY_KEY_SECRET) {
-      try {
-        const authHeader = btoa(`${c.env.RAZORPAY_KEY_ID}:${c.env.RAZORPAY_KEY_SECRET}`);
-        const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
-          method: "POST",
-          headers: {
-            "Authorization": `Basic ${authHeader}`,
-            "Content-Type": "application/json",
+    if (keyId && keySecret) {
+      const authHeader = btoa(`${keyId}:${keySecret}`);
+      const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${authHeader}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: Math.round(totalAmount),
+          currency: "INR",
+          receipt: orderNumber,
+          notes: {
+            order_id: orderId,
+            order_number: orderNumber,
           },
-          body: JSON.stringify({
-            amount: totalAmount,
-            currency: "INR",
-            receipt: orderNumber,
-            notes: {
-              order_id: orderId,
-              order_number: orderNumber,
-            },
-          }),
-        });
+        }),
+      });
 
-        if (rzpRes.ok) {
-          const rzpData = await rzpRes.json() as any;
-          razorpayOrderId = rzpData.id;
-          isMockPayment = false;
-        }
-      } catch (err) {
-        console.error("Razorpay API error, falling back to development adapter:", err);
+      if (rzpRes.status === 401) {
+        return c.json(
+          { error: "Razorpay authentication failed. Please check your Key ID and Key Secret." },
+          401
+        );
       }
+
+      if (!rzpRes.ok) {
+        const errData = (await rzpRes.json().catch(() => ({}))) as any;
+        return c.json(
+          { error: "Failed to create Razorpay payment order", details: errData },
+          500
+        );
+      }
+
+      const rzpData = (await rzpRes.json()) as any;
+      razorpayOrderId = rzpData.id;
+      isMockPayment = false;
     }
 
     // Create payment entry in D1
@@ -257,7 +252,7 @@ checkoutRouter.post("/create-order", async (c) => {
       amount: totalAmount,
       currency: "INR",
       razorpayOrderId,
-      razorpayKeyId: c.env.RAZORPAY_KEY_ID || "rzp_test_placeholder",
+      razorpayKeyId: keyId || "rzp_test_placeholder",
       isMockPayment,
       customerDetails: {
         name: shipping.fullName,
@@ -285,17 +280,24 @@ checkoutRouter.post("/verify", async (c) => {
       return c.json({ error: "Order not found" }, 404);
     }
 
+    const { keySecret } = getRazorpayCredentials(c);
     let isValid = false;
 
-    if (isMock || !c.env.RAZORPAY_KEY_SECRET) {
-      // Development mock payment adapter
+    if (isMock || !keySecret) {
+      // Development mock payment adapter (only if no secret configured or explicitly requested)
       isValid = true;
     } else {
+      if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+        return c.json(
+          { error: "Missing required Razorpay fields (razorpayOrderId, razorpayPaymentId, razorpaySignature)" },
+          400
+        );
+      }
       isValid = await verifyRazorpaySignature(
         razorpayOrderId,
         razorpayPaymentId,
         razorpaySignature,
-        c.env.RAZORPAY_KEY_SECRET
+        keySecret
       );
     }
 
@@ -304,7 +306,7 @@ checkoutRouter.post("/verify", async (c) => {
         .prepare("UPDATE payments SET status = 'failed', failure_reason = 'Signature verification failed' WHERE order_id = ?")
         .bind(orderId)
         .run();
-      return c.json({ error: "Payment verification failed" }, 400);
+      return c.json({ success: false, error: "Payment verification failed: Signature mismatch." }, 400);
     }
 
     // Payment successfully confirmed!

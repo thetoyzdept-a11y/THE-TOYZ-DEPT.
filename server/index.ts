@@ -9,6 +9,7 @@ import { checkoutRouter } from "./routes/checkout";
 import { customRequestsRouter } from "./routes/custom-requests";
 import { customerRouter } from "./routes/customer";
 import { adminRouter } from "./routes/admin";
+import { razorpayRouter } from "./routes/razorpay";
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -60,6 +61,7 @@ app.route("/api/auth", authRouter);
 app.route("/api", productsRouter); // mounts /api/products & /api/categories
 app.route("/api/cart", cartRouter);
 app.route("/api/checkout", checkoutRouter);
+app.route("/api", razorpayRouter); // Mounts /api/create-order & /api/verify-payment
 app.route("/api/custom-requests", customRequestsRouter);
 app.route("/api/customer", customerRouter);
 app.route("/api/admin", adminRouter);

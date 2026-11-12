@@ -66,6 +66,16 @@ export const api = {
     request<any>("/checkout/create-order", { method: "POST", body: JSON.stringify(shippingDetails) }),
   verifyPayment: (paymentDetails: any) =>
     request<any>("/checkout/verify", { method: "POST", body: JSON.stringify(paymentDetails) }),
+  createRazorpayOrder: (data: { amount: number; currency?: string; receipt?: string; notes?: any }) =>
+    request<{ order_id: string; amount: number; currency: string; key_id: string }>("/create-order", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  verifyRazorpayPayment: (data: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) => request<{ success: boolean; message: string }>("/verify-payment", { method: "POST", body: JSON.stringify(data) }),
 
   // Custom 3D Printing Service
   submitCustomRequest: (formData: FormData) =>

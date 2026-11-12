@@ -118,10 +118,15 @@ export function CheckoutPage() {
         navigate(`/order-success/${orderData.orderNumber}`);
       } else {
         // Open Razorpay Standard Checkout Modal
+        const keyId =
+          orderData.razorpayKeyId && orderData.razorpayKeyId !== "rzp_test_placeholder"
+            ? orderData.razorpayKeyId
+            : ((import.meta as any).env?.VITE_RAZORPAY_KEY_ID || "rzp_test_TzPLspqdiriZ2Q");
+
         const options = {
-          key: orderData.razorpayKeyId,
+          key: keyId,
           amount: orderData.amount,
-          currency: orderData.currency,
+          currency: orderData.currency || "INR",
           name: "THE TOYZ DEPT.",
           description: `Order #${orderData.orderNumber}`,
           order_id: orderData.razorpayOrderId,
@@ -133,8 +138,15 @@ export function CheckoutPage() {
           theme: {
             color: "#191919",
           },
+          modal: {
+            ondismiss: () => {
+              setLoading(false);
+              setErrorMsg("Payment cancelled by user. You can try again whenever you're ready.");
+            },
+          },
           handler: async (response: any) => {
             try {
+              setLoading(true);
               await api.verifyPayment({
                 orderId: orderData.orderId,
                 razorpayOrderId: response.razorpay_order_id,
@@ -146,11 +158,18 @@ export function CheckoutPage() {
               navigate(`/order-success/${orderData.orderNumber}`);
             } catch (err: any) {
               setErrorMsg("Payment verification failed: " + err.message);
+            } finally {
+              setLoading(false);
             }
           },
         };
 
         const rzp = new (window as any).Razorpay(options);
+        rzp.on("payment.failed", (response: any) => {
+          setLoading(false);
+          const desc = response.error?.description || "Payment failed or was declined.";
+          setErrorMsg(`Payment Failed: ${desc} (Code: ${response.error?.code || "PAYMENT_ERROR"})`);
+        });
         rzp.open();
       }
     } catch (err: any) {
