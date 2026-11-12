@@ -14,19 +14,21 @@
     {
       "binding": "DB",
       "database_name": "toyz-dept-db",
-      "database_id": "toyz-dept-local-db",
+      "database_id": "f0f2b827-b416-4045-a2c6-ea02b3759763",
       "migrations_dir": "drizzle/migrations"
     }
   ],
+  /*
   "r2_buckets": [
     {
       "binding": "R2_BUCKET",
       "bucket_name": "toyz-dept-assets"
     }
   ],
+  */
   "vars": {
-    "ENVIRONMENT": "development",
-    "SITE_URL": "http://localhost:5173",
+    "ENVIRONMENT": "production",
+    "SITE_URL": "https://thetoyzdept.in",
     "SESSION_SECRET": "the-toyz-dept-dev-session-secret-min-32-chars-long",
     "RAZORPAY_KEY_ID": "",
     "RAZORPAY_KEY_SECRET": "",
