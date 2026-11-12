@@ -62,7 +62,8 @@ async function getFullCart(db: D1Database, cartId: string, couponCode?: string |
 
   const freeThreshold = freeShipSetting ? parseInt(freeShipSetting.value, 10) : 99900;
   const stdRate = stdShipSetting ? parseInt(stdShipSetting.value, 10) : 9900;
-  const shipping = subtotal >= freeThreshold || subtotal === 0 ? 0 : stdRate;
+  // Free shipping for test items (<= ₹5) or orders meeting threshold
+  const shipping = subtotal >= freeThreshold || subtotal === 0 || subtotal <= 500 ? 0 : stdRate;
 
   let discount = 0;
   let appliedCoupon: any = null;

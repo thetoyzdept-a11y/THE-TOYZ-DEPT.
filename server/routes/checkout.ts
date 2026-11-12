@@ -110,10 +110,10 @@ checkoutRouter.post("/create-order", async (c) => {
       });
     }
 
-    // Calculate shipping
+    // Calculate shipping (free shipping on orders over threshold or test items <= ₹5)
     const freeThreshold = 99900;
     const stdShipping = 9900;
-    const shippingCost = subtotal >= freeThreshold ? 0 : stdShipping;
+    const shippingCost = (subtotal >= freeThreshold || subtotal <= 500) ? 0 : stdShipping;
 
     // Calculate coupon discount
     let discountAmount = 0;
