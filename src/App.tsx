@@ -25,7 +25,10 @@ import {
   ContactPage,
   PrivacyPage,
   TermsPage,
-} from "./pages/static/StaticPages";
+  PricingPage,
+  GrievancePage,
+  SampleInvoicePage,
+} from "./pages/static";
 
 function ScrollToTop() {
   const { pathname } = window.location;
@@ -49,6 +52,7 @@ export function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/shop" element={<ShopPage />} />
                 <Route path="/products/:slug" element={<ProductDetailPage />} />
+                <Route path="/product/:slug" element={<ProductDetailPage />} />
                 <Route path="/custom-prints" element={<CustomPrintsPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
@@ -73,10 +77,16 @@ export function App() {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/shipping" element={<ShippingPage />} />
                 <Route path="/returns" element={<ReturnsPage />} />
+                <Route path="/refunds" element={<ReturnsPage />} />
                 <Route path="/refund-policy" element={<ReturnsPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
+                <Route path="/terms-and-conditions" element={<TermsPage />} />
+                <Route path="/grievance-redressal" element={<GrievancePage />} />
+                <Route path="/sample-invoice" element={<SampleInvoicePage />} />
 
                 {/* Fallback */}
                 <Route

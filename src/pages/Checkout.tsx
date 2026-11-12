@@ -397,6 +397,36 @@ export function CheckoutPage() {
                   </div>
                 )}
 
+                {/* Statutory Compliance & Policy Agreement */}
+                <div className="pt-2 border-t border-ink/10 space-y-2 font-mono text-[11px] text-ink/80">
+                  <label className="flex items-start gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      required
+                      defaultChecked={true}
+                      className="mt-0.5"
+                    />
+                    <span>
+                      I have read and agree to the{" "}
+                      <Link to="/terms" target="_blank" className="font-bold underline text-ink hover:text-coral">
+                        Terms of Service
+                      </Link>
+                      ,{" "}
+                      <Link to="/privacy-policy" target="_blank" className="font-bold underline text-ink hover:text-coral">
+                        Privacy Policy
+                      </Link>
+                      , and{" "}
+                      <Link to="/refund-policy" target="_blank" className="font-bold underline text-ink hover:text-coral">
+                        Refund & Cancellation Policy
+                      </Link>
+                      . I understand that articulated products contain small parts and have a 48-hour transit inspection window.
+                    </span>
+                  </label>
+                  <p className="text-[10px] text-ink-muted">
+                    Prices are final in INR (₹). Exempt from GST under Section 22 of the CGST Act.
+                  </p>
+                </div>
+
                 {/* Pay Button */}
                 <button
                   type="submit"

@@ -11,6 +11,7 @@ import { customerRouter } from "./routes/customer";
 import { adminRouter } from "./routes/admin";
 import { razorpayRouter } from "./routes/razorpay";
 import { shippingRouter } from "./routes/shiprocket";
+import { complianceRouter } from "./routes/compliance";
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -67,6 +68,7 @@ app.route("/api/custom-requests", customRequestsRouter);
 app.route("/api/customer", customerRouter);
 app.route("/api/admin", adminRouter);
 app.route("/api/shipping", shippingRouter);
+app.route("/api", complianceRouter); // Mounts /api/contact, /api/grievance, /api/business-profile
 
 // Public R2 Asset Streaming Endpoint
 app.get("/api/assets/:key{.+}", async (c) => {
