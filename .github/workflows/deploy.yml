@@ -26,7 +26,18 @@ jobs:
       - name: Build Frontend
         run: npm run build
 
+      - name: Check Cloudflare Credentials
+        id: check_token
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "::notice ::CLOUDFLARE_API_TOKEN secret is not set in GitHub repository settings. Skipping automatic cloud deploy. Deployments are managed directly via Wrangler."
+            echo "has_token=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy to Cloudflare Workers
+        if: steps.check_token.outputs.has_token == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
