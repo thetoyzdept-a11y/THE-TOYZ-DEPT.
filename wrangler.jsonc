@@ -29,9 +29,6 @@
   "vars": {
     "ENVIRONMENT": "production",
     "SITE_URL": "https://thetoyzdept.in",
-    "SESSION_SECRET": "the-toyz-dept-dev-session-secret-min-32-chars-long",
-    "RAZORPAY_KEY_ID": "",
-    "RAZORPAY_KEY_SECRET": "",
-    "RAZORPAY_WEBHOOK_SECRET": ""
+    "SESSION_SECRET": "the-toyz-dept-dev-session-secret-min-32-chars-long"
   }
 }
