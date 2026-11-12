@@ -244,6 +244,16 @@ export function ShopPage() {
                     >
                       {product.name}
                     </Link>
+
+                    {/* Aesthetic Filament Colorway Swatches */}
+                    <div className="flex items-center gap-1.5 my-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full border border-ink/40 bg-zinc-900 shadow-sm" title="Obsidian Matte Black" />
+                      <span className="w-2.5 h-2.5 rounded-full border border-ink/40 bg-gradient-to-tr from-amber-400 to-emerald-400 shadow-sm" title="Silk Dual-Tone Coextrusion" />
+                      <span className="w-2.5 h-2.5 rounded-full border border-ink/40 bg-lime-400 shadow-sm" title="Signal Neon Lime" />
+                      <span className="w-2.5 h-2.5 rounded-full border border-ink/40 bg-slate-200 shadow-sm" title="Bauhaus Chalk White" />
+                      <span className="w-2.5 h-2.5 rounded-full border border-ink/40 bg-amber-700 shadow-sm" title="Metallic Cast Bronze" />
+                      <span className="text-[9px] font-mono font-bold text-ink-muted uppercase ml-0.5">Editions</span>
+                    </div>
                     <p className="hidden sm:block text-xs text-ink-muted line-clamp-2 mt-1 font-body">
                       {product.short_description || product.description}
                     </p>

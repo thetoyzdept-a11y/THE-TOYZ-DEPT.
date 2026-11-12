@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import type { Env, Variables } from "../types";
-import { requireAdmin } from "../auth";
+import { requireAdmin, hashPassword, verifyPassword } from "../auth";
 
 export const adminRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -203,6 +203,50 @@ adminRouter.put("/products/:id", async (c) => {
         id
       )
       .run();
+
+    // Handle primary image update/insert if provided
+    const imageUrl = body.image || (body.images && body.images.length > 0 ? body.images[0] : null);
+    if (imageUrl) {
+      const existingImg = await c.env.DB
+        .prepare("SELECT id FROM product_images WHERE product_id = ? AND is_primary = 1")
+        .bind(id)
+        .first<{ id: string }>();
+
+      if (existingImg) {
+        await c.env.DB
+          .prepare("UPDATE product_images SET url = ? WHERE id = ?")
+          .bind(imageUrl, existingImg.id)
+          .run();
+      } else {
+        await c.env.DB
+          .prepare("INSERT INTO product_images (id, product_id, url, alt_text, sort_order, is_primary) VALUES (?, ?, ?, ?, 0, 1)")
+          .bind("img_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16), id, imageUrl, body.name || "Product Image")
+          .run();
+      }
+    }
+
+    // Handle stock update if provided
+    if (body.stock !== undefined) {
+      const stockNum = typeof body.stock === "number" ? body.stock : parseInt(body.stock, 10);
+      if (!isNaN(stockNum)) {
+        const existingVar = await c.env.DB
+          .prepare("SELECT id FROM product_variants WHERE product_id = ? LIMIT 1")
+          .bind(id)
+          .first<{ id: string }>();
+
+        if (existingVar) {
+          await c.env.DB
+            .prepare("UPDATE product_variants SET stock = ?, updated_at = datetime('now') WHERE id = ?")
+            .bind(stockNum, existingVar.id)
+            .run();
+        } else {
+          await c.env.DB
+            .prepare("INSERT INTO product_variants (id, product_id, name, sku, price_modifier, stock, is_active) VALUES (?, ?, 'Standard', ?, 0, ?, 1)")
+            .bind("var_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16), id, `${id}-STD`, stockNum)
+            .run();
+        }
+      }
+    }
 
     return c.json({ message: "Product updated successfully" });
   } catch (err: any) {
@@ -544,5 +588,61 @@ adminRouter.get("/compliance-records", async (c) => {
     });
   } catch (err: any) {
     return c.json({ inquiries: [], grievances: [] });
+  }
+});
+
+// ── 10. Security & Admin Password Management ──────────────────────────
+adminRouter.post("/change-password", async (c) => {
+  try {
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const body = await c.req.json();
+    const { currentPassword, newPassword } = body;
+
+    if (!newPassword || newPassword.length < 8) {
+      return c.json({ error: "Validation Failed", message: "New password must be at least 8 characters long." }, 400);
+    }
+
+    const dbUser = await c.env.DB
+      .prepare("SELECT id, password_hash FROM users WHERE id = ?")
+      .bind(user.userId)
+      .first<{ id: string; password_hash: string }>();
+
+    if (!dbUser) {
+      return c.json({ error: "User not found" }, 404);
+    }
+
+    // Verify current password if provided
+    if (currentPassword) {
+      const match = await verifyPassword(currentPassword, dbUser.password_hash);
+      if (!match) {
+        return c.json({ error: "Unauthorized", message: "Current password does not match." }, 401);
+      }
+    }
+
+    const newHash = await hashPassword(newPassword);
+
+    await c.env.DB
+      .prepare("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?")
+      .bind(newHash, user.userId)
+      .run();
+
+    return c.json({ message: "Admin password updated successfully. Next sign in will require your new credentials." });
+  } catch (err: any) {
+    return c.json({ error: "Server Error", message: err.message }, 500);
+  }
+});
+
+adminRouter.get("/accounts", async (c) => {
+  try {
+    const admins = await c.env.DB
+      .prepare("SELECT id, email, first_name, last_name, phone, role, created_at FROM users WHERE role = 'admin' ORDER BY created_at ASC")
+      .all();
+    return c.json({ admins: admins.results || [] });
+  } catch (err: any) {
+    return c.json({ admins: [] });
   }
 });

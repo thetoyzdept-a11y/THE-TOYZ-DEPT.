@@ -30,7 +30,41 @@ import {
   Check,
   Phone,
   MapPin,
+  Camera,
+  Upload,
+  Lock,
+  Key,
+  ShieldCheck,
+  EyeOff,
+  Palette,
+  Image as ImageIcon,
 } from "lucide-react";
+
+export const STUDIO_PHOTO_PRESETS = [
+  { name: "Cyber Dragon", url: "/images/products/dragon-1.jpg" },
+  { name: "Flexi Rex", url: "/images/products/rex-1.jpg" },
+  { name: "Crystal Serpent", url: "/images/products/serpent-1.jpg" },
+  { name: "Concrete Planter", url: "/images/products/planter-1.jpg" },
+  { name: "Cable Dock", url: "/images/products/dock-1.jpg" },
+  { name: "Headphone Stand", url: "/images/products/stand-1.jpg" },
+  { name: "Gear Cube", url: "/images/products/cube-1.jpg" },
+  { name: "Geometric Wolf", url: "/images/products/wolf-1.jpg" },
+  { name: "Bauhaus Caddy", url: "/images/products/caddy-1.jpg" },
+  { name: "Magnetic Mounts", url: "/images/products/mount-1.jpg" },
+  { name: "Test Token (₹1)", url: "/images/products/token-1.jpg" },
+  { name: "Tactile Keychain (₹5)", url: "/images/products/keychain-1.jpg" },
+];
+
+export const CURATED_FILAMENT_COLORS = [
+  { name: "Obsidian Matte Black", hex: "#18181B" },
+  { name: "Dual-Tone Silk Cyber", hex: "#F59E0B" },
+  { name: "Signal Neon Lime", hex: "#D4FF00" },
+  { name: "Industrial Concrete Slate", hex: "#64748B" },
+  { name: "Bauhaus Chalk White", hex: "#F8FAFC" },
+  { name: "Safety Cyber Orange", hex: "#FF5522" },
+  { name: "Metallic Cast Bronze", hex: "#92400E" },
+  { name: "Iridescent Silk Violet", hex: "#A855F7" },
+];
 
 export function AdminDashboardPage() {
   const { user, isAdmin, logout } = useAuth();
@@ -38,7 +72,7 @@ export function AdminDashboardPage() {
 
   // Active Admin Module
   const [activeModule, setActiveModule] = useState<
-    "overview" | "products" | "orders" | "custom" | "inventory" | "customers" | "settings" | "inquiries"
+    "overview" | "products" | "orders" | "custom" | "inventory" | "customers" | "settings" | "inquiries" | "security"
   >("overview");
 
   // State data
@@ -52,6 +86,7 @@ export function AdminDashboardPage() {
   const [storeSettings, setStoreSettings] = useState<Record<string, string>>({});
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [grievances, setGrievances] = useState<any[]>([]);
+  const [adminAccounts, setAdminAccounts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Search & Filter
@@ -68,6 +103,9 @@ export function AdminDashboardPage() {
   const [editPrice, setEditPrice] = useState("");
   const [editStock, setEditStock] = useState("");
   const [editStatus, setEditStatus] = useState("active");
+  const [editImage, setEditImage] = useState("");
+  const [editColor, setEditColor] = useState("");
+  const [showEditPresetsPicker, setShowEditPresetsPicker] = useState(false);
 
   // Modal & Edit States
   const [showCreateProductModal, setShowCreateProductModal] = useState(false);
@@ -78,6 +116,19 @@ export function AdminDashboardPage() {
   const [newProdMaterial, setNewProdMaterial] = useState("PLA+ (Standard)");
   const [newProdDesc, setNewProdDesc] = useState("");
   const [newProdStatus, setNewProdStatus] = useState<"draft" | "active">("active");
+  const [newProdImage, setNewProdImage] = useState("");
+  const [newProdColor, setNewProdColor] = useState("Obsidian Matte Black");
+  const [newProdStock, setNewProdStock] = useState("25");
+  const [showCreatePresetsPicker, setShowCreatePresetsPicker] = useState(false);
+
+  // Admin Password Management State
+  const [currentAdminPass, setCurrentAdminPass] = useState("");
+  const [newAdminPass, setNewAdminPass] = useState("");
+  const [confirmAdminPass, setConfirmAdminPass] = useState("");
+  const [showPassToggles, setShowPassToggles] = useState({ current: false, new: false, confirm: false });
+  const [passChanging, setPassChanging] = useState(false);
+  const [passChangeSuccess, setPassChangeSuccess] = useState("");
+  const [passChangeError, setPassChangeError] = useState("");
 
   // Quotation Preparation State
   const [selectedRequestForQuote, setSelectedRequestForQuote] = useState<any>(null);
@@ -107,10 +158,25 @@ export function AdminDashboardPage() {
     }
   };
 
+  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>, target: "create" | "edit") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (target === "create") {
+        setNewProdImage(dataUrl);
+      } else {
+        setEditImage(dataUrl);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
-      const [overviewRes, prodRes, ordRes, custReqRes, invRes, custRes, setRes, compRes] = await Promise.all([
+      const [overviewRes, prodRes, ordRes, custReqRes, invRes, custRes, setRes, compRes, acctRes] = await Promise.all([
         api.getAdminOverview(),
         api.getAdminProducts(),
         api.getAdminOrders(),
@@ -119,6 +185,7 @@ export function AdminDashboardPage() {
         api.getAdminCustomers(),
         api.getAdminSettings(),
         api.getAdminComplianceRecords().catch(() => ({ inquiries: [], grievances: [] })),
+        api.getAdminAccounts().catch(() => ({ admins: [] })),
       ]);
 
       setMetrics(overviewRes.metrics);
@@ -131,6 +198,7 @@ export function AdminDashboardPage() {
       setStoreSettings(setRes.settings || {});
       setInquiries(compRes.inquiries || []);
       setGrievances(compRes.grievances || []);
+      setAdminAccounts(acctRes.admins || []);
     } catch (err) {
       console.error("Admin data load error", err);
     } finally {
@@ -162,10 +230,12 @@ export function AdminDashboardPage() {
         slug: quickEditProduct.slug,
         basePrice: pricePaise,
         categoryId: quickEditProduct.category_id,
-        material: quickEditProduct.material,
+        material: editColor || quickEditProduct.material,
         description: quickEditProduct.description,
         status: editStatus,
         isFeatured: quickEditProduct.is_featured,
+        image: editImage || undefined,
+        stock: !isNaN(stockNum) ? stockNum : undefined,
       });
 
       const invRow = inventory.find((i) => i.product_id === quickEditProduct.id);
@@ -175,9 +245,40 @@ export function AdminDashboardPage() {
 
       setQuickEditProduct(null);
       await loadAllAdminData();
-      alert("Product details updated successfully!");
+      alert("Product details, photo, and inventory updated successfully!");
     } catch (err: any) {
       alert("Failed to update product: " + err.message);
+    }
+  };
+
+  const handleChangeAdminPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPassChangeError("");
+    setPassChangeSuccess("");
+
+    if (newAdminPass.length < 8) {
+      setPassChangeError("New password must be at least 8 characters long.");
+      return;
+    }
+    if (newAdminPass !== confirmAdminPass) {
+      setPassChangeError("New password and confirm password do not match.");
+      return;
+    }
+
+    setPassChanging(true);
+    try {
+      const res = await api.changeAdminPassword({
+        currentPassword: currentAdminPass || undefined,
+        newPassword: newAdminPass,
+      });
+      setPassChangeSuccess(res.message || "Admin password successfully updated!");
+      setCurrentAdminPass("");
+      setNewAdminPass("");
+      setConfirmAdminPass("");
+    } catch (err: any) {
+      setPassChangeError(err.message || "Failed to update admin password.");
+    } finally {
+      setPassChanging(false);
     }
   };
 
@@ -193,19 +294,34 @@ export function AdminDashboardPage() {
     e.preventDefault();
     try {
       const basePricePaise = Math.round(parseFloat(newProdPrice) * 100);
+      const stockUnits = parseInt(newProdStock, 10) || 10;
       await api.createAdminProduct({
         name: newProdName,
         slug: newProdSlug.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
         basePrice: basePricePaise,
         categoryId: newProdCategory,
-        material: newProdMaterial,
+        material: newProdColor ? `${newProdMaterial} (${newProdColor})` : newProdMaterial,
         description: newProdDesc,
         status: newProdStatus,
         isFeatured: true,
+        images: newProdImage ? [newProdImage] : [],
+        variants: [
+          {
+            name: newProdColor || "Standard Edition",
+            color: newProdColor,
+            stock: stockUnits,
+            priceModifier: 0,
+          },
+        ],
       });
       setShowCreateProductModal(false);
+      setNewProdName("");
+      setNewProdSlug("");
+      setNewProdPrice("");
+      setNewProdDesc("");
+      setNewProdImage("");
       await loadAllAdminData();
-      alert("Product created successfully!");
+      alert("Product created successfully with photo and initial stock in D1!");
     } catch (err: any) {
       alert(err.message || "Product creation failed");
     }
@@ -319,6 +435,7 @@ export function AdminDashboardPage() {
             { id: "custom", label: `3D Requests (${customRequests.length})`, icon: FileCode },
             { id: "inventory", label: "Inventory & Stock", icon: Sliders },
             { id: "inquiries", label: `Inquiries (${inquiries.length + grievances.length})`, icon: Mail },
+            { id: "security", label: "Security & Passwords", icon: ShieldCheck },
             { id: "customers", label: `Customers (${customers.length})`, icon: Users },
             { id: "settings", label: "Store Settings", icon: Settings },
           ].map((tab) => {
@@ -510,6 +627,22 @@ export function AdminDashboardPage() {
                         <div>
                           <p className="font-display font-bold text-sm uppercase">{p.name}</p>
                           <p className="text-[10px] text-ink-muted">{p.slug}</p>
+                          {!p.primary_image && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setQuickEditProduct(p);
+                                setEditPrice(String(p.base_price / 100));
+                                setEditStock(String(p.total_stock || 0));
+                                setEditStatus(p.status || "active");
+                                setEditImage("");
+                                setEditColor(p.material || "Obsidian Matte Black");
+                              }}
+                              className="mt-1 px-1.5 py-0.5 bg-lime text-ink text-[9px] font-bold uppercase border border-ink shadow-brutal-sm hover:bg-lime-light inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <Camera className="w-2.5 h-2.5" /> + Add Photo
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td className="p-3 uppercase">{p.category_name}</td>
@@ -534,6 +667,8 @@ export function AdminDashboardPage() {
                               setEditPrice(String(p.base_price / 100));
                               setEditStock(String(p.total_stock || 0));
                               setEditStatus(p.status || "active");
+                              setEditImage(p.primary_image || "");
+                              setEditColor(p.material || "Obsidian Matte Black");
                             }}
                             className="px-2 py-1 bg-ink text-cream hover:bg-lime hover:text-ink uppercase font-bold text-[10px] inline-flex items-center gap-1 border border-ink"
                           >
@@ -1023,6 +1158,167 @@ export function AdminDashboardPage() {
           </div>
         )}
 
+        {/* ── MODULE 9: SECURITY & ADMIN PASSWORDS ───────────────────────── */}
+        {activeModule === "security" && (
+          <div className="space-y-6 font-mono">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-ink gap-2">
+              <div>
+                <h2 className="font-display font-black text-2xl uppercase">
+                  Security, Passwords & Access Control
+                </h2>
+                <p className="font-mono text-xs text-ink-muted uppercase">
+                  Manage master admin credentials, audit authorized personnel & inspect cryptographic policy
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Card 1: Change Admin Password */}
+              <div className="card-brutal bg-cream-light p-6 space-y-4">
+                <div className="border-b border-ink/15 pb-2 flex items-center justify-between">
+                  <h3 className="font-display font-black text-base uppercase flex items-center gap-2">
+                    <Key className="w-4 h-4 text-coral" /> Master Admin Password
+                  </h3>
+                  <span className="badge-lime text-[10px] uppercase">PBKDF2 SHA-256</span>
+                </div>
+
+                <p className="text-xs text-ink-muted">
+                  Update the password for your administrator profile (<strong>{user?.email}</strong>). Requires at least 8 characters.
+                </p>
+
+                {passChangeSuccess && (
+                  <div className="p-3 bg-lime/30 border-2 border-ink text-ink font-bold text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-lime-darker flex-shrink-0" />
+                    {passChangeSuccess}
+                  </div>
+                )}
+
+                {passChangeError && (
+                  <div className="p-3 bg-coral/20 border-2 border-coral text-coral-dark font-bold text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    {passChangeError}
+                  </div>
+                )}
+
+                <form onSubmit={handleChangeAdminPassword} className="space-y-3 text-xs">
+                  <div>
+                    <label className="block font-bold uppercase mb-1">Current Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassToggles.current ? "text" : "password"}
+                        value={currentAdminPass}
+                        onChange={(e) => setCurrentAdminPass(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-cream border-2 border-ink p-2.5 pr-9 text-xs font-bold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassToggles({ ...showPassToggles, current: !showPassToggles.current })}
+                        className="absolute right-2.5 top-2.5 text-ink-muted hover:text-ink cursor-pointer"
+                      >
+                        {showPassToggles.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold uppercase mb-1">New Strong Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassToggles.new ? "text" : "password"}
+                        value={newAdminPass}
+                        onChange={(e) => setNewAdminPass(e.target.value)}
+                        placeholder="Min 8 characters (letters + numbers)"
+                        required
+                        minLength={8}
+                        className="w-full bg-cream border-2 border-ink p-2.5 pr-9 text-xs font-bold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassToggles({ ...showPassToggles, new: !showPassToggles.new })}
+                        className="absolute right-2.5 top-2.5 text-ink-muted hover:text-ink cursor-pointer"
+                      >
+                        {showPassToggles.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold uppercase mb-1">Confirm New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassToggles.confirm ? "text" : "password"}
+                        value={confirmAdminPass}
+                        onChange={(e) => setConfirmAdminPass(e.target.value)}
+                        placeholder="Retype new password"
+                        required
+                        minLength={8}
+                        className="w-full bg-cream border-2 border-ink p-2.5 pr-9 text-xs font-bold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassToggles({ ...showPassToggles, confirm: !showPassToggles.confirm })}
+                        className="absolute right-2.5 top-2.5 text-ink-muted hover:text-ink cursor-pointer"
+                      >
+                        {showPassToggles.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={passChanging}
+                    className="btn-primary w-full py-2.5 text-xs uppercase flex items-center justify-center gap-2 mt-2"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    {passChanging ? "Updating Security..." : "Apply New Admin Password"}
+                  </button>
+                </form>
+              </div>
+
+              {/* Card 2: Authorized Admin Personnel & Sessions */}
+              <div className="space-y-6">
+                <div className="card-brutal bg-cream-light p-6 space-y-4">
+                  <div className="border-b border-ink/15 pb-2 flex items-center justify-between">
+                    <h3 className="font-display font-black text-base uppercase flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-lime-darker" /> Authorized Administrators
+                    </h3>
+                    <span className="badge-coral text-[10px]">{adminAccounts.length} Admins</span>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    {adminAccounts.map((adm: any) => (
+                      <div key={adm.id} className="p-3 bg-cream border border-ink flex items-center justify-between">
+                        <div>
+                          <p className="font-bold text-ink uppercase">{adm.first_name} {adm.last_name || ""}</p>
+                          <p className="text-[11px] text-ink-muted">{adm.email}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="px-2 py-0.5 bg-lime text-ink text-[10px] font-bold uppercase border border-ink">
+                            {adm.role}
+                          </span>
+                          <p className="text-[9px] text-ink-muted mt-1">Verified Admin</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="card-brutal bg-cream-light p-6 space-y-3 text-xs">
+                  <h3 className="font-display font-black text-base uppercase border-b border-ink/15 pb-2">
+                    Security Protocols & IT Act Compliance
+                  </h3>
+                  <div className="space-y-1.5 text-ink-muted text-[11px]">
+                    <p>• <strong>Password Hashing:</strong> PBKDF2 with HMAC-SHA256 and 100,000 derive iterations with cryptographically random salt per record.</p>
+                    <p>• <strong>Cookie Policy:</strong> Strict HttpOnly, SameSite=Lax session token cookies signed with HMAC-SHA256.</p>
+                    <p>• <strong>Statutory Compliance:</strong> Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── MODAL: PREPARE 3D QUOTATION ─────────────────────────────── */}
         {selectedRequestForQuote && (
           <div className="fixed inset-0 z-50 bg-ink/75 flex items-center justify-center p-4">
@@ -1265,6 +1561,120 @@ export function AdminDashboardPage() {
                   </div>
                 </div>
 
+                {/* ── PHOTO UPLOAD & PRESET SECTION ── */}
+                <div className="p-3 bg-cream border-2 border-ink space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold uppercase text-ink flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-lime-darker" /> Primary Object Photo
+                    </label>
+                    {newProdImage && (
+                      <button
+                        type="button"
+                        onClick={() => setNewProdImage("")}
+                        className="text-[10px] text-coral hover:underline font-bold uppercase"
+                      >
+                        Clear Photo
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 bg-cream-light border-2 border-ink overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      <img
+                        src={newProdImage || "/images/placeholder-product.svg"}
+                        alt="Object drop preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-1.5">
+                      <div className="flex gap-2">
+                        <label className="flex-1 py-1.5 px-2 bg-ink text-cream hover:bg-lime hover:text-ink border border-ink text-center cursor-pointer font-bold text-[10px] uppercase flex items-center justify-center gap-1 transition-all">
+                          <Upload className="w-3 h-3" /> Upload Device File
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageFileUpload(e, "create")}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowCreatePresetsPicker(!showCreatePresetsPicker)}
+                          className="py-1.5 px-2 bg-cream-dark border border-ink text-ink font-bold text-[10px] uppercase hover:bg-lime flex items-center gap-1"
+                        >
+                          <ImageIcon className="w-3 h-3" /> Studio Presets
+                        </button>
+                      </div>
+
+                      <input
+                        type="text"
+                        value={newProdImage}
+                        onChange={(e) => setNewProdImage(e.target.value)}
+                        placeholder="Or paste image URL (e.g. /images/products/dragon-1.jpg)"
+                        className="w-full bg-cream-light border border-ink p-1.5 text-[10px]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Studio Presets Drawer */}
+                  {showCreatePresetsPicker && (
+                    <div className="p-2 bg-cream-light border border-ink space-y-1.5 mt-2">
+                      <p className="text-[10px] uppercase font-bold text-ink-muted">
+                        Select Photorealistic Studio Asset:
+                      </p>
+                      <div className="grid grid-cols-4 gap-1.5 max-h-36 overflow-y-auto">
+                        {STUDIO_PHOTO_PRESETS.map((pst) => (
+                          <button
+                            key={pst.url}
+                            type="button"
+                            onClick={() => {
+                              setNewProdImage(pst.url);
+                              setShowCreatePresetsPicker(false);
+                            }}
+                            className={`p-1 border text-center transition-all ${
+                              newProdImage === pst.url ? "border-ink bg-lime shadow-sm" : "border-ink/30 hover:border-ink bg-cream"
+                            }`}
+                          >
+                            <img src={pst.url} alt={pst.name} className="w-full aspect-square object-cover mb-1 border border-ink/20" />
+                            <span className="block text-[8px] font-bold truncate">{pst.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* ── COLOR FINISH & INITIAL STOCK ── */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block font-bold uppercase mb-1 flex items-center gap-1">
+                      <Palette className="w-3 h-3" /> Color Finish
+                    </label>
+                    <select
+                      value={newProdColor}
+                      onChange={(e) => setNewProdColor(e.target.value)}
+                      className="w-full bg-cream-light border-2 border-ink p-2 font-bold uppercase text-[10px]"
+                    >
+                      {CURATED_FILAMENT_COLORS.map((col) => (
+                        <option key={col.name} value={col.name}>
+                          {col.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold uppercase mb-1">Stock on Hand (Units)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={newProdStock}
+                      onChange={(e) => setNewProdStock(e.target.value)}
+                      placeholder="25"
+                      className="w-full bg-cream-light border-2 border-ink p-2 font-bold"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block font-bold uppercase mb-1">Description</label>
                   <textarea
@@ -1438,6 +1848,89 @@ export function AdminDashboardPage() {
               </div>
 
               <form onSubmit={handleQuickEditSave} className="space-y-4">
+                {/* ── PHOTO UPLOAD & PRESET SECTION IN QUICK EDIT ── */}
+                <div className="p-3 bg-cream border-2 border-ink space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold uppercase text-ink flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-lime-darker" /> Product Photo
+                    </label>
+                    {editImage && (
+                      <button
+                        type="button"
+                        onClick={() => setEditImage("")}
+                        className="text-[10px] text-coral hover:underline font-bold uppercase"
+                      >
+                        Clear Photo
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 bg-cream-light border-2 border-ink overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      <img
+                        src={editImage || "/images/placeholder-product.svg"}
+                        alt={quickEditProduct.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-1.5">
+                      <div className="flex gap-2">
+                        <label className="flex-1 py-1.5 px-2 bg-ink text-cream hover:bg-lime hover:text-ink border border-ink text-center cursor-pointer font-bold text-[10px] uppercase flex items-center justify-center gap-1 transition-all">
+                          <Upload className="w-3 h-3" /> Upload File
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageFileUpload(e, "edit")}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowEditPresetsPicker(!showEditPresetsPicker)}
+                          className="py-1.5 px-2 bg-cream-dark border border-ink text-ink font-bold text-[10px] uppercase hover:bg-lime flex items-center gap-1"
+                        >
+                          <ImageIcon className="w-3 h-3" /> Studio Presets
+                        </button>
+                      </div>
+
+                      <input
+                        type="text"
+                        value={editImage}
+                        onChange={(e) => setEditImage(e.target.value)}
+                        placeholder="Or paste image URL"
+                        className="w-full bg-cream-light border border-ink p-1.5 text-[10px]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Studio Presets Drawer in Edit */}
+                  {showEditPresetsPicker && (
+                    <div className="p-2 bg-cream-light border border-ink space-y-1.5 mt-2">
+                      <p className="text-[10px] uppercase font-bold text-ink-muted">
+                        Select Photorealistic Studio Asset:
+                      </p>
+                      <div className="grid grid-cols-4 gap-1.5 max-h-36 overflow-y-auto">
+                        {STUDIO_PHOTO_PRESETS.map((pst) => (
+                          <button
+                            key={pst.url}
+                            type="button"
+                            onClick={() => {
+                              setEditImage(pst.url);
+                              setShowEditPresetsPicker(false);
+                            }}
+                            className={`p-1 border text-center transition-all ${
+                              editImage === pst.url ? "border-ink bg-lime shadow-sm" : "border-ink/30 hover:border-ink bg-cream"
+                            }`}
+                          >
+                            <img src={pst.url} alt={pst.name} className="w-full aspect-square object-cover mb-1 border border-ink/20" />
+                            <span className="block text-[8px] font-bold truncate">{pst.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <label className="block font-bold uppercase mb-1">Base Price in INR (₹)</label>
                   <input

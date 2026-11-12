@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#191919" stroke-width="0.5" stroke-opacity="0.08"/>
+    </pattern>
+  </defs>
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#F5F1E8" />
+  <rect width="100%" height="100%" fill="url(#grid)" />
+  
+  <!-- Outer Technical Border -->
+  <rect x="12" y="12" width="376" height="376" fill="none" stroke="#191919" stroke-width="2"/>
+  
+  <!-- Corner Marks -->
+  <path d="M 12 32 L 32 32 L 32 12" fill="none" stroke="#191919" stroke-width="2"/>
+  <path d="M 388 32 L 368 32 L 368 12" fill="none" stroke="#191919" stroke-width="2"/>
+  <path d="M 12 368 L 32 368 L 32 388" fill="none" stroke="#191919" stroke-width="2"/>
+  <path d="M 388 368 L 368 368 L 368 388" fill="none" stroke="#191919" stroke-width="2"/>
+
+  <!-- Center Isometric 3D Cube Icon -->
+  <g transform="translate(200, 185)">
+    <!-- Top Face -->
+    <polygon points="0,-70 60,-35 0,0 -60,-35" fill="#D9FF43" stroke="#191919" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Left Face with FDM Layer Lines -->
+    <polygon points="-60,-35 0,0 0,70 -60,35" fill="#E5E0D5" stroke="#191919" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="-50" y1="-15" x2="0" y2="15" stroke="#191919" stroke-width="1.5" stroke-opacity="0.3"/>
+    <line x1="-50" y1="5" x2="0" y2="35" stroke="#191919" stroke-width="1.5" stroke-opacity="0.3"/>
+    <line x1="-50" y1="25" x2="0" y2="55" stroke="#191919" stroke-width="1.5" stroke-opacity="0.3"/>
+    <!-- Right Face -->
+    <polygon points="0,0 60,-35 60,35 0,70" fill="#191919" stroke="#191919" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Nozzle Extruder Indicator -->
+    <circle cx="0" cy="-70" r="4" fill="#FF694B" stroke="#191919" stroke-width="2"/>
+  </g>
+
+  <!-- Monospace Technical Labels -->
+  <text x="200" y="295" font-family="monospace" font-size="12" font-weight="900" fill="#191919" text-anchor="middle" letter-spacing="2">OBJECT PREVIEW PENDING</text>
+  <text x="200" y="315" font-family="monospace" font-size="10" font-weight="600" fill="#71717A" text-anchor="middle" letter-spacing="1">THE TOYZ DEPT. // 0.12MM FDM CAD</text>
+
+  <!-- Status Chip -->
+  <g transform="translate(140, 40)">
+    <rect width="120" height="20" fill="#191919" />
+    <text x="60" y="14" font-family="monospace" font-size="9" font-weight="700" fill="#D9FF43" text-anchor="middle" letter-spacing="1">PHOTO UNASSIGNED</text>
+  </g>
+</svg>

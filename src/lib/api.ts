@@ -37,6 +37,7 @@ export const api = {
   getMe: () => request<{ user: any }>("/auth/me"),
   register: (data: any) => request<any>("/auth/register", { method: "POST", body: JSON.stringify(data) }),
   login: (data: any) => request<any>("/auth/login", { method: "POST", body: JSON.stringify(data) }),
+  loginGoogle: (data: any) => request<any>("/auth/google", { method: "POST", body: JSON.stringify(data) }),
   logout: () => request<any>("/auth/logout", { method: "POST" }),
 
   // Products & Categories
@@ -121,6 +122,9 @@ export const api = {
   saveAdminSettings: (data: Record<string, string>) =>
     request<any>("/admin/settings", { method: "POST", body: JSON.stringify(data) }),
   getAdminComplianceRecords: () => request<{ inquiries: any[]; grievances: any[] }>("/admin/compliance-records"),
+  changeAdminPassword: (data: { currentPassword?: string; newPassword: string }) =>
+    request<any>("/admin/change-password", { method: "POST", body: JSON.stringify(data) }),
+  getAdminAccounts: () => request<{ admins: any[] }>("/admin/accounts"),
 
   // Shiprocket Shipping & Tracking
   checkShippingServiceability: (pincode: string) =>

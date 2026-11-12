@@ -15,6 +15,7 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   login: (credentials: any) => Promise<void>;
+  loginGoogle: (data: any) => Promise<void>;
   register: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -46,6 +47,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(res.user);
   };
 
+  const loginGoogle = async (data: any) => {
+    const res = await api.loginGoogle(data);
+    setUser(res.user);
+  };
+
   const register = async (data: any) => {
     const res = await api.register(data);
     setUser(res.user);
@@ -63,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         isAdmin: user?.role === "admin",
         login,
+        loginGoogle,
         register,
         logout,
         refreshUser,
