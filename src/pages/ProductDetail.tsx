@@ -32,6 +32,25 @@ export function ProductDetailPage() {
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
+  // Shiprocket Pincode Check State
+  const [deliveryPincode, setDeliveryPincode] = useState("");
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeResult, setPincodeResult] = useState<any>(null);
+
+  const handleCheckPincode = async () => {
+    if (deliveryPincode.length !== 6) return;
+    setPincodeLoading(true);
+    setPincodeResult(null);
+    try {
+      const res = await api.checkShippingServiceability(deliveryPincode);
+      setPincodeResult(res);
+    } catch {
+      setPincodeResult({ available: false, message: "Could not verify delivery right now" });
+    } finally {
+      setPincodeLoading(false);
+    }
+  };
+
   const { addToCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -370,6 +389,49 @@ export function ProductDetailPage() {
               >
                 Instant Buy Now <ArrowRight className="w-4 h-4" />
               </button>
+            </div>
+
+            {/* Live Shiprocket Pincode Serviceability */}
+            <div className="card-brutal p-3.5 bg-cream-light border-2 border-ink text-xs font-mono">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold uppercase text-[11px] text-ink flex items-center gap-1.5">
+                  <Truck className="w-3.5 h-3.5 text-lime-darker" /> Check Express Courier Delivery
+                </span>
+                <span className="text-[10px] text-ink-muted">Shiprocket Network</span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={deliveryPincode}
+                  onChange={(e) => setDeliveryPincode(e.target.value.replace(/[^0-9]/g, ""))}
+                  placeholder="Enter 6-digit PIN (e.g. 560038)"
+                  className="flex-1 bg-cream border-2 border-ink px-3 py-1.5 text-xs font-mono font-bold uppercase focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleCheckPincode}
+                  disabled={pincodeLoading || deliveryPincode.length !== 6}
+                  className="btn-dark py-1.5 px-4 text-[11px] uppercase font-mono disabled:opacity-40"
+                >
+                  {pincodeLoading ? "Checking..." : "Check"}
+                </button>
+              </div>
+              {pincodeResult && (
+                <div className="mt-2.5 pt-2 border-t border-ink/20 text-xs">
+                  {pincodeResult.available ? (
+                    <p className="text-lime-darker font-bold flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-lime-darker" />
+                      Serviceable! Est. {pincodeResult.recommendedCourier?.estimatedDeliveryDays || "2-3"} Days delivery via {pincodeResult.recommendedCourier?.courierName || "Bluedart / Delhivery"}
+                    </p>
+                  ) : (
+                    <p className="text-coral font-bold flex items-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-coral" />
+                      {pincodeResult.message || "Pincode not currently serviceable."}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Technical Specifications Table */}

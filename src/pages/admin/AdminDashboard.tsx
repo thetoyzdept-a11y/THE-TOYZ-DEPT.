@@ -67,6 +67,21 @@ export function AdminDashboardPage() {
   const [newStatus, setNewStatus] = useState("");
   const [statusTrackingNum, setStatusTrackingNum] = useState("");
   const [statusNote, setStatusNote] = useState("");
+  const [shiprocketLoading, setShiprocketLoading] = useState<string | null>(null);
+
+  const handleShiprocketDispatch = async (orderId: string) => {
+    try {
+      setShiprocketLoading(orderId);
+      const res = await api.createShiprocketShipment(orderId);
+      alert(`Success! Created Shiprocket shipment #${res.shipmentId}.\nCourier: ${res.courierName}\nAWB: ${res.awbCode}`);
+      await loadAllAdminData();
+      setSelectedOrderForStatus(null);
+    } catch (err: any) {
+      alert("Shiprocket Error: " + err.message);
+    } finally {
+      setShiprocketLoading(null);
+    }
+  };
 
   const loadAllAdminData = async () => {
     setLoading(true);
@@ -461,16 +476,30 @@ export function AdminDashboardPage() {
                         {ord.tracking_number || "—"}
                       </td>
                       <td className="p-3 text-right">
-                        <button
-                          onClick={() => {
-                            setSelectedOrderForStatus(ord);
-                            setNewStatus(ord.status);
-                            setStatusTrackingNum(ord.tracking_number || "");
-                          }}
-                          className="px-2.5 py-1 bg-ink text-cream hover:bg-lime hover:text-ink text-[10px] uppercase font-bold border border-ink"
-                        >
-                          Lifecycle
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleShiprocketDispatch(ord.id)}
+                            disabled={shiprocketLoading === ord.id || !!ord.tracking_number}
+                            title={ord.tracking_number ? `AWB: ${ord.tracking_number}` : "Push order to Shiprocket"}
+                            className={`px-2 py-1 text-[10px] uppercase font-mono font-bold border border-ink transition-all ${
+                              ord.tracking_number
+                                ? "bg-lime/20 text-ink/50 cursor-default"
+                                : "bg-lime text-ink hover:bg-ink hover:text-lime"
+                            }`}
+                          >
+                            {shiprocketLoading === ord.id ? "Shipping..." : ord.tracking_number ? "AWB Active" : "Shiprocket"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedOrderForStatus(ord);
+                              setNewStatus(ord.status);
+                              setStatusTrackingNum(ord.tracking_number || "");
+                            }}
+                            className="px-2.5 py-1 bg-ink text-cream hover:bg-lime hover:text-ink text-[10px] uppercase font-bold border border-ink"
+                          >
+                            Lifecycle
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -864,6 +893,29 @@ export function AdminDashboardPage() {
                     placeholder="e.g. Sliced on PEI sheet 0.12mm"
                     className="w-full bg-cream-light border-2 border-ink p-2"
                   />
+                </div>
+
+                {/* Shiprocket Automated Dispatch Option */}
+                <div className="p-3 bg-lime/20 border-2 border-ink space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[11px] uppercase">Shiprocket Integration</span>
+                    <span className="text-[10px] font-mono text-ink-muted">Auto-AWB</span>
+                  </div>
+                  <p className="text-[10px] text-ink-muted">
+                    Automatically create order in Shiprocket, assign courier (Bluedart/Delhivery), generate live AWB & update order to Shipped.
+                  </p>
+                  <button
+                    type="button"
+                    disabled={shiprocketLoading === selectedOrderForStatus.id || !!selectedOrderForStatus.tracking_number}
+                    onClick={() => handleShiprocketDispatch(selectedOrderForStatus.id)}
+                    className="btn-dark w-full py-1.5 text-[10px] font-mono tracking-wider uppercase disabled:opacity-40"
+                  >
+                    {shiprocketLoading === selectedOrderForStatus.id
+                      ? "Contacting Shiprocket..."
+                      : selectedOrderForStatus.tracking_number
+                      ? `AWB Active (${selectedOrderForStatus.tracking_number})`
+                      : "🚀 Dispatch via Shiprocket"}
+                  </button>
                 </div>
 
                 <div className="flex gap-2 pt-2 border-t border-ink/20">

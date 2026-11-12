@@ -120,4 +120,12 @@ export const api = {
   getAdminSettings: () => request<{ settings: Record<string, string> }>("/admin/settings"),
   saveAdminSettings: (data: Record<string, string>) =>
     request<any>("/admin/settings", { method: "POST", body: JSON.stringify(data) }),
+
+  // Shiprocket Shipping & Tracking
+  checkShippingServiceability: (pincode: string) =>
+    request<any>(`/shipping/serviceability?pincode=${encodeURIComponent(pincode)}`),
+  createShiprocketShipment: (orderId: string) =>
+    request<any>(`/shipping/create-shipment/${orderId}`, { method: "POST" }),
+  trackShiprocketAwb: (awb: string) =>
+    request<any>(`/shipping/track/${encodeURIComponent(awb)}`),
 };

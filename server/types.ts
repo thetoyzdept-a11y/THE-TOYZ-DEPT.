@@ -9,6 +9,9 @@ export interface Env {
   RAZORPAY_KEY_ID?: string;
   RAZORPAY_KEY_SECRET?: string;
   RAZORPAY_WEBHOOK_SECRET?: string;
+  SHIPROCKET_EMAIL?: string;
+  SHIPROCKET_PASSWORD?: string;
+  SHIPROCKET_PICKUP_LOCATION?: string;
   ASSETS?: Fetcher;
 }
 
