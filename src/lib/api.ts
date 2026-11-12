@@ -125,6 +125,20 @@ export const api = {
   changeAdminPassword: (data: { currentPassword?: string; newPassword: string }) =>
     request<any>("/admin/change-password", { method: "POST", body: JSON.stringify(data) }),
   getAdminAccounts: () => request<{ admins: any[] }>("/admin/accounts"),
+  uploadAdminAsset: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/admin/upload", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const err = (await res.json().catch(() => ({}))) as any;
+      throw new Error(err.message || "Failed to upload file to R2");
+    }
+    return (await res.json()) as { url: string; key: string; name: string; size: number };
+  },
 
   // Shiprocket Shipping & Tracking
   checkShippingServiceability: (pincode: string) =>

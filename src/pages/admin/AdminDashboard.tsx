@@ -158,9 +158,13 @@ export function AdminDashboardPage() {
     }
   };
 
-  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>, target: "create" | "edit") => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: "create" | "edit") => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Instant local preview
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
@@ -171,6 +175,23 @@ export function AdminDashboardPage() {
       }
     };
     reader.readAsDataURL(file);
+
+    // Upload to Cloudflare R2 bucket
+    setUploadingImage(true);
+    try {
+      const res = await api.uploadAdminAsset(file);
+      if (res && res.url) {
+        if (target === "create") {
+          setNewProdImage(res.url);
+        } else {
+          setEditImage(res.url);
+        }
+      }
+    } catch (err: any) {
+      console.warn("R2 upload fallback to local dataUrl", err);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const loadAllAdminData = async () => {
