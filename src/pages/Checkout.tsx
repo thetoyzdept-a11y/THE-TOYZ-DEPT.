@@ -138,6 +138,13 @@ export function CheckoutPage() {
           theme: {
             color: "#191919",
           },
+          // Explicitly request all supported payment methods including UPI
+          method: {
+            upi: true,
+            card: true,
+            netbanking: true,
+            wallet: true,
+          },
           modal: {
             ondismiss: () => {
               setLoading(false);
