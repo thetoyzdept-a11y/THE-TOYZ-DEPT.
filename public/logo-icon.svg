@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <!-- Brutalist Offset Shadow -->
+  <rect x="24" y="24" width="80" height="80" fill="#D9FF43" rx="12" />
+  
+  <!-- Main Badge -->
+  <rect x="16" y="16" width="80" height="80" fill="#191919" stroke="#191919" stroke-width="4" rx="12" />
+  
+  <!-- Letter T -->
+  <text x="56" y="74" text-anchor="middle" font-family="'Space Grotesk', -apple-system, sans-serif" font-weight="900" font-size="54" fill="#D9FF43">T</text>
+  
+  <!-- Coral accent dot -->
+  <circle cx="80" cy="74" r="5" fill="#FF694B" />
+</svg>
