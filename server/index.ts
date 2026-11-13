@@ -15,6 +15,16 @@ import { complianceRouter } from "./routes/compliance";
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
+// Canonical Hostname Enforcement: Redirect www.thetoyzdept.in -> thetoyzdept.in
+app.use("*", async (c, next) => {
+  const url = new URL(c.req.url);
+  if (url.hostname === "www.thetoyzdept.in") {
+    url.hostname = "thetoyzdept.in";
+    return c.redirect(url.toString(), 301);
+  }
+  await next();
+});
+
 // CORS configuration for local development and production
 app.use(
   "*",
