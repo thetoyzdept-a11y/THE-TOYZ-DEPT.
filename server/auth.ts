@@ -75,6 +75,29 @@ export async function verifyPassword(password: string, storedHash: string): Prom
   return computedHash === expectedHash;
 }
 
+// ── UTF-8 Safe Base64 Helpers ────────────────────────────────────────
+function toBase64Utf8(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function fromBase64Utf8(b64: string): string {
+  try {
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new TextDecoder().decode(bytes);
+  } catch {
+    return atob(b64);
+  }
+}
+
 // ── Signed Token Utilities ──────────────────────────────────────────
 async function signToken(payload: string, secret: string): Promise<string> {
   const enc = new TextEncoder();
@@ -89,14 +112,14 @@ async function signToken(payload: string, secret: string): Promise<string> {
   const sigHex = Array.from(new Uint8Array(sig))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
-  return `${btoa(payload)}.${sigHex}`;
+  return `${toBase64Utf8(payload)}.${sigHex}`;
 }
 
 async function verifyToken(token: string, secret: string): Promise<string | null> {
   try {
     const [b64, sigHex] = token.split(".");
     if (!b64 || !sigHex) return null;
-    const payload = atob(b64);
+    const payload = fromBase64Utf8(b64);
     const enc = new TextEncoder();
     const key = await crypto.subtle.importKey(
       "raw",

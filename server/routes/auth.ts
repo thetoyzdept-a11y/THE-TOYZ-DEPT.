@@ -202,11 +202,16 @@ authRouter.post("/google", async (c) => {
       try {
         const parts = body.credential.split(".");
         if (parts.length === 3) {
-          const payload = JSON.parse(
-            new TextDecoder().decode(
-              Uint8Array.from(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0))
-            )
-          );
+          const base64Url = parts[1];
+          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+          const pad = base64.length % 4;
+          const padded = pad ? base64 + "=".repeat(4 - pad) : base64;
+          const raw = atob(padded);
+          const bytes = new Uint8Array(raw.length);
+          for (let i = 0; i < raw.length; i++) {
+            bytes[i] = raw.charCodeAt(i);
+          }
+          const payload = JSON.parse(new TextDecoder().decode(bytes));
           if (payload.email) email = payload.email;
           if (payload.given_name) firstName = payload.given_name;
           if (payload.family_name) lastName = payload.family_name;
