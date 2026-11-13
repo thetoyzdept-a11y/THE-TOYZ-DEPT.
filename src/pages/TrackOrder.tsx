@@ -60,40 +60,47 @@ export function TrackOrderPage() {
   return (
     <div className="bg-cream min-h-screen py-12 sm:py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b-2 border-ink pb-6 mb-10 text-center">
-          <p className="font-mono text-xs font-bold uppercase text-coral tracking-widest mb-1">
-            REAL-TIME FABRICATION MONITOR
-          </p>
-          <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter">
-            Track Your Order<span className="text-lime">.</span>
+        <div className="border-b-2 border-ink pb-6 mb-8 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-coral text-cream border border-ink text-xs font-mono font-bold uppercase tracking-wider shadow-brutal-sm mb-3">
+            <Package className="w-3.5 h-3.5" />
+            LIVE DISPATCH RADAR
+          </div>
+          <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-ink">
+            Track Your Drop<span className="text-lime">.</span>
           </h1>
-          <p className="text-ink-muted text-xs font-mono uppercase mt-1">
-            Live telemetry from our print farm and courier dispatch
+          <p className="text-ink-muted text-xs sm:text-sm font-mono uppercase mt-2 max-w-md mx-auto">
+            Check real-time 3D print progress, quality check, and courier dispatch.
           </p>
         </div>
 
         {/* ── Search Input ───────────────────────────────────────────── */}
-        <div className="card-brutal p-6 bg-cream-light mb-10 max-w-xl mx-auto">
+        <div className="card-brutal p-4 sm:p-6 bg-cream-light mb-8 max-w-xl mx-auto shadow-brutal">
           <form
             onSubmit={(e) => { e.preventDefault(); searchOrder(orderQuery); }}
-            className="flex gap-2"
+            className="flex flex-col sm:flex-row gap-2.5 w-full"
           >
-            <input
-              type="text"
-              value={orderQuery}
-              onChange={(e) => setOrderQuery(e.target.value)}
-              placeholder="Order Number (e.g. TTD-2026-8912)"
-              required
-              className="flex-1 bg-cream border-2 border-ink px-4 py-3 font-mono text-sm uppercase font-bold focus:outline-none focus:ring-2 focus:ring-lime"
-            />
-            <button type="submit" disabled={loading} className="btn-primary text-xs">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={orderQuery}
+                onChange={(e) => setOrderQuery(e.target.value)}
+                placeholder="Order Reference (e.g. TTD-2026-8912)"
+                required
+                className="w-full bg-cream border-2 border-ink px-3.5 py-3 font-mono text-xs sm:text-sm uppercase font-bold text-ink placeholder:text-ink-muted/50 focus:outline-none focus:ring-2 focus:ring-lime"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full sm:w-auto py-3 px-5 text-xs flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
+            >
               <Search className="w-4 h-4" />
-              {loading ? "Searching..." : "Track"}
+              <span>{loading ? "LOCATING..." : "TRACK DROP"}</span>
             </button>
           </form>
           {errorMsg && (
             <p className="font-mono text-xs text-coral font-bold mt-3 flex items-center gap-1.5">
-              <AlertCircle className="w-4 h-4" /> {errorMsg}
+              <AlertCircle className="w-4 h-4 flex-shrink-0" /> {errorMsg}
             </p>
           )}
         </div>

@@ -111,16 +111,15 @@ export function CustomPrintsPage() {
     <div className="bg-cream min-h-screen py-12 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── Page Header ────────────────────────────────────────────── */}
-        <div className="border-b-2 border-ink pb-8 mb-12">
+        <div className="border-b-2 border-ink pb-8 mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-lime text-ink border border-ink text-xs font-mono font-bold uppercase tracking-wider mb-3 shadow-brutal-sm">
-            <Cpu className="w-3.5 h-3.5" /> Industrial FDM Fabrication Service
+            <Sparkles className="w-3.5 h-3.5" /> CUSTOM 3D LAB // BENGALURU
           </div>
-          <h1 className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter">
-            Custom 3D Printing Service<span className="text-coral">.</span>
+          <h1 className="font-display font-black text-3xl sm:text-5xl lg:text-6xl uppercase tracking-tighter text-ink">
+            Print Your Custom 3D Model<span className="text-coral">.</span>
           </h1>
-          <p className="text-ink-muted text-base max-w-2xl font-body mt-2 leading-relaxed">
-            Have a personal CAD project, keycap prototype, functional bracket, or tabletop miniature?
-            Submit your geometry for professional engineering slicing, print time calculation, and a transparent quotation.
+          <p className="text-ink-muted text-sm sm:text-base max-w-2xl font-body mt-2 leading-relaxed">
+            Got an STL, OBJ, or STEP file? Upload your 3D model below. We slice the toolpaths, check wall tolerances, and email you an exact quote in under 2 hours.
           </p>
         </div>
 

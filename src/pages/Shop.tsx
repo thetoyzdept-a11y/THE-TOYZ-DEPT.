@@ -82,56 +82,33 @@ export function ShopPage() {
     <div className="bg-cream min-h-screen py-8 sm:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── Page Header Banner ───────────────────────────────────────── */}
-        <div className="border-b-2 border-ink pb-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 font-mono text-[11px] text-ink-muted uppercase">
-              <Link to="/" className="hover:underline hover:text-ink">Store</Link>
-              <span>/</span>
-              <span className="text-ink font-bold">Catalog Archive</span>
-              {selectedCategory && (
-                <>
-                  <span>/</span>
-                  <span className="text-coral font-bold uppercase">{selectedCategory}</span>
-                </>
-              )}
-            </div>
-            <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tight text-ink">
-              Store Drops & Archive<span className="text-coral">.</span>
-            </h1>
-            <p className="font-mono text-xs text-ink-muted uppercase flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-lime border border-ink animate-pulse" />
-              <span>{products.length} Tactile Drops Fabricated in Bengaluru // Ready for Dispatch</span>
-            </p>
-          </div>
-
-          {/* Quick Search */}
-          <div className="relative w-full md:w-80">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => updateParam("search", e.target.value)}
-              placeholder="Search dragons, fidgets, planters..."
-              className="w-full bg-cream-light border-2 border-ink px-4 py-2.5 pl-10 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-lime shadow-brutal-sm"
-            />
-            <Search className="w-4 h-4 text-ink-muted absolute left-3.5 top-3" />
-            {searchQuery && (
-              <button
-                onClick={() => updateParam("search", "")}
-                className="absolute right-3 top-3 text-ink-muted hover:text-ink cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
+        <div className="border-b-2 border-ink pb-5 mb-6 space-y-2">
+          <div className="flex items-center gap-2 font-mono text-[11px] text-ink-muted uppercase">
+            <Link to="/" className="hover:underline hover:text-ink">Store</Link>
+            <span>/</span>
+            <span className="text-ink font-bold">Catalog Archive</span>
+            {selectedCategory && (
+              <>
+                <span>/</span>
+                <span className="text-coral font-bold uppercase">{selectedCategory}</span>
+              </>
             )}
+          </div>
+          <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tight text-ink">
+            Store Drops & Archive<span className="text-coral">.</span>
+          </h1>
+          <div className="flex items-center gap-2 font-mono text-xs text-ink-muted uppercase">
+            <span className="w-2 h-2 rounded-full bg-lime border border-ink flex-shrink-0 animate-pulse" />
+            <span className="truncate">{products.length} Tactile Drops Fabricated in Bengaluru // Ready for Dispatch</span>
           </div>
         </div>
 
-        {/* ── Dynamic Category Filter Dock & Sort Bar ──────────────────── */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 bg-cream-light p-3.5 sm:p-4 border-2 border-ink shadow-brutal-sm">
-          {/* Category Filter Pills (Scrollable on mobile) */}
-          <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 items-center no-scrollbar">
+        {/* ── Dynamic Category Filter Dock (Edge-to-Edge Touch Scroll) ─── */}
+        <div className="mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
             <button
               onClick={() => updateParam("category", "")}
-              className={`px-3.5 py-1.5 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
                 selectedCategory === ""
                   ? "bg-ink text-lime border-ink shadow-brutal-sm"
                   : "bg-cream text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"
@@ -146,7 +123,7 @@ export function ShopPage() {
               <button
                 key={cat.id}
                 onClick={() => updateParam("category", cat.slug)}
-                className={`px-3.5 py-1.5 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+                className={`px-3.5 py-2 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
                   selectedCategory === cat.slug
                     ? "bg-ink text-lime border-ink shadow-brutal-sm"
                     : "bg-cream text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"
@@ -159,22 +136,46 @@ export function ShopPage() {
 
             <Link
               to="/custom-prints"
-              className="px-3.5 py-1.5 text-xs font-mono font-bold uppercase border-2 border-dashed border-ink bg-lime/30 hover:bg-lime text-ink transition-all flex items-center gap-1.5 flex-shrink-0"
+              className="px-3.5 py-2 text-xs font-mono font-bold uppercase border-2 border-dashed border-ink bg-lime/30 hover:bg-lime text-ink transition-all flex items-center gap-1.5 flex-shrink-0"
             >
               <span>🖨️</span>
               <span>Upload Custom STL</span>
             </Link>
           </div>
+        </div>
+
+        {/* ── Search & Sort Responsive Toolbar ─────────────────────────── */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
+          {/* Quick Search */}
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => updateParam("search", e.target.value)}
+              placeholder="Search dragons, fidgets, planters, desk gear..."
+              className="w-full bg-cream-light border-2 border-ink px-4 py-2.5 pl-10 font-mono text-xs text-ink placeholder:text-ink-muted/50 focus:outline-none focus:ring-2 focus:ring-lime shadow-brutal-sm"
+            />
+            <Search className="w-4 h-4 text-ink-muted absolute left-3.5 top-3" />
+            {searchQuery && (
+              <button
+                onClick={() => updateParam("search", "")}
+                className="absolute right-3 top-2.5 text-ink-muted hover:text-ink cursor-pointer p-0.5"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
           {/* Sort Selector */}
-          <div className="flex items-center justify-between md:justify-end gap-2 font-mono text-xs pt-2 md:pt-0 border-t md:border-t-0 border-ink/15">
+          <div className="flex items-center justify-between sm:justify-end gap-2 font-mono text-xs flex-shrink-0">
             <span className="text-ink-muted flex items-center gap-1 text-[11px] uppercase font-bold">
               <ArrowUpDown className="w-3.5 h-3.5" /> Sort:
             </span>
             <select
               value={selectedSort}
               onChange={(e) => updateParam("sort", e.target.value)}
-              className="bg-cream border-2 border-ink px-3 py-1.5 font-mono text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-lime cursor-pointer shadow-brutal-xs"
+              className="bg-cream-light border-2 border-ink px-3 py-2 font-mono text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-lime cursor-pointer shadow-brutal-sm"
             >
               <option value="featured">Featured First</option>
               <option value="price-asc">Price: Low to High</option>

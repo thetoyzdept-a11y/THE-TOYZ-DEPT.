@@ -56,13 +56,16 @@ export function HomePage() {
                 +999 DESK AURA // TACTILE 3D DROPS
               </div>
 
-              <h1 className="font-display font-black text-3xl sm:text-6xl lg:text-7xl uppercase tracking-tighter leading-[0.95]">
-                YOUR DESK IS <br className="hidden sm:inline" />
-                <span className="text-lime underline decoration-coral decoration-4 underline-offset-8">
-                  DEPRESSING
-                </span>{" "}
+              <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-tight sm:leading-[0.95] text-cream">
+                <span>YOUR DESK IS </span>
                 <br className="hidden sm:inline" />
-                WE FIXED THAT<span className="text-coral">.</span>
+                <span className="inline-block bg-lime text-ink px-2.5 py-0.5 sm:px-3 sm:py-1 -rotate-1 shadow-brutal-sm border border-ink my-1.5 sm:my-0 font-black">
+                  DEPRESSING
+                </span>
+                <span className="text-coral">.</span>{" "}
+                <br className="inline" />
+                <span className="text-cream">WE FIXED THAT</span>
+                <span className="text-lime">!</span>
               </h1>
 
               <p className="text-cream/80 text-sm sm:text-lg max-w-xl mx-auto lg:mx-0 font-body leading-relaxed">
@@ -96,7 +99,7 @@ export function HomePage() {
             </div>
 
             {/* Right Hero Visual Showcase */}
-            <div className="lg:col-span-5 relative mt-4 lg:mt-0">
+            <div className="lg:col-span-5 relative mt-8 lg:mt-0 max-w-sm sm:max-w-md mx-auto w-full">
               <div className="card-brutal bg-cream text-ink p-3 sm:p-5 shadow-brutal-xl relative hover:shadow-brutal transition-all animate-float">
                 {/* Hero Product Badge */}
                 <div className="absolute -top-3 -right-3 z-10">

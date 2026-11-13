@@ -16,6 +16,8 @@ import {
   AlertCircle,
   ArrowRight,
   Share2,
+  Sparkles,
+  Cpu,
 } from "lucide-react";
 
 export function ProductDetailPage() {
