@@ -121,7 +121,7 @@ export function CheckoutPage() {
         const keyId =
           orderData.razorpayKeyId && orderData.razorpayKeyId !== "rzp_test_placeholder"
             ? orderData.razorpayKeyId
-            : ((import.meta as any).env?.VITE_RAZORPAY_KEY_ID || "rzp_test_TzPLspqdiriZ2Q");
+            : ((import.meta as any).env?.VITE_RAZORPAY_KEY_ID || "");
 
         const options = {
           key: keyId,
