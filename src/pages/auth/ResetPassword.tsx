@@ -59,15 +59,17 @@ export function ResetPasswordPage() {
   };
 
   return (
-    <div className="bg-cream min-h-screen py-16 flex items-center justify-center px-4 font-mono">
-      <div className="card-brutal bg-cream-light p-8 sm:p-10 w-full max-w-md space-y-6 shadow-brutal-xl">
-        <div className="text-center space-y-1">
-          <span className="badge-lime text-xs">Security Protocol</span>
-          <h1 className="font-display font-black text-3xl uppercase tracking-tight text-ink">
+    <div className="bg-cream min-h-[calc(100vh-140px)] py-8 md:py-16 flex items-center justify-center px-4 font-mono">
+      <div className="card-brutal bg-cream-light p-6 sm:p-8 w-full max-w-md space-y-6 shadow-brutal-xl">
+        <div className="text-center space-y-2">
+          <div className="w-10 h-10 bg-ink text-lime border-2 border-ink flex items-center justify-center font-display font-black text-xl mx-auto shadow-brutal-sm">
+            T
+          </div>
+          <h1 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight text-ink">
             Set New Password<span className="text-coral">.</span>
           </h1>
           <p className="text-xs text-ink-muted uppercase">
-            Configure secure credentials for your customer account
+            Enter your new password below to regain account access
           </p>
         </div>
 

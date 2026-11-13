@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { Header } from "./components/layout/Header";
@@ -122,79 +122,94 @@ function CustomerRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AppLayout() {
+  const location = useLocation();
+  const isAuthPage = ["/login", "/register", "/reset-password"].includes(location.pathname);
+  const isAdminPage = location.pathname.startsWith("/admin");
+
+  return (
+    <div className="flex flex-col min-h-screen bg-cream text-ink">
+      <Header />
+      <main className="flex-1">
+        <Routes>
+          {/* Storefront */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/products/:slug" element={<ProductDetailPage />} />
+          <Route path="/product/:slug" element={<ProductDetailPage />} />
+          <Route path="/custom-prints" element={<CustomPrintsPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
+          <Route path="/track-order" element={<TrackOrderPage />} />
+
+          {/* Auth */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+          {/* Customer Dashboard */}
+          <Route path="/account" element={<CustomerRoute><CustomerDashboardPage /></CustomerRoute>} />
+          <Route path="/account/*" element={<CustomerRoute><CustomerDashboardPage /></CustomerRoute>} />
+
+          {/* Admin Dashboard */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
+          <Route path="/admin/*" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
+
+          {/* Brand & Policies */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/shipping" element={<ShippingPage />} />
+          <Route path="/returns" element={<ReturnsPage />} />
+          <Route path="/refunds" element={<ReturnsPage />} />
+          <Route path="/refund-policy" element={<ReturnsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/terms-and-conditions" element={<TermsPage />} />
+          <Route path="/grievance-redressal" element={<GrievancePage />} />
+          <Route path="/sample-invoice" element={<SampleInvoicePage />} />
+
+          {/* Fallback */}
+          <Route
+            path="*"
+            element={
+              <div className="min-h-[60vh] flex items-center justify-center text-center p-6">
+                <div className="card-brutal p-8 max-w-md mx-auto">
+                  <span className="badge-coral text-xs mb-2">404 Exception</span>
+                  <h2 className="font-display font-black text-3xl uppercase mb-2">
+                    Page Not Found
+                  </h2>
+                  <p className="font-mono text-xs text-ink-muted mb-6">
+                    The requested page path does not exist in our catalog or router.
+                  </p>
+                  <a href="/" className="btn-primary text-xs">
+                    Back to Home
+                  </a>
+                </div>
+              </div>
+            }
+          />
+        </Routes>
+      </main>
+      {!isAuthPage && !isAdminPage && <Footer />}
+      {isAuthPage && (
+        <footer className="py-4 text-center font-mono text-[11px] text-ink-muted border-t border-ink/10 bg-cream">
+          © 2026 THE TOYZ DEPT. // BENGALURU, INDIA • ALL RIGHTS RESERVED
+        </footer>
+      )}
+      <CartDrawer />
+    </div>
+  );
+}
+
 export function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
           <ScrollToTop />
-          <div className="flex flex-col min-h-screen bg-cream text-ink">
-            <Header />
-            <main className="flex-1">
-              <Routes>
-                {/* Storefront */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/shop" element={<ShopPage />} />
-                <Route path="/products/:slug" element={<ProductDetailPage />} />
-                <Route path="/product/:slug" element={<ProductDetailPage />} />
-                <Route path="/custom-prints" element={<CustomPrintsPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
-                <Route path="/track-order" element={<TrackOrderPage />} />
-
-                {/* Auth */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-
-                {/* Customer Dashboard */}
-                <Route path="/account" element={<CustomerRoute><CustomerDashboardPage /></CustomerRoute>} />
-                <Route path="/account/*" element={<CustomerRoute><CustomerDashboardPage /></CustomerRoute>} />
-
-                {/* Admin Dashboard */}
-                <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
-                <Route path="/admin/*" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
-
-                {/* Brand & Policies */}
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/shipping" element={<ShippingPage />} />
-                <Route path="/returns" element={<ReturnsPage />} />
-                <Route path="/refunds" element={<ReturnsPage />} />
-                <Route path="/refund-policy" element={<ReturnsPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/pricing" element={<PricingPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/privacy-policy" element={<PrivacyPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/terms-and-conditions" element={<TermsPage />} />
-                <Route path="/grievance-redressal" element={<GrievancePage />} />
-                <Route path="/sample-invoice" element={<SampleInvoicePage />} />
-
-                {/* Fallback */}
-                <Route
-                  path="*"
-                  element={
-                    <div className="min-h-[60vh] flex items-center justify-center text-center p-6">
-                      <div className="card-brutal p-8 max-w-md mx-auto">
-                        <span className="badge-coral text-xs mb-2">404 Exception</span>
-                        <h2 className="font-display font-black text-3xl uppercase mb-2">
-                          Page Not Found
-                        </h2>
-                        <p className="font-mono text-xs text-ink-muted mb-6">
-                          The requested page path does not exist in our catalog or router.
-                        </p>
-                        <a href="/" className="btn-primary text-xs">
-                          Back to Home
-                        </a>
-                      </div>
-                    </div>
-                  }
-                />
-              </Routes>
-            </main>
-            <Footer />
-            <CartDrawer />
-          </div>
+          <AppLayout />
         </BrowserRouter>
       </CartProvider>
     </AuthProvider>
