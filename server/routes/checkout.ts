@@ -110,9 +110,16 @@ checkoutRouter.post("/create-order", async (c) => {
       });
     }
 
-    // Calculate shipping (free shipping on orders over threshold or test items <= ₹5)
-    const freeThreshold = 99900;
-    const stdShipping = 9900;
+    // Calculate shipping from store settings
+    const freeShipSetting = await c.env.DB
+      .prepare("SELECT value FROM store_settings WHERE key = 'free_shipping_threshold'")
+      .first<{ value: string }>();
+    const stdShipSetting = await c.env.DB
+      .prepare("SELECT value FROM store_settings WHERE key = 'standard_shipping_rate'")
+      .first<{ value: string }>();
+
+    const freeThreshold = freeShipSetting ? parseInt(freeShipSetting.value, 10) : 99900;
+    const stdShipping = stdShipSetting ? parseInt(stdShipSetting.value, 10) : 9900;
     const shippingCost = (subtotal >= freeThreshold || subtotal <= 500) ? 0 : stdShipping;
 
     // Calculate coupon discount

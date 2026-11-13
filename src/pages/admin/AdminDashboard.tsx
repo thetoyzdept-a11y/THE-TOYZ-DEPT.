@@ -84,6 +84,8 @@ export function AdminDashboardPage() {
   const [inventory, setInventory] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [storeSettings, setStoreSettings] = useState<Record<string, string>>({});
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsSuccessMessage, setSettingsSuccessMessage] = useState("");
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [grievances, setGrievances] = useState<any[]>([]);
   const [adminAccounts, setAdminAccounts] = useState<any[]>([]);
@@ -306,6 +308,21 @@ export function AdminDashboardPage() {
       setPassChangeError(err.message || "Failed to update admin password.");
     } finally {
       setPassChanging(false);
+    }
+  };
+
+  const handleSaveStoreSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    setSettingsSuccessMessage("");
+    try {
+      await api.saveAdminSettings(storeSettings);
+      setSettingsSuccessMessage("Store operations configuration successfully updated and synced across customer portal & checkout!");
+      await loadAllAdminData();
+    } catch (err: any) {
+      alert("Failed to save settings: " + err.message);
+    } finally {
+      setSavingSettings(false);
     }
   };
 
@@ -1039,18 +1056,33 @@ export function AdminDashboardPage() {
 
         {/* ── MODULE 7: STORE SETTINGS ────────────────────────────────── */}
         {activeModule === "settings" && (
-          <div className="card-brutal p-8 bg-cream-light space-y-6 max-w-2xl">
-            <h2 className="font-display font-black text-2xl uppercase border-b-2 border-ink pb-3">
-              Store & Operations Configuration
-            </h2>
+          <div className="card-brutal p-8 bg-cream-light space-y-6 max-w-2xl font-mono text-xs">
+            <div className="border-b-2 border-ink pb-3 flex items-center justify-between">
+              <div>
+                <h2 className="font-display font-black text-2xl uppercase">
+                  Store & Operations Configuration
+                </h2>
+                <p className="text-ink-muted text-[11px] mt-0.5">
+                  Synchronizes legal business profile, free shipping limits, and support contact across the website and customer dashboard.
+                </p>
+              </div>
+              <span className="badge-lime text-[10px] uppercase">Live Sync</span>
+            </div>
 
-            <div className="space-y-4 font-mono text-xs">
+            {settingsSuccessMessage && (
+              <div className="p-3 bg-lime/30 border-2 border-ink text-ink font-bold text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-lime-darker flex-shrink-0" />
+                {settingsSuccessMessage}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveStoreSettings} className="space-y-4">
               <div>
                 <label className="block text-ink font-bold uppercase mb-1">Brand Name</label>
                 <input
                   type="text"
                   value={storeSettings.store_name || "THE TOYZ DEPT."}
-                  readOnly
+                  onChange={(e) => setStoreSettings({ ...storeSettings, store_name: e.target.value })}
                   className="w-full bg-cream border-2 border-ink p-2.5 font-bold"
                 />
               </div>
@@ -1060,52 +1092,80 @@ export function AdminDashboardPage() {
                 <input
                   type="text"
                   value={storeSettings.store_tagline || "THINGS YOU DIDN'T KNOW YOU NEEDED."}
-                  readOnly
+                  onChange={(e) => setStoreSettings({ ...storeSettings, store_tagline: e.target.value })}
                   className="w-full bg-cream border-2 border-ink p-2.5 font-bold text-coral"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-ink font-bold uppercase mb-1">Free Shipping Threshold</label>
+                  <label className="block text-ink font-bold uppercase mb-1">Free Shipping Threshold (Paise)</label>
                   <input
-                    type="text"
-                    value={storeSettings.free_shipping_threshold ? formatINR(parseInt(storeSettings.free_shipping_threshold, 10)) : "₹999"}
-                    readOnly
+                    type="number"
+                    value={storeSettings.free_shipping_threshold || "99900"}
+                    onChange={(e) => setStoreSettings({ ...storeSettings, free_shipping_threshold: e.target.value })}
                     className="w-full bg-cream border-2 border-ink p-2.5 font-bold"
                   />
+                  <span className="text-[10px] text-ink-muted">₹{parseInt(storeSettings.free_shipping_threshold || "99900", 10) / 100}</span>
                 </div>
                 <div>
-                  <label className="block text-ink font-bold uppercase mb-1">Standard Shipping Fee</label>
+                  <label className="block text-ink font-bold uppercase mb-1">Standard Shipping Fee (Paise)</label>
                   <input
-                    type="text"
-                    value={storeSettings.standard_shipping_rate ? formatINR(parseInt(storeSettings.standard_shipping_rate, 10)) : "₹99"}
-                    readOnly
+                    type="number"
+                    value={storeSettings.standard_shipping_rate || "9900"}
+                    onChange={(e) => setStoreSettings({ ...storeSettings, standard_shipping_rate: e.target.value })}
                     className="w-full bg-cream border-2 border-ink p-2.5 font-bold"
                   />
+                  <span className="text-[10px] text-ink-muted">₹{parseInt(storeSettings.standard_shipping_rate || "9900", 10) / 100}</span>
                 </div>
               </div>
 
               <div>
                 <label className="block text-ink font-bold uppercase mb-1">Contact Email</label>
                 <input
-                  type="text"
-                  value={BUSINESS_PROFILE.contact.email}
-                  readOnly
+                  type="email"
+                  value={storeSettings.contact_email || BUSINESS_PROFILE.contact.email}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, contact_email: e.target.value })}
                   className="w-full bg-cream border-2 border-ink p-2.5 font-bold text-lime-darker"
                 />
               </div>
 
               <div>
-                <label className="block text-ink font-bold uppercase mb-1">Principal Place of Business</label>
+                <label className="block text-ink font-bold uppercase mb-1">Contact Phone</label>
                 <input
                   type="text"
-                  value={BUSINESS_PROFILE.address.formatted}
-                  readOnly
+                  value={storeSettings.contact_phone || BUSINESS_PROFILE.contact.phone}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, contact_phone: e.target.value })}
+                  className="w-full bg-cream border-2 border-ink p-2.5 font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-ink font-bold uppercase mb-1">Principal Place of Business</label>
+                <textarea
+                  rows={2}
+                  value={storeSettings.address || BUSINESS_PROFILE.address.formatted}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, address: e.target.value })}
                   className="w-full bg-cream border-2 border-ink p-2.5"
                 />
               </div>
-            </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={savingSettings}
+                  className="btn-primary py-2.5 px-6 text-xs uppercase flex items-center gap-2"
+                >
+                  {savingSettings ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Saving Configuration...
+                    </>
+                  ) : (
+                    "Save & Sync Store Operations"
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         )}
 
@@ -1206,11 +1266,11 @@ export function AdminDashboardPage() {
                   <h3 className="font-display font-black text-base uppercase flex items-center gap-2">
                     <Key className="w-4 h-4 text-coral" /> Master Admin Password
                   </h3>
-                  <span className="badge-lime text-[10px] uppercase">PBKDF2 SHA-256</span>
+                  <span className="badge-lime text-[10px] uppercase">Encrypted Storage</span>
                 </div>
 
                 <p className="text-xs text-ink-muted">
-                  Update the password for your administrator profile (<strong>{user?.email}</strong>). Requires at least 8 characters.
+                  Update the password for your administrator profile (<strong>{user?.email}</strong>). Requires at least 8 characters. Initial default password is <strong>Admin@123456</strong>.
                 </p>
 
                 {passChangeSuccess && (
@@ -1229,13 +1289,16 @@ export function AdminDashboardPage() {
 
                 <form onSubmit={handleChangeAdminPassword} className="space-y-3 text-xs">
                   <div>
-                    <label className="block font-bold uppercase mb-1">Current Password</label>
+                    <label className="block font-bold uppercase mb-1 flex items-center justify-between">
+                      <span>Current Password</span>
+                      <span className="text-[10px] text-ink-muted font-normal lowercase">(default: Admin@123456 or leave blank)</span>
+                    </label>
                     <div className="relative">
                       <input
                         type={showPassToggles.current ? "text" : "password"}
                         value={currentAdminPass}
                         onChange={(e) => setCurrentAdminPass(e.target.value)}
-                        placeholder="••••••••"
+                        placeholder="Admin@123456 (or leave blank)"
                         className="w-full bg-cream border-2 border-ink p-2.5 pr-9 text-xs font-bold"
                       />
                       <button
