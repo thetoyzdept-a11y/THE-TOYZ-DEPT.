@@ -45,21 +45,27 @@ customerRouter.put("/profile", async (c) => {
 // GET /api/customer/orders
 customerRouter.get("/orders", async (c) => {
   const user = c.get("user")!;
+  const userEmail = (user.email || "").toLowerCase();
+
   const orders = await c.env.DB
     .prepare(`
       SELECT 
         o.id, o.order_number, o.status, o.total_amount, o.subtotal, o.shipping_cost,
         o.discount_amount, o.tracking_number, o.tracking_url, o.shipped_at, o.delivered_at,
+        o.courier_name, o.awb_code, o.label_url, o.pickup_scheduled_date,
+        o.shipping_name, o.shipping_city, o.shipping_state, o.shipping_postal_code,
+        o.razorpay_order_id, o.razorpay_payment_id,
+        COALESCE(o.payment_status, p.status, 'created') as payment_status,
+        COALESCE(o.payment_method, p.method, 'Razorpay') as payment_method,
         o.created_at,
         (SELECT COUNT(id) FROM order_items WHERE order_id = o.id) as item_count,
-        (SELECT product_name FROM order_items WHERE order_id = o.id LIMIT 1) as first_item_name,
-        p.status as payment_status, p.method as payment_method
+        (SELECT product_name FROM order_items WHERE order_id = o.id LIMIT 1) as first_item_name
       FROM orders o
       LEFT JOIN payments p ON p.order_id = o.id
-      WHERE o.user_id = ?
+      WHERE o.user_id = ? OR (o.shipping_email IS NOT NULL AND LOWER(o.shipping_email) = ?)
       ORDER BY o.created_at DESC
     `)
-    .bind(user.userId)
+    .bind(user.userId, userEmail)
     .all<any>();
 
   return c.json({ orders: orders.results || [] });
@@ -68,11 +74,12 @@ customerRouter.get("/orders", async (c) => {
 // GET /api/customer/orders/:id
 customerRouter.get("/orders/:id", async (c) => {
   const user = c.get("user")!;
+  const userEmail = (user.email || "").toLowerCase();
   const id = c.req.param("id");
 
   const order = await c.env.DB
-    .prepare("SELECT * FROM orders WHERE id = ? AND user_id = ?")
-    .bind(id, user.userId)
+    .prepare("SELECT * FROM orders WHERE id = ? AND (user_id = ? OR (shipping_email IS NOT NULL AND LOWER(shipping_email) = ?))")
+    .bind(id, user.userId, userEmail)
     .first<any>();
 
   if (!order) {

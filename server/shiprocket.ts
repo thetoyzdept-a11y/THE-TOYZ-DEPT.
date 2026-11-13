@@ -241,6 +241,80 @@ export async function generateShiprocketAWB(
 }
 
 /**
+ * Generate Printable Shipping Label (PDF) for a shipment
+ */
+export async function generateShiprocketLabel(
+  env: Env,
+  shipmentId: number
+): Promise<{ success: boolean; labelUrl?: string; error?: string }> {
+  const token = await getShiprocketToken(env);
+  if (!token) return { success: false, error: "Shiprocket not authenticated" };
+
+  try {
+    const res = await fetch("https://apiv2.shiprocket.in/v1/external/courier/generate/label", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        shipment_id: [shipmentId],
+      }),
+    });
+
+    const data = (await res.json()) as any;
+    if (res.ok && data.label_url) {
+      return {
+        success: true,
+        labelUrl: data.label_url,
+      };
+    }
+
+    return { success: false, error: data.message || "Label not yet generated" };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Schedule Courier Pickup from Gadag Hub
+ */
+export async function requestShiprocketPickup(
+  env: Env,
+  shipmentId: number
+): Promise<{ success: boolean; pickupDate?: string; tokenNumber?: string; error?: string }> {
+  const token = await getShiprocketToken(env);
+  if (!token) return { success: false, error: "Shiprocket not authenticated" };
+
+  try {
+    const res = await fetch("https://apiv2.shiprocket.in/v1/external/courier/generate/pickup", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        shipment_id: [shipmentId],
+      }),
+    });
+
+    const data = (await res.json()) as any;
+    const respData = data.response || data;
+    if (res.ok && respData.pickup_status === 1) {
+      return {
+        success: true,
+        pickupDate: respData.pickup_scheduled_date,
+        tokenNumber: respData.pickup_token_number?.toString(),
+      };
+    }
+
+    return { success: false, error: respData.data || data.message || "Pickup scheduling queued" };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
  * Live Track Shipment by AWB
  */
 export async function trackShiprocketShipment(env: Env, awbNumber: string) {

@@ -99,6 +99,12 @@ authRouter.post("/register", async (c) => {
       .bind(userId, email.toLowerCase(), passwordHash, firstName, lastName, phone || null)
       .run();
 
+    // Adopt any past guest orders matching this email into this user account
+    await c.env.DB
+      .prepare("UPDATE orders SET user_id = ? WHERE LOWER(shipping_email) = ? AND user_id != ?")
+      .bind(userId, email.toLowerCase(), userId)
+      .run();
+
     const token = await createSession(c.env.DB, c.env.SESSION_SECRET, {
       id: userId,
       email: email.toLowerCase(),
@@ -170,6 +176,14 @@ authRouter.post("/login", async (c) => {
       lastName: user.last_name,
       role: effectiveRole,
     });
+
+    // Ensure all orders matching this email are mapped to this user in D1
+    if (effectiveRole === "customer") {
+      await c.env.DB
+        .prepare("UPDATE orders SET user_id = ? WHERE LOWER(shipping_email) = ? AND user_id != ?")
+        .bind(user.id, user.email.toLowerCase(), user.id)
+        .run();
+    }
 
     c.header("Set-Cookie", createSessionCookie(token));
 
@@ -293,6 +307,14 @@ authRouter.post("/google", async (c) => {
       lastName: user.last_name,
       role: assignedRole,
     });
+
+    // Ensure all orders matching this email are mapped to this user in D1
+    if (assignedRole === "customer") {
+      await c.env.DB
+        .prepare("UPDATE orders SET user_id = ? WHERE LOWER(shipping_email) = ? AND user_id != ?")
+        .bind(user.id, user.email.toLowerCase(), user.id)
+        .run();
+    }
 
     c.header("Set-Cookie", createSessionCookie(token));
 

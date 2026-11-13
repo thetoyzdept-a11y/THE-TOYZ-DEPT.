@@ -299,11 +299,27 @@ export const orders = sqliteTable(
     shippingPostalCode: text("shipping_postal_code").notNull(),
     shippingCountry: text("shipping_country").notNull().default("India"),
 
-    // Tracking
+    // Tracking & Logistics
     trackingNumber: text("tracking_number"),
     trackingUrl: text("tracking_url"),
     shippedAt: text("shipped_at"),
     deliveredAt: text("delivered_at"),
+
+    // Customer & Logistics Mapping
+    shippingEmail: text("shipping_email"),
+    shiprocketOrderId: text("shiprocket_order_id"),
+    shiprocketShipmentId: text("shiprocket_shipment_id"),
+    courierName: text("courier_name"),
+    awbCode: text("awb_code"),
+    pickupScheduledDate: text("pickup_scheduled_date"),
+    pickupTokenNumber: text("pickup_token_number"),
+    labelUrl: text("label_url"),
+    manifestUrl: text("manifest_url"),
+    invoiceUrl: text("invoice_url"),
+    razorpayOrderId: text("razorpay_order_id"),
+    razorpayPaymentId: text("razorpay_payment_id"),
+    paymentStatus: text("payment_status").default("created"),
+    paymentMethod: text("payment_method"),
 
     // Admin
     internalNotes: text("internal_notes"),

@@ -791,10 +791,11 @@ export function AdminDashboardPage() {
                     <th className="p-3">Order Number</th>
                     <th className="p-3">Customer</th>
                     <th className="p-3">Date</th>
-                    <th className="p-3">Total Amount</th>
-                    <th className="p-3">Current Status</th>
-                    <th className="p-3">Air Tracking</th>
-                    <th className="p-3 text-right">Action</th>
+                    <th className="p-3">Amount</th>
+                    <th className="p-3">Lifecycle</th>
+                    <th className="p-3">Payment</th>
+                    <th className="p-3">Shiprocket Logistics</th>
+                    <th className="p-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-ink/10">
@@ -807,7 +808,8 @@ export function AdminDashboardPage() {
                         ord.order_number.toLowerCase().includes(q) ||
                         (ord.shipping_name && ord.shipping_name.toLowerCase().includes(q)) ||
                         (ord.customer_email && ord.customer_email.toLowerCase().includes(q)) ||
-                        (ord.tracking_number && ord.tracking_number.toLowerCase().includes(q));
+                        (ord.tracking_number && ord.tracking_number.toLowerCase().includes(q)) ||
+                        (ord.courier_name && ord.courier_name.toLowerCase().includes(q));
                       return matchesStatus && matchesSearch;
                     })
                     .map((ord) => (
@@ -822,7 +824,7 @@ export function AdminDashboardPage() {
                       </td>
                       <td className="p-3">
                         <p className="font-bold text-ink">{ord.shipping_name}</p>
-                        <p className="text-[10px] text-ink-muted">{ord.customer_email}</p>
+                        <p className="text-[10px] text-ink-muted">{ord.customer_email || ord.shipping_email || "Guest"}</p>
                       </td>
                       <td className="p-3 text-ink-muted">{formatDate(ord.created_at)}</td>
                       <td className="p-3 font-bold">{formatINR(ord.total_amount)}</td>
@@ -831,8 +833,32 @@ export function AdminDashboardPage() {
                           {getOrderStatusBadge(ord.status).label}
                         </span>
                       </td>
-                      <td className="p-3 text-[11px] text-lime-darker font-bold">
-                        {ord.tracking_number || "—"}
+                      <td className="p-3">
+                        <div className="space-y-0.5">
+                          <span className="inline-block px-1.5 py-0.5 text-[10px] uppercase font-bold bg-lime/20 text-lime-darker border border-lime-darker">
+                            {ord.payment_status === "captured" ? "PAID" : ord.payment_status || "PAID"}
+                          </span>
+                          <p className="text-[9px] font-mono text-ink-muted truncate max-w-[90px]">
+                            {ord.payment_method || "Razorpay"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="p-3 text-[11px]">
+                        {ord.tracking_number ? (
+                          <div className="space-y-0.5">
+                            <a
+                              href={ord.tracking_url || `https://shiprocket.co/tracking/${ord.tracking_number}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-bold text-lime-darker hover:underline flex items-center gap-1 font-mono"
+                            >
+                              <Truck className="w-3 h-3" /> {ord.tracking_number}
+                            </a>
+                            <p className="text-[10px] text-ink-muted">{ord.courier_name || "Shiprocket Air"}</p>
+                          </div>
+                        ) : (
+                          <span className="text-ink-muted text-xs">Unassigned</span>
+                        )}
                       </td>
                       <td className="p-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
@@ -842,6 +868,17 @@ export function AdminDashboardPage() {
                           >
                             <Eye className="w-3 h-3" /> View
                           </button>
+                          {ord.label_url && (
+                            <a
+                              href={ord.label_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-1 bg-coral/20 text-coral hover:bg-coral hover:text-white text-[10px] uppercase font-bold border border-coral inline-flex items-center gap-1"
+                              title="Print Shipping Label PDF"
+                            >
+                              <Printer className="w-3 h-3" /> Label
+                            </a>
+                          )}
                           <button
                             onClick={() => handleShiprocketDispatch(ord.id)}
                             disabled={shiprocketLoading === ord.id || !!ord.tracking_number}
@@ -849,7 +886,7 @@ export function AdminDashboardPage() {
                             className={`px-2 py-1 text-[10px] uppercase font-mono font-bold border border-ink transition-all ${
                               ord.tracking_number
                                 ? "bg-lime/20 text-ink/50 cursor-default"
-                                : "bg-lime text-ink hover:bg-ink hover:text-lime"
+                                : "bg-lime text-ink hover:bg-ink hover:text-lime cursor-pointer"
                             }`}
                           >
                             {shiprocketLoading === ord.id ? "Shipping..." : ord.tracking_number ? "AWB Active" : "Shiprocket"}
@@ -860,7 +897,7 @@ export function AdminDashboardPage() {
                               setNewStatus(ord.status);
                               setStatusTrackingNum(ord.tracking_number || "");
                             }}
-                            className="px-2.5 py-1 bg-ink text-cream hover:bg-lime hover:text-ink text-[10px] uppercase font-bold border border-ink"
+                            className="px-2.5 py-1 bg-ink text-cream hover:bg-lime hover:text-ink text-[10px] uppercase font-bold border border-ink cursor-pointer"
                           >
                             Status
                           </button>
@@ -1824,15 +1861,73 @@ export function AdminDashboardPage() {
                 <div>
                   <span className="text-[10px] uppercase text-ink-muted font-bold block mb-1">Customer & Recipient:</span>
                   <p className="font-bold text-ink text-sm">{viewingOrderDetails.shipping_name}</p>
-                  <p className="text-ink/80">{viewingOrderDetails.customer_email || viewingOrderDetails.shipping_email}</p>
+                  <p className="text-ink/80">{viewingOrderDetails.customer_email || viewingOrderDetails.shipping_email || "Guest"}</p>
                   <p className="text-ink/80 font-bold mt-1">📞 {viewingOrderDetails.shipping_phone || "—"}</p>
                 </div>
                 <div>
                   <span className="text-[10px] uppercase text-ink-muted font-bold block mb-1">Delivery Destination:</span>
-                  <p className="text-ink">{viewingOrderDetails.shipping_address_line1}</p>
-                  {viewingOrderDetails.shipping_address_line2 && <p className="text-ink">{viewingOrderDetails.shipping_address_line2}</p>}
+                  <p className="text-ink">{viewingOrderDetails.shipping_address_1 || viewingOrderDetails.shipping_address_line1}</p>
+                  {(viewingOrderDetails.shipping_address_2 || viewingOrderDetails.shipping_address_line2) && (
+                    <p className="text-ink">{viewingOrderDetails.shipping_address_2 || viewingOrderDetails.shipping_address_line2}</p>
+                  )}
                   <p className="text-ink">{viewingOrderDetails.shipping_city}, {viewingOrderDetails.shipping_state} - {viewingOrderDetails.shipping_postal_code}</p>
                   <p className="text-ink-muted text-[10px] mt-1">{viewingOrderDetails.shipping_country || "India"}</p>
+                </div>
+              </div>
+
+              {/* Payment & Logistics Telemetry */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-cream-light p-4 border-2 border-ink font-mono text-xs">
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase text-ink-muted font-bold block mb-1">💳 Razorpay Settlement:</span>
+                  <p className="font-bold text-ink">
+                    Payment Status: <span className="text-lime-darker uppercase">{viewingOrderDetails.payment_status || viewingOrderDetails.payment?.status || "PAID"}</span>
+                  </p>
+                  <p className="text-[11px] text-ink-muted">
+                    Payment ID: {viewingOrderDetails.razorpay_payment_id || viewingOrderDetails.payment?.razorpay_payment_id || "Direct Verified"}
+                  </p>
+                  <p className="text-[11px] text-ink-muted">
+                    Order ID: {viewingOrderDetails.razorpay_order_id || viewingOrderDetails.payment?.razorpay_order_id || "rzp_live"}
+                  </p>
+                  <p className="text-[11px] text-ink-muted">
+                    Method: {viewingOrderDetails.payment_method || viewingOrderDetails.payment?.method || "UPI / Cards"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase text-ink-muted font-bold block mb-1">🚀 Shiprocket Fulfillment:</span>
+                  <p className="font-bold text-ink">
+                    Courier: {viewingOrderDetails.courier_name || (viewingOrderDetails.tracking_number ? "Shiprocket Express" : "Unassigned")}
+                  </p>
+                  <p className="text-[11px] text-ink-muted">
+                    AWB Code: {viewingOrderDetails.awb_code || viewingOrderDetails.tracking_number || "Pending dispatch"}
+                  </p>
+                  {viewingOrderDetails.pickup_scheduled_date && (
+                    <p className="text-[11px] text-ink-muted">
+                      Pickup Scheduled: {viewingOrderDetails.pickup_scheduled_date}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {viewingOrderDetails.label_url && (
+                      <a
+                        href={viewingOrderDetails.label_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold text-coral underline hover:text-ink inline-flex items-center gap-1"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Shipping Label (PDF)
+                      </a>
+                    )}
+                    {viewingOrderDetails.tracking_url && (
+                      <a
+                        href={viewingOrderDetails.tracking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold text-lime-darker underline hover:text-ink inline-flex items-center gap-1"
+                      >
+                        <Truck className="w-3 h-3" /> Live Radar Tracking
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1883,7 +1978,7 @@ export function AdminDashboardPage() {
                   </div>
                   <div className="flex justify-between text-ink-muted">
                     <span>Shipping:</span>
-                    <span>{viewingOrderDetails.shipping_amount === 0 ? "FREE" : formatINR(viewingOrderDetails.shipping_amount)}</span>
+                    <span>{(viewingOrderDetails.shipping_cost ?? viewingOrderDetails.shipping_amount ?? 0) === 0 ? "FREE" : formatINR(viewingOrderDetails.shipping_cost ?? viewingOrderDetails.shipping_amount ?? 0)}</span>
                   </div>
                   <div className="flex justify-between font-display font-black text-sm text-ink pt-1 border-t border-ink/20">
                     <span>Total Paid:</span>

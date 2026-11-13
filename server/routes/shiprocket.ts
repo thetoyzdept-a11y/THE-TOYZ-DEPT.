@@ -5,6 +5,8 @@ import {
   checkCourierServiceability,
   createShiprocketOrder,
   generateShiprocketAWB,
+  generateShiprocketLabel,
+  requestShiprocketPickup,
   trackShiprocketShipment,
 } from "../shiprocket";
 import { sendEmail, buildShipmentDispatchedEmail } from "../email";
@@ -63,21 +65,63 @@ shippingRouter.post("/create-shipment/:orderId", requireAdmin, async (c) => {
   const courierName = awbRes.courierName || "Shiprocket Express";
   const trackingUrl = `https://shiprocket.co/tracking/${awbCode}`;
 
-  // 3. Update order in D1
+  // 3. Generate Printable Shipping Label (PDF)
+  let labelUrl: string | null = null;
+  try {
+    const labelRes = await generateShiprocketLabel(c.env, shipRes.shipmentId);
+    if (labelRes.success && labelRes.labelUrl) {
+      labelUrl = labelRes.labelUrl;
+    }
+  } catch (lblErr) {
+    console.warn("Shipping label auto-generation non-blocking warning:", lblErr);
+  }
+
+  // 4. Request Hub Courier Pickup
+  let pickupDate: string | null = null;
+  let pickupToken: string | null = null;
+  try {
+    const pickupRes = await requestShiprocketPickup(c.env, shipRes.shipmentId);
+    if (pickupRes.success) {
+      pickupDate = pickupRes.pickupDate || null;
+      pickupToken = pickupRes.tokenNumber || null;
+    }
+  } catch (pkErr) {
+    console.warn("Pickup scheduling non-blocking warning:", pkErr);
+  }
+
+  // 5. Update order in D1 with full Shiprocket telemetry and metadata
   await c.env.DB
     .prepare(`
       UPDATE orders SET 
         status = 'shipped',
+        shiprocket_order_id = ?,
+        shiprocket_shipment_id = ?,
+        courier_name = ?,
+        awb_code = ?,
         tracking_number = ?,
         tracking_url = ?,
+        label_url = COALESCE(?, label_url),
+        pickup_scheduled_date = COALESCE(?, pickup_scheduled_date),
+        pickup_token_number = COALESCE(?, pickup_token_number),
         shipped_at = datetime('now'),
         updated_at = datetime('now')
       WHERE id = ?
     `)
-    .bind(awbCode, trackingUrl, orderId)
+    .bind(
+      shipRes.shiprocketOrderId?.toString() || null,
+      shipRes.shipmentId?.toString() || null,
+      courierName,
+      awbCode,
+      awbCode,
+      trackingUrl,
+      labelUrl,
+      pickupDate,
+      pickupToken,
+      orderId
+    )
     .run();
 
-  // 4. Record status history
+  // 6. Record status history
   await c.env.DB
     .prepare(`
       INSERT INTO order_status_history (id, order_id, from_status, to_status, note)
@@ -87,13 +131,14 @@ shippingRouter.post("/create-shipment/:orderId", requireAdmin, async (c) => {
       "osh_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16),
       orderId,
       order.status,
-      `Shipped via ${courierName}. AWB: ${awbCode}`
+      `Shipped via ${courierName}. AWB: ${awbCode}${pickupDate ? ` (Pickup scheduled: ${pickupDate})` : ""}`
     )
     .run();
 
-  // 5. Trigger Shipment Dispatched Email via Resend
+  // 7. Trigger Shipment Dispatched Email via Resend
   try {
     const customerEmail =
+      order.shipping_email ||
       order.user_email ||
       (order.shipping_address_2 && order.shipping_address_2.includes("@") ? order.shipping_address_2 : null);
 
@@ -127,6 +172,9 @@ shippingRouter.post("/create-shipment/:orderId", requireAdmin, async (c) => {
     awbCode,
     courierName,
     trackingUrl,
+    labelUrl,
+    pickupDate,
+    pickupToken,
   });
 });
 

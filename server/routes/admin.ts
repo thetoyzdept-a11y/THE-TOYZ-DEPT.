@@ -290,9 +290,10 @@ adminRouter.get("/orders", async (c) => {
   let sql = `
     SELECT 
       o.*,
-      u.email as customer_email,
+      COALESCE(o.shipping_email, u.email) as customer_email,
       (SELECT COUNT(id) FROM order_items WHERE order_id = o.id) as item_count,
-      p.status as payment_status, p.method as payment_method
+      COALESCE(o.payment_status, p.status, 'created') as payment_status,
+      COALESCE(o.payment_method, p.method, 'Razorpay') as payment_method
     FROM orders o
     LEFT JOIN users u ON o.user_id = u.id
     LEFT JOIN payments p ON p.order_id = o.id
@@ -316,7 +317,7 @@ adminRouter.get("/orders/:id", async (c) => {
 
   const order = await c.env.DB
     .prepare(`
-      SELECT o.*, u.email as customer_email, u.first_name, u.last_name
+      SELECT o.*, COALESCE(o.shipping_email, u.email) as customer_email, u.first_name, u.last_name
       FROM orders o
       LEFT JOIN users u ON o.user_id = u.id
       WHERE o.id = ?

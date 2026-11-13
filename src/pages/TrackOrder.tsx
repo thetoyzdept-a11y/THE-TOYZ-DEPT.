@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { formatINR, formatDate, getOrderStatusBadge } from "../lib/utils";
 import { Search, Package, Truck, CheckCircle2, Clock, AlertCircle, ArrowRight } from "lucide-react";
+import { BUSINESS_PROFILE } from "../config/business";
 
 const STAGES = [
   { key: "pending", label: "Placed" },
@@ -172,16 +173,16 @@ export function TrackOrderPage() {
                   <p className="font-bold text-ink flex items-center gap-1.5">
                     <Truck className="w-4 h-4" /> Air Courier Waybill: {order.tracking_number}
                   </p>
-                  <p className="text-ink-muted text-[11px]">Shipped with DTDC / BlueDart Express</p>
+                  <p className="text-ink-muted text-[11px]">Carrier: {order.courier_name || "Shiprocket Express Network"}</p>
                 </div>
                 {order.tracking_url && (
                   <a
                     href={order.tracking_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn-dark text-[11px] py-1.5 px-3"
+                    className="btn-dark text-[11px] py-1.5 px-3 flex items-center gap-1.5"
                   >
-                    Open Courier Portal <ArrowRight className="w-3.5 h-3.5" />
+                    Open Live Courier Radar <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 )}
               </div>
@@ -199,9 +200,13 @@ export function TrackOrderPage() {
 
               <div>
                 <p className="font-bold text-ink uppercase mb-1">Customer Care Support:</p>
-                <p className="text-ink-muted">Need to modify shipping notes or rush delivery?</p>
-                <p className="text-ink font-bold mt-1">support@thetoyzdept.in</p>
-                <p className="text-ink font-bold">+91 80 4123 9900</p>
+                <p className="text-ink-muted">Need assistance with your delivery?</p>
+                <p className="text-ink font-bold mt-1">
+                  <a href={`mailto:${BUSINESS_PROFILE.contact.email}`} className="hover:underline">{BUSINESS_PROFILE.contact.email}</a>
+                </p>
+                <p className="text-ink font-bold">
+                  <a href={`tel:${BUSINESS_PROFILE.contact.phone.replace(/\s+/g, "")}`} className="hover:underline">{BUSINESS_PROFILE.contact.phone}</a>
+                </p>
               </div>
             </div>
           </div>

@@ -175,13 +175,13 @@ checkoutRouter.post("/create-order", async (c) => {
       .prepare(`
         INSERT INTO orders (
           id, order_number, user_id, status, subtotal, shipping_cost, tax_amount, discount_amount, total_amount,
-          coupon_code, shipping_name, shipping_phone, shipping_address_1, shipping_address_2,
-          shipping_city, shipping_state, shipping_postal_code, shipping_country, internal_notes
-        ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          coupon_code, shipping_name, shipping_phone, shipping_email, shipping_address_1, shipping_address_2,
+          shipping_city, shipping_state, shipping_postal_code, shipping_country, internal_notes, payment_status
+        ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created')
       `)
       .bind(
         orderId, orderNumber, finalUserId, subtotal, shippingCost, discountAmount, totalAmount,
-        validCouponCode, shipping.fullName, shipping.phone, shipping.addressLine1, shipping.addressLine2 || null,
+        validCouponCode, shipping.fullName, shipping.phone, shipping.email.toLowerCase(), shipping.addressLine1, shipping.addressLine2 || null,
         shipping.city, shipping.state, shipping.postalCode, shipping.country, shipping.customerNotes || null
       )
       .run();
@@ -247,11 +247,16 @@ checkoutRouter.post("/create-order", async (c) => {
       isMockPayment = false;
     }
 
-    // Create payment entry in D1
+    // Create payment entry in D1 and link razorpay_order_id to orders table
     const paymentId = "pay_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
     await c.env.DB
       .prepare("INSERT INTO payments (id, order_id, razorpay_order_id, amount, currency, status) VALUES (?, ?, ?, ?, 'INR', 'created')")
       .bind(paymentId, orderId, razorpayOrderId, totalAmount)
+      .run();
+
+    await c.env.DB
+      .prepare("UPDATE orders SET razorpay_order_id = ?, updated_at = datetime('now') WHERE id = ?")
+      .bind(razorpayOrderId, orderId)
       .run();
 
     return c.json({
@@ -330,10 +335,18 @@ checkoutRouter.post("/verify", async (c) => {
       .bind(razorpayPaymentId || "pay_mock_" + Date.now(), razorpaySignature || "mock_sig", orderId)
       .run();
 
-    // Transition Order to payment_confirmed
+    // Transition Order to payment_confirmed and store payment references
     await c.env.DB
-      .prepare("UPDATE orders SET status = 'payment_confirmed', updated_at = datetime('now') WHERE id = ?")
-      .bind(orderId)
+      .prepare(`
+        UPDATE orders SET 
+          status = 'payment_confirmed',
+          razorpay_payment_id = ?,
+          payment_status = 'captured',
+          payment_method = 'razorpay',
+          updated_at = datetime('now')
+        WHERE id = ?
+      `)
+      .bind(razorpayPaymentId || "pay_mock_" + Date.now(), orderId)
       .run();
 
     // Update stock in variants
@@ -367,6 +380,7 @@ checkoutRouter.post("/verify", async (c) => {
     // Trigger Branded Order Confirmation Email via Resend
     try {
       const customerEmail =
+        order.shipping_email ||
         order.user_email ||
         (order.shipping_address_2 && order.shipping_address_2.includes("@") ? order.shipping_address_2 : null);
 

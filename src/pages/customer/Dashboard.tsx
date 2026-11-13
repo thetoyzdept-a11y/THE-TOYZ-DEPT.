@@ -381,7 +381,10 @@ export function CustomerDashboardPage() {
                             </p>
                           </div>
 
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <span className="badge-lime text-[10px] uppercase font-bold">
+                              {ord.payment_status === "captured" ? "PAID" : ord.payment_status || "PAID"} • Razorpay
+                            </span>
                             <span className={getOrderStatusBadge(ord.status).className + " px-2.5 py-0.5 text-[11px] uppercase font-bold"}>
                               {getOrderStatusBadge(ord.status).label}
                             </span>
@@ -397,8 +400,9 @@ export function CustomerDashboardPage() {
                               Items: <span className="font-bold text-ink">{ord.first_item_name} {ord.item_count > 1 ? `(+${ord.item_count - 1} more)` : ""}</span>
                             </p>
                             {ord.tracking_number ? (
-                              <p className="text-lime-darker font-bold mt-0.5 flex items-center gap-1">
-                                <Truck className="w-3.5 h-3.5" /> AWB: {ord.tracking_number}
+                              <p className="text-lime-darker font-bold mt-0.5 flex items-center gap-1.5">
+                                <Truck className="w-3.5 h-3.5" />
+                                <span>{ord.courier_name || "Express Courier"}: <strong>{ord.tracking_number}</strong></span>
                               </p>
                             ) : (
                               <p className="text-ink-muted text-[10px] mt-0.5">
@@ -858,20 +862,23 @@ export function CustomerDashboardPage() {
                 </div>
 
                 <div className="p-3 bg-cream-light border border-ink space-y-1">
-                  <span className="font-bold uppercase text-ink block">Payment Information:</span>
+                  <span className="font-bold uppercase text-ink block">Payment & Logistics:</span>
                   <p>Provider: <strong>Razorpay Standard Checkout</strong></p>
-                  {viewingOrder.payment?.razorpay_payment_id && (
-                    <p className="text-lime-darker font-bold">
-                      Payment ID: {viewingOrder.payment.razorpay_payment_id}
+                  <p className="text-lime-darker font-bold">
+                    Payment ID: {viewingOrder.razorpay_payment_id || viewingOrder.payment?.razorpay_payment_id || "Direct Verified"}
+                  </p>
+                  {viewingOrder.courier_name && (
+                    <p className="text-ink font-bold">
+                      Courier: {viewingOrder.courier_name}
                     </p>
                   )}
-                  {viewingOrder.payment?.razorpay_order_id && (
-                    <p className="text-ink-muted text-[10px]">
-                      Razorpay Order: {viewingOrder.payment.razorpay_order_id}
+                  {viewingOrder.tracking_number && (
+                    <p className="text-lime-darker font-bold">
+                      AWB Code: {viewingOrder.tracking_number}
                     </p>
                   )}
                   <p className="text-ink-muted text-[10px]">
-                    Settlement: 100% Verified Escrow Secured
+                    Settlement: 100% Escrow Verified & Secured
                   </p>
                 </div>
               </div>
