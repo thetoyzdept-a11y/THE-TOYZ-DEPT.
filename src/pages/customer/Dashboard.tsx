@@ -3,11 +3,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { api } from "../../lib/api";
-import { formatINR, formatDate, getOrderStatusBadge, getCustomRequestStatusBadge } from "../../lib/utils";
+import { formatINR, formatDate, getOrderStatusBadge } from "../../lib/utils";
 import { BUSINESS_PROFILE } from "../../config/business";
 import {
   Package,
-  FileCode,
   MapPin,
   Heart,
   User,
@@ -36,18 +35,16 @@ export function CustomerDashboardPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Active Tab: 'orders' | 'custom' | 'addresses' | 'wishlist' | 'profile' | 'support'
+  // Active Tab: 'orders' | 'addresses' | 'wishlist' | 'profile' | 'support'
   const getInitialTab = () => {
     if (location.pathname.includes("/orders")) return "orders";
-    if (location.pathname.includes("/custom-requests")) return "custom";
     if (location.pathname.includes("/addresses")) return "addresses";
     if (location.pathname.includes("/wishlist")) return "wishlist";
     return "orders";
   };
 
-  const [activeTab, setActiveTab] = useState<"orders" | "custom" | "addresses" | "wishlist" | "profile" | "support">(getInitialTab());
+  const [activeTab, setActiveTab] = useState<"orders" | "addresses" | "wishlist" | "profile" | "support">(getInitialTab());
   const [orders, setOrders] = useState<any[]>([]);
-  const [customRequests, setCustomRequests] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [wishlist, setWishlist] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,14 +86,12 @@ export function CustomerDashboardPage() {
     async function loadDashboardData() {
       setLoading(true);
       try {
-        const [ordersRes, customRes, addrRes, wishRes] = await Promise.all([
+        const [ordersRes, addrRes, wishRes] = await Promise.all([
           api.getCustomerOrders().catch(() => ({ orders: [] })),
-          api.getMyCustomRequests().catch(() => ({ requests: [] })),
           api.getCustomerAddresses().catch(() => ({ addresses: [] })),
           api.getWishlist().catch(() => ({ wishlist: [] })),
         ]);
         setOrders(ordersRes.orders || []);
-        setCustomRequests(customRes.requests || []);
         setAddresses(addrRes.addresses || []);
         setWishlist(wishRes.wishlist || []);
       } catch (err) {
@@ -183,19 +178,6 @@ export function CustomerDashboardPage() {
     }
   };
 
-  const handleRespondQuotation = async (requestId: string, quotationId: string, action: "accepted" | "rejected") => {
-    try {
-      await api.respondToQuotation(requestId, quotationId, action);
-      const res = await api.getMyCustomRequests();
-      setCustomRequests(res.requests || []);
-      if (action === "accepted") {
-        alert("Quotation accepted! Our engineering team has been notified and scheduled the print job.");
-      }
-    } catch (err: any) {
-      alert(err.message || "Action failed");
-    }
-  };
-
   if (!user) return null;
 
   return (
@@ -232,7 +214,7 @@ export function CustomerDashboardPage() {
         </div>
 
         {/* ── Customer Quick Metrics Overview ──────────────────────────── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div
             onClick={() => setActiveTab("orders")}
             className="card-brutal p-4 bg-cream-light cursor-pointer hover:bg-lime/20 transition-all font-mono"
@@ -243,18 +225,6 @@ export function CustomerDashboardPage() {
             </div>
             <p className="text-[10px] uppercase font-bold text-ink">Total Orders</p>
             <p className="text-[9px] text-ink-muted">Invoices & Shipments</p>
-          </div>
-
-          <div
-            onClick={() => setActiveTab("custom")}
-            className="card-brutal p-4 bg-cream-light cursor-pointer hover:bg-lime/20 transition-all font-mono"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <FileCode className="w-4 h-4 text-ink-muted" />
-              <span className="text-xl font-display font-black text-coral">{customRequests.length}</span>
-            </div>
-            <p className="text-[10px] uppercase font-bold text-ink">3D Print Jobs</p>
-            <p className="text-[9px] text-ink-muted">Custom STL Quotations</p>
           </div>
 
           <div
@@ -297,18 +267,6 @@ export function CustomerDashboardPage() {
                   <Package className="w-4 h-4" /> Orders & Invoices
                 </span>
                 <span className="font-mono text-[10px]">{orders.length}</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("custom")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all ${
-                  activeTab === "custom" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <FileCode className="w-4 h-4" /> 3D Quotations
-                </span>
-                <span className="font-mono text-[10px]">{customRequests.length}</span>
               </button>
 
               <button
@@ -472,107 +430,7 @@ export function CustomerDashboardPage() {
               </div>
             )}
 
-            {/* ── 2. Custom 3D Printing Quotations Tab ──────────────── */}
-            {activeTab === "custom" && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between pb-3 border-b-2 border-ink">
-                  <div>
-                    <h2 className="font-display font-black text-xl uppercase">
-                      3D Print Quotations & Requests
-                    </h2>
-                    <p className="font-mono text-xs text-ink-muted">
-                      Direct engineering estimates for customer STL / 3MF custom models
-                    </p>
-                  </div>
-                  <Link to="/custom-prints" className="btn-primary text-xs py-1.5 px-3">
-                    + New 3D Model
-                  </Link>
-                </div>
-
-                {customRequests.length === 0 ? (
-                  <div className="card-brutal p-8 bg-cream-light text-center">
-                    <FileCode className="w-10 h-10 text-ink/30 mx-auto mb-2" />
-                    <p className="font-display font-bold uppercase text-sm">No Custom Requests Lodged</p>
-                    <p className="font-mono text-xs text-ink-muted mt-1 mb-4">
-                      Submit an STL or 3MF file to get a transparent engineering quote.
-                    </p>
-                    <Link to="/custom-prints" className="btn-primary text-xs">
-                      Submit 3D Model
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {customRequests.map((req) => (
-                      <div key={req.id} className="card-brutal bg-cream-light p-5 space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-ink/15 gap-2">
-                          <div>
-                            <span className="font-display font-bold text-base uppercase">
-                              #{req.request_number}
-                            </span>
-                            <p className="font-mono text-[11px] text-ink-muted">
-                              Submitted {formatDate(req.created_at)} • File: {req.file_name || "CAD Model"}
-                            </p>
-                          </div>
-
-                          <span className={getCustomRequestStatusBadge(req.status).className + " px-2.5 py-0.5 font-mono text-[11px] uppercase font-bold"}>
-                            {getCustomRequestStatusBadge(req.status).label}
-                          </span>
-                        </div>
-
-                        <div className="text-xs font-body text-ink/80 bg-cream p-3 border border-ink/20">
-                          <p className="font-bold font-mono uppercase text-ink mb-1">
-                            {req.material} • {req.color} • Qty: {req.quantity}
-                          </p>
-                          <p>{req.description}</p>
-                        </div>
-
-                        {req.quotation_id && (
-                          <div className="p-4 bg-lime/20 border-2 border-ink space-y-3 font-mono text-xs">
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-ink uppercase">Commercial Quotation:</span>
-                              <span className="font-display font-black text-lg text-ink">
-                                {formatINR(req.quotation_amount)}
-                              </span>
-                            </div>
-
-                            {req.quotation_notes && (
-                              <p className="text-ink-muted text-[11px]">
-                                Engineering Notes: {req.quotation_notes}
-                              </p>
-                            )}
-
-                            {req.quotation_status === "sent" && (
-                              <div className="flex gap-2 pt-2 border-t border-ink/20">
-                                <button
-                                  onClick={() => handleRespondQuotation(req.id, req.quotation_id, "accepted")}
-                                  className="btn-primary text-xs py-1.5 px-4"
-                                >
-                                  Accept Quotation & Start Printing
-                                </button>
-                                <button
-                                  onClick={() => handleRespondQuotation(req.id, req.quotation_id, "rejected")}
-                                  className="btn-secondary text-xs py-1.5 px-3 text-coral"
-                                >
-                                  Decline
-                                </button>
-                              </div>
-                            )}
-
-                            {req.quotation_status === "accepted" && (
-                              <div className="flex items-center gap-1.5 text-lime-darker font-bold">
-                                <CheckCircle2 className="w-4 h-4" /> Quotation Accepted! In Production Queue.
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* ── 3. Saved Addresses Tab ────────────────────────────── */}
+            {/* ── 2. Saved Addresses Tab ────────────────────────────── */}
             {activeTab === "addresses" && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between pb-3 border-b-2 border-ink">

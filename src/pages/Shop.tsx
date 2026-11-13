@@ -97,9 +97,12 @@ export function ShopPage() {
           <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tight text-ink">
             Store Drops & Archive<span className="text-coral">.</span>
           </h1>
-          <div className="flex items-center gap-2 font-mono text-xs text-ink-muted uppercase">
-            <span className="w-2 h-2 rounded-full bg-lime border border-ink flex-shrink-0 animate-pulse" />
-            <span className="truncate">{products.length} Tactile Drops Fabricated in Bengaluru // Ready for Dispatch</span>
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-ink-muted uppercase">
+            <span className="inline-flex items-center gap-1.5 bg-lime/20 border border-ink px-2 py-0.5 text-[10px] font-bold text-ink">
+              <span className="w-1.5 h-1.5 rounded-full bg-lime border border-ink animate-pulse" />
+              {products.length} Drops Live
+            </span>
+            <span className="text-[11px] text-ink-muted">Fabricated in Bengaluru // Ready for Dispatch</span>
           </div>
         </div>
 
@@ -133,14 +136,6 @@ export function ShopPage() {
                 <span>{cat.name}</span>
               </button>
             ))}
-
-            <Link
-              to="/custom-prints"
-              className="px-3.5 py-2 text-xs font-mono font-bold uppercase border-2 border-dashed border-ink bg-lime/30 hover:bg-lime text-ink transition-all flex items-center gap-1.5 flex-shrink-0"
-            >
-              <span>🖨️</span>
-              <span>Upload Custom STL</span>
-            </Link>
           </div>
         </div>
 

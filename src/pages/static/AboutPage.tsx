@@ -209,14 +209,11 @@ export function AboutPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-lime text-ink border-2 border-ink">
           <div>
             <h3 className="font-display font-black text-lg uppercase">Ready to explore our catalog?</h3>
-            <p className="font-mono text-xs">Browse our tactile collectibles or request a custom quotation.</p>
+            <p className="font-mono text-xs">Browse our tactile collectibles, kinetic desk gear, and brutalist home objects.</p>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/shop" className="btn-primary text-xs">
               Explore Shop
-            </Link>
-            <Link to="/custom-prints" className="btn-secondary text-xs">
-              Custom Prints
             </Link>
           </div>
         </div>

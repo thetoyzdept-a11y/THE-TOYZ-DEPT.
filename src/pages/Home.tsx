@@ -56,15 +56,13 @@ export function HomePage() {
                 +999 DESK AURA // TACTILE 3D DROPS
               </div>
 
-              <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-tight sm:leading-[0.95] text-cream">
-                <span>YOUR DESK IS </span>
-                <br className="hidden sm:inline" />
-                <span className="inline-block bg-lime text-ink px-2.5 py-0.5 sm:px-3 sm:py-1 -rotate-1 shadow-brutal-sm border border-ink my-1.5 sm:my-0 font-black">
+              <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-[1.1] sm:leading-[0.95] text-cream">
+                <span className="block sm:inline">YOUR DESK IS </span>
+                <span className="inline-block bg-lime text-ink px-2.5 py-0.5 sm:px-3 sm:py-1 shadow-brutal-sm border border-ink my-1 sm:my-0 font-black">
                   DEPRESSING
                 </span>
                 <span className="text-coral">.</span>{" "}
-                <br className="inline" />
-                <span className="text-cream">WE FIXED THAT</span>
+                <span className="block sm:inline text-cream">WE FIXED THAT</span>
                 <span className="text-lime">!</span>
               </h1>
 
@@ -76,8 +74,8 @@ export function HomePage() {
                 <Link to="/shop" className="btn-primary w-full sm:w-auto text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 text-center flex items-center justify-center gap-2 cursor-pointer">
                   <span>Feed Your Dopamine</span> <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
-                <Link to="/custom-prints" className="btn-secondary w-full sm:w-auto text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 bg-transparent text-cream border-cream hover:bg-cream hover:text-ink text-center cursor-pointer">
-                  Upload Custom STL
+                <Link to="/shop?category=collectibles" className="btn-secondary w-full sm:w-auto text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 bg-transparent text-cream border-cream hover:bg-cream hover:text-ink text-center cursor-pointer">
+                  Explore Drops
                 </Link>
               </div>
 
@@ -102,7 +100,7 @@ export function HomePage() {
             <div className="lg:col-span-5 relative mt-8 lg:mt-0 max-w-sm sm:max-w-md mx-auto w-full">
               <div className="card-brutal bg-cream text-ink p-3 sm:p-5 shadow-brutal-xl relative hover:shadow-brutal transition-all animate-float">
                 {/* Hero Product Badge */}
-                <div className="absolute -top-3 -right-3 z-10">
+                <div className="absolute top-2 right-2 sm:-top-3 sm:-right-3 z-10">
                   <span className="badge-coral text-xs py-1 px-3 shadow-brutal-sm font-bold animate-pulse">
                     FLAGSHIP DROP
                   </span>
@@ -192,7 +190,7 @@ export function HomePage() {
           {categories.map((cat, idx) => (
             <Link
               key={cat.id}
-              to={cat.slug === "custom-creations" ? "/custom-prints" : `/shop?category=${cat.slug}`}
+              to={`/shop?category=${cat.slug}`}
               className="card-brutal-hover p-4 sm:p-6 flex flex-col justify-between group"
             >
               <div>
@@ -200,11 +198,7 @@ export function HomePage() {
                   <span className="font-mono text-[10px] sm:text-xs font-bold text-ink-muted">
                     0{idx + 1} //
                   </span>
-                  {cat.slug === "custom-creations" ? (
-                    <span className="badge-coral text-[9px] sm:text-[10px]">Instant Quote</span>
-                  ) : (
-                    <span className="badge-lime text-[9px] sm:text-[10px]">{cat.product_count} Items</span>
-                  )}
+                  <span className="badge-lime text-[9px] sm:text-[10px]">{cat.product_count} Items</span>
                 </div>
                 <h3 className="font-display font-black text-base sm:text-xl uppercase mb-1 sm:mb-2 group-hover:text-coral transition-colors line-clamp-1">
                   {cat.name}
@@ -322,51 +316,51 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ── CUSTOM 3D PRINTING SERVICE CALLOUT ─────────────────────── */}
+      {/* ── THE TOYZ DEPT. BRAND MANIFESTO CALLOUT ─────────────────── */}
       <section className="bg-lime border-b-2 border-ink py-12 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="card-brutal bg-ink text-cream p-6 sm:p-12 shadow-brutal-xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-lime text-ink text-xs font-mono font-bold uppercase tracking-wider">
-                  <UploadCloud className="w-4 h-4" /> Got A Weird 3D Idea?
+                  <Sparkles className="w-4 h-4" /> BENGALURU 3D DESIGN STUDIO
                 </div>
                 <h2 className="font-display font-black text-2xl sm:text-4xl lg:text-5xl uppercase tracking-tight text-cream">
-                  Have an STL or STEP file? <br />
-                  <span className="text-lime">We Print It In Bengaluru.</span>
+                  ENGINEERED FOR DOPAMINE. <br />
+                  <span className="text-lime">BUILT FOR YOUR WORKSPACE.</span>
                 </h2>
                 <p className="text-cream/80 text-xs sm:text-base font-body max-w-2xl leading-relaxed">
-                  Got a custom CAD prototype, mechanical bracket, or desk figurine? Drop your .STL or .STEP file. We check wall thickness, calculate exact material costs, and deliver a clean quotation in under 2 hours.
+                  We don't do boring corporate swag or generic plastic junk. Every single drop in our archive is designed with tactile ball-and-socket joints, silky co-extruded colorways, and micrometer precision tolerances.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono text-cream/70">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-lime" />
-                    <span>0.12mm Ultra Detail</span>
+                    <span>0.12mm Ultra Detail FDM</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-lime" />
-                    <span>PLA+, Silk Dual-Tone, PETG</span>
+                    <span>Virgin Bio-Based Silk PLA+</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-lime" />
-                    <span>Express Pan-India Delivery</span>
+                    <span>Express Pan-India Dispatch</span>
                   </div>
                 </div>
               </div>
 
               <div className="lg:col-span-4 flex flex-col gap-3">
                 <Link
-                  to="/custom-prints"
+                  to="/shop"
                   className="btn-primary text-center py-4 text-xs sm:text-sm uppercase tracking-wider cursor-pointer"
                 >
-                  Upload 3D Model Now ⚡
+                  Browse Full Drop Archive ⚡
                 </Link>
                 <Link
-                  to="/pricing"
+                  to="/about"
                   className="btn-secondary text-center py-3 bg-transparent text-cream border-cream hover:bg-cream hover:text-ink text-xs uppercase cursor-pointer"
                 >
-                  View Slicing Rates
+                  About Our Studio
                 </Link>
               </div>
             </div>

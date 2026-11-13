@@ -156,7 +156,7 @@ export function buildOrderConfirmationEmail(
     <div class="badge">Payment Verified // Print Bed Queued</div>
     <h1>THE TOYZ DEPT<span style="color: #FF694B;">.</span></h1>
     <p>Yo <strong>${order.shipping_name || "Collector"}</strong>,</p>
-    <p>Your drop <strong>#${order.order_number}</strong> is confirmed. Our print farm is spinning up toolpaths in 0.12mm high-precision FDM.</p>
+    <p>Your drop <strong>#${order.order_number}</strong> is confirmed! Our studio is prepping your tactile pieces with micrometer precision.</p>
 
     <table class="items-table">
       <thead>
@@ -245,7 +245,7 @@ export function buildShipmentDispatchedEmail(
       </a>
     </div>
 
-    <p style="font-size: 11px; color: #666666;">You can also check live telemetry anytime on our website using your order number.</p>
+    <p style="font-size: 11px; color: #666666;">You can also track your shipment status anytime on our website using your order reference.</p>
 
     <div class="footer">
       THE TOYZ DEPT. • MIG 146, KHB Colony, Rajiv Gandhi Nagar, Gadag, KA 582101, India<br>

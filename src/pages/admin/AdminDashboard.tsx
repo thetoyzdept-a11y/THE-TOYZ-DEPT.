@@ -481,7 +481,6 @@ export function AdminDashboardPage() {
             { id: "overview", label: "Overview & Revenue", icon: DollarSign },
             { id: "orders", label: `Orders (${orders.length})`, icon: Package },
             { id: "products", label: `Products (${products.length})`, icon: Layers },
-            { id: "custom", label: `3D Requests (${customRequests.length})`, icon: FileCode },
             { id: "inventory", label: "Inventory & Stock", icon: Sliders },
             { id: "inquiries", label: `Inquiries (${inquiries.length + grievances.length})`, icon: Mail },
             { id: "security", label: "Security & Passwords", icon: ShieldCheck },
@@ -537,11 +536,11 @@ export function AdminDashboardPage() {
               </div>
 
               <div className="card-brutal p-5 bg-cream-light space-y-1">
-                <p className="font-mono text-xs uppercase text-ink-muted">Custom STL Requests</p>
+                <p className="font-mono text-xs uppercase text-ink-muted">Active Catalog Drops</p>
                 <p className="font-display font-black text-2xl sm:text-3xl text-ink">
-                  {customRequests.length}
+                  {products.length}
                 </p>
-                <span className="badge-lime text-[10px]">{customRequests.filter((r) => r.status === "submitted").length} In Queue</span>
+                <span className="badge-lime text-[10px]">Tactile Drops Live</span>
               </div>
             </div>
 
@@ -1402,7 +1401,7 @@ export function AdminDashboardPage() {
                   </h3>
                   <div className="space-y-1.5 text-ink-muted text-[11px]">
                     <p>• <strong>Strict Separation:</strong> The Admin Dashboard is strictly locked to the company account (thetoyzdept@gmail.com). Customers are separated completely and routed to their own accounts.</p>
-                    <p>• <strong>Live Persistence:</strong> Orders, customer accounts, custom STL print requests, and inventory sync in real-time.</p>
+                    <p>• <strong>Live Persistence:</strong> Orders, customer accounts, live inventory, and fulfillment sync in real-time.</p>
                     <p>• <strong>Payment & Logistics:</strong> Direct integration with Razorpay Webhooks and Shiprocket fulfillment.</p>
                   </div>
                 </div>

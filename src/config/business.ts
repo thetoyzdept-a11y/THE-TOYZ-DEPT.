@@ -14,7 +14,7 @@ export const BUSINESS_PROFILE = {
   brandName: "THE TOYZ DEPT.",
   tagline: "THINGS YOU DIDN'T KNOW YOU NEEDED.",
   description:
-    "An independent, design-led 3D-printing brand engineering tactile collectibles, creative desk accessories, architectural home objects, and precision customer CAD fabrication.",
+    "An independent, design-led 3D-printing brand engineering tactile fidget collectibles, kinetic desk companions, and brutalist home objects.",
 
   // Legal Entity & Constitution
   legalEntityName: "ABHISHEK H",
@@ -80,7 +80,6 @@ export const BUSINESS_PROFILE = {
     flatShippingFee: 99, // in INR
     courierPartners: ["Delhivery", "BlueDart", "DTDC", "Xpressbees", "Ekart"],
     standardProcessingTime: "24–48 business hours",
-    customProcessingTime: "3–5 business days",
     standardDeliveryMetros: "3–5 business days",
     standardDeliveryRestOfIndia: "4–7 business days",
   },

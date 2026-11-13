@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { CreditCard, Truck, Calculator, HelpCircle, CheckCircle2, ShieldCheck, Tag } from "lucide-react";
+import { CreditCard, Truck, HelpCircle, CheckCircle2, ShieldCheck, Tag } from "lucide-react";
 import { BUSINESS_PROFILE } from "../../config/business";
 
 export function PricingPage() {
@@ -82,54 +82,12 @@ export function PricingPage() {
           </div>
         </div>
 
-        {/* Custom 3D Printing Quotation Formula */}
-        <div className="card-brutal p-6 sm:p-8 bg-cream-light space-y-6">
-          <div className="flex items-center gap-2">
-            <Calculator className="w-6 h-6 text-coral" />
-            <h2 className="font-display font-black text-2xl uppercase tracking-tight text-ink">
-              2. Custom 3D Printing Service Quotations
-            </h2>
-          </div>
-          <div className="font-mono text-xs text-ink/80 leading-relaxed space-y-4">
-            <p>
-              For customer-uploaded CAD files (.STL, .STEP, .OBJ), custom manufacturing costs cannot be determined by a single fixed rate because 3D geometry varies drastically in volume, infill, and print orientation.
-            </p>
-            <p>
-              Our custom quotation is calculated objectively using an itemized engineering formula:
-            </p>
-
-            {/* Formula Breakdown */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-[11px] pt-2">
-              <div className="p-3 bg-cream border border-ink/20">
-                <p className="font-bold text-ink uppercase mb-1">A. Material Mass</p>
-                <p className="text-ink-muted">Filament weight in grams based on sliced model infill percentage.</p>
-              </div>
-              <div className="p-3 bg-cream border border-ink/20">
-                <p className="font-bold text-ink uppercase mb-1">B. Machine Runtime</p>
-                <p className="text-ink-muted">Nozzle time and bed heating power consumption based on layer height.</p>
-              </div>
-              <div className="p-3 bg-cream border border-ink/20">
-                <p className="font-bold text-ink uppercase mb-1">C. Post-Processing</p>
-                <p className="text-ink-muted">Support structure removal, deburring, and tolerance verification.</p>
-              </div>
-              <div className="p-3 bg-cream border border-ink/20">
-                <p className="font-bold text-ink uppercase mb-1">D. Protective Packing</p>
-                <p className="text-ink-muted">Multi-layer bubble cushioning and corrugated box packaging.</p>
-              </div>
-            </div>
-
-            <div className="p-4 bg-lime/20 border border-lime-darker text-[11px]">
-              <strong className="text-ink">Quotation Guarantee:</strong> Custom quotations transmitted to the customer remain binding and locked for 14 calendar days. Customers are never charged without reviewing and approving the itemized quotation first.
-            </div>
-          </div>
-        </div>
-
         {/* Payment Terms & Gateway */}
         <div className="card-brutal p-6 sm:p-8 bg-cream-light space-y-6">
           <div className="flex items-center gap-2">
             <CreditCard className="w-6 h-6 text-lime-darker" />
             <h2 className="font-display font-black text-2xl uppercase tracking-tight text-ink">
-              3. Payment Terms & Supported Modes
+              2. Payment Terms & Supported Modes
             </h2>
           </div>
           <div className="font-mono text-xs text-ink/80 leading-relaxed space-y-4">
@@ -151,10 +109,10 @@ export function PricingPage() {
                 <p className="font-bold text-ink">When Payment is Required:</p>
                 <ul className="list-disc list-inside text-ink-muted space-y-1 text-[11px]">
                   <li>
-                    <strong>Catalog Orders:</strong> Full payment at online checkout prior to order dispatch.
+                    <strong>All Store Drops:</strong> Full payment at online checkout prior to order dispatch.
                   </li>
                   <li>
-                    <strong>Custom Prints:</strong> Payment upon customer acceptance of the final quotation, prior to machine slicing and production initiation.
+                    <strong>Order Confirmation:</strong> An instant order confirmation with invoice receipt is emailed immediately upon payment completion.
                   </li>
                 </ul>
               </div>

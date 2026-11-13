@@ -195,7 +195,7 @@ export function LoginPage() {
             Sign In<span className="text-coral">.</span>
           </h1>
           <p className="font-mono text-xs text-ink-muted uppercase">
-            Access your orders, custom 3D quotes & wishlist
+            Access your drops, tracking & wishlist
           </p>
         </div>
 

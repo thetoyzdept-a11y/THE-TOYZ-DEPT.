@@ -10,7 +10,6 @@ import { CartDrawer } from "./components/layout/CartDrawer";
 import { HomePage } from "./pages/Home";
 import { ShopPage } from "./pages/Shop";
 import { ProductDetailPage } from "./pages/ProductDetail";
-import { CustomPrintsPage } from "./pages/CustomPrints";
 import { CheckoutPage } from "./pages/Checkout";
 import { OrderSuccessPage } from "./pages/OrderSuccess";
 import { TrackOrderPage } from "./pages/TrackOrder";
@@ -137,7 +136,7 @@ function AppLayout() {
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/product/:slug" element={<ProductDetailPage />} />
-          <Route path="/custom-prints" element={<CustomPrintsPage />} />
+          <Route path="/custom-prints" element={<Navigate to="/shop" replace />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
           <Route path="/track-order" element={<TrackOrderPage />} />

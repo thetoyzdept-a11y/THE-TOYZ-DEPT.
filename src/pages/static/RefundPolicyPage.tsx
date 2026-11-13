@@ -100,28 +100,10 @@ export function RefundPolicyPage() {
             </ul>
           </div>
 
-          {/* Section 3: Custom Prints Policy */}
+          {/* Section 3: Cancellation Policy */}
           <div className="space-y-3">
             <h2 className="font-display font-bold text-lg uppercase text-ink">
-              3. Custom 3D Printing Service (Customer CAD Uploads)
-            </h2>
-            <p>
-              Custom 3D prints are manufactured strictly on-demand using customer-supplied 3D CAD files (.STL, .STEP, .OBJ). Because custom prints have no resale value:
-            </p>
-            <div className="p-4 bg-coral/10 border border-coral text-xs space-y-2">
-              <p>
-                <strong>No Cancellation Once Production Begins:</strong> Once you approve the itemized quotation and machine slicing has commenced, custom fabrication orders cannot be cancelled or returned.
-              </p>
-              <p>
-                <strong>Dimensional Accuracy Guarantee:</strong> If our printed physical piece deviates from your supplied 3D CAD geometry beyond standard additive manufacturing tolerances of ±0.20mm, we will reprint the part free of charge or issue a 100% refund.
-              </p>
-            </div>
-          </div>
-
-          {/* Section 4: Cancellation Policy */}
-          <div className="space-y-3">
-            <h2 className="font-display font-bold text-lg uppercase text-ink">
-              4. Order Cancellation Policy
+              3. Order Cancellation Policy
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="bg-cream-light p-4 border border-ink/20 space-y-1">
@@ -139,10 +121,10 @@ export function RefundPolicyPage() {
             </div>
           </div>
 
-          {/* Section 5: Refund Mode & Timeline */}
+          {/* Section 4: Refund Mode & Timeline */}
           <div className="space-y-3">
             <h2 className="font-display font-bold text-lg uppercase text-ink">
-              5. Refund Timeline & Processing Method
+              4. Refund Timeline & Processing Method
             </h2>
             <p>
               Upon approving a return or cancellation request:
@@ -155,10 +137,10 @@ export function RefundPolicyPage() {
             </ul>
           </div>
 
-          {/* Section 6: Return Logistics Costs */}
+          {/* Section 5: Return Logistics Costs */}
           <div className="space-y-3">
             <h2 className="font-display font-bold text-lg uppercase text-ink">
-              6. Return Logistics & Courier Expenses
+              5. Return Logistics & Courier Expenses
             </h2>
             <p>
               For any verified damaged shipment or manufacturing error on our part, THE TOYZ DEPT. covers all return shipping expenses or coordinates a reverse pickup via Shiprocket at our sole cost.

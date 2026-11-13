@@ -145,11 +145,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/custom-prints" className="text-cream/80 hover:text-lime transition-colors flex items-center gap-1.5">
-                  <span>🖨️</span> <span>Upload Custom 3D STL</span>
-                </Link>
-              </li>
-              <li>
                 <Link to="/shop" className="text-coral hover:underline flex items-center gap-1.5 pt-1">
                   <span>✦</span> <span>View Full Catalog →</span>
                 </Link>

@@ -99,11 +99,16 @@ export function Header() {
                 </span>
               </Link>
               <Link
-                to="/custom-prints"
+                to="/shop?category=collectibles"
                 className="hover:text-coral transition-colors py-1 flex items-center gap-2 group"
               >
-                <span className="w-2 h-2 rounded-full bg-lime border border-ink animate-pulse" />
-                <span>Custom 3D Lab</span>
+                <span>Collectibles</span>
+              </Link>
+              <Link
+                to="/shop?category=desk-objects"
+                className="hover:text-coral transition-colors py-1 flex items-center gap-2 group"
+              >
+                <span>Desk Gear</span>
               </Link>
               <Link
                 to="/about"
@@ -170,9 +175,6 @@ export function Header() {
                       </Link>
                       <Link to="/account/orders" className="block px-4 py-2 hover:bg-lime transition-colors">
                         Orders & Invoices
-                      </Link>
-                      <Link to="/account/custom-requests" className="block px-4 py-2 hover:bg-lime transition-colors">
-                        Custom Quotations
                       </Link>
                       <Link to="/account/wishlist" className="block px-4 py-2 hover:bg-lime transition-colors">
                         Saved Wishlist
@@ -268,10 +270,10 @@ export function Header() {
               </button>
               <button
                 type="button"
-                onClick={() => { setSearchOpen(false); navigate("/custom-prints"); }}
+                onClick={() => { setSearchOpen(false); navigate("/shop?category=home-stuff"); }}
                 className="hover:underline text-coral font-bold"
               >
-                #custom-stl
+                #home-decor
               </button>
             </div>
           </div>
@@ -318,15 +320,20 @@ export function Header() {
                   <span className="badge-lime text-[10px] font-mono">12 Drops</span>
                 </Link>
                 <Link
-                  to="/custom-prints"
+                  to="/shop?category=collectibles"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 bg-lime/30 hover:bg-lime border border-ink transition-all"
+                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-lime border border-ink animate-pulse" />
-                    Custom 3D Lab
-                  </span>
-                  <span className="badge-coral text-[9px]">Upload STL</span>
+                  <span>🐉 Collectibles</span>
+                  <ChevronRight className="w-4 h-4 text-ink-muted" />
+                </Link>
+                <Link
+                  to="/shop?category=desk-objects"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                >
+                  <span>⚡ Desk Gear & Fidgets</span>
+                  <ChevronRight className="w-4 h-4 text-ink-muted" />
                 </Link>
                 <Link
                   to="/about"
