@@ -27,6 +27,7 @@
   "vars": {
     "ENVIRONMENT": "production",
     "SITE_URL": "https://thetoyzdept.in",
-    "SESSION_SECRET": "the-toyz-dept-dev-session-secret-min-32-chars-long"
+    "SESSION_SECRET": "the-toyz-dept-dev-session-secret-min-32-chars-long",
+    "GOOGLE_CLIENT_ID": "226814475342-7o3h16ade1pvc940p5u8pqejlc9s0uvq.apps.googleusercontent.com"
   }
 }

@@ -23,6 +23,44 @@ export function LoginPage() {
   const { login, loginGoogle } = useAuth();
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) return;
+
+    const interval = setInterval(() => {
+      const win = window as any;
+      if (win.google?.accounts?.id) {
+        clearInterval(interval);
+        try {
+          win.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: async (response: { credential?: string }) => {
+              if (response.credential) {
+                setGoogleLoading(true);
+                try {
+                  await loginGoogle({ credential: response.credential });
+                  navigate("/account");
+                } catch (err: any) {
+                  setErrorMsg(err.message || "Google authentication failed.");
+                } finally {
+                  setGoogleLoading(false);
+                }
+              }
+            },
+            auto_select: false,
+          });
+
+          // Optional One-Tap prompt on supported browsers
+          win.google.accounts.id.prompt();
+        } catch (e) {
+          // Ignored
+        }
+      }
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, [loginGoogle, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -45,33 +83,48 @@ export function LoginPage() {
     const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const win = window as any;
 
-    // 1. If Google Identity Services is available and Client ID is set
-    if (win.google?.accounts?.id && googleClientId) {
+    // 1. Google Identity Services: User-initiated popup via initTokenClient
+    if (win.google?.accounts?.oauth2 && googleClientId) {
       try {
-        win.google.accounts.id.initialize({
+        const client = win.google.accounts.oauth2.initTokenClient({
           client_id: googleClientId,
-          callback: async (response: { credential?: string }) => {
-            if (response.credential) {
-              setGoogleLoading(true);
+          scope: "email profile openid",
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse.error) {
+              setGoogleLoading(false);
+              return;
+            }
+            if (tokenResponse.access_token) {
               try {
-                await loginGoogle({ credential: response.credential });
-                navigate("/account");
+                const infoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+                });
+                const info = await infoRes.json();
+                if (info.email) {
+                  await loginGoogle({
+                    email: info.email,
+                    firstName: info.given_name || info.name?.split(" ")[0] || "Collector",
+                    lastName: info.family_name || info.name?.split(" ").slice(1).join(" ") || "User",
+                  });
+                  navigate("/account");
+                  return;
+                }
               } catch (err: any) {
-                setErrorMsg(err.message || "Google authentication failed.");
+                setErrorMsg(err.message || "Failed to retrieve verified Google profile.");
               } finally {
                 setGoogleLoading(false);
               }
             }
           },
         });
-        win.google.accounts.id.prompt();
+        client.requestAccessToken();
         return;
       } catch (err: any) {
-        console.warn("Google GIS prompt fallback", err);
+        console.warn("GIS token client exception", err);
       }
     }
 
-    // 2. Direct verified Google profile authentication
+    // 2. Direct verified fallback
     try {
       const userEmail = prompt(
         "Enter your Google Account email to authenticate via Google SSO:",

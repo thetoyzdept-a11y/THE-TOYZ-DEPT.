@@ -58,6 +58,50 @@ export function RegisterPage() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     setErrorMsg("");
+
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const win = window as any;
+
+    if (win.google?.accounts?.oauth2 && googleClientId) {
+      try {
+        const client = win.google.accounts.oauth2.initTokenClient({
+          client_id: googleClientId,
+          scope: "email profile openid",
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse.error) {
+              setGoogleLoading(false);
+              return;
+            }
+            if (tokenResponse.access_token) {
+              try {
+                const infoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+                });
+                const info = await infoRes.json();
+                if (info.email) {
+                  await loginGoogle({
+                    email: info.email,
+                    firstName: info.given_name || info.name?.split(" ")[0] || "Collector",
+                    lastName: info.family_name || info.name?.split(" ").slice(1).join(" ") || "User",
+                  });
+                  navigate("/account");
+                  return;
+                }
+              } catch (err: any) {
+                setErrorMsg(err.message || "Failed to retrieve verified Google profile.");
+              } finally {
+                setGoogleLoading(false);
+              }
+            }
+          },
+        });
+        client.requestAccessToken();
+        return;
+      } catch (err: any) {
+        console.warn("GIS token client exception", err);
+      }
+    }
+
     try {
       const userEmail = prompt("Enter your Google Account email for 1-click verified sign up:", email || "user@gmail.com");
       if (!userEmail) {
