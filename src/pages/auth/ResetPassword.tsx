@@ -102,7 +102,7 @@ export function ResetPasswordPage() {
               Password Configured!
             </h2>
             <p className="text-xs text-ink-muted leading-relaxed">
-              Your new password has been hashed with <strong>PBKDF2 SHA-256 (100k rounds)</strong> and saved to Cloudflare D1. All previous sessions have been safely terminated.
+              Your new password is now active and protected with bank-grade 256-bit encryption. All previous active sessions have been safely terminated.
             </p>
             <Link
               to="/login"

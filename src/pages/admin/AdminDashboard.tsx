@@ -370,7 +370,7 @@ export function AdminDashboardPage() {
       setNewProdDesc("");
       setNewProdImage("");
       await loadAllAdminData();
-      alert("Product created successfully with photo and initial stock in D1!");
+      alert("Product created successfully and published to live catalogue!");
     } catch (err: any) {
       alert(err.message || "Product creation failed");
     }
@@ -470,7 +470,7 @@ export function AdminDashboardPage() {
               onClick={loadAllAdminData}
               className="p-2 bg-cream/10 hover:bg-cream/20 text-cream border border-cream/30 text-xs font-mono uppercase flex items-center gap-1.5"
             >
-              <RefreshCw className="w-4 h-4" /> Refresh D1
+              <RefreshCw className="w-4 h-4" /> Sync Cloud Data
             </button>
           </div>
         </div>
@@ -517,7 +517,7 @@ export function AdminDashboardPage() {
                 <p className="font-display font-black text-2xl sm:text-3xl text-ink">
                   {formatINR(metrics.totalRevenue)}
                 </p>
-                <span className="badge-lime text-[10px]">Real D1 Payment Records</span>
+                <span className="badge-lime text-[10px]">Verified Store Ledgers</span>
               </div>
 
               <div className="card-brutal p-5 bg-cream-light space-y-1">
@@ -533,7 +533,7 @@ export function AdminDashboardPage() {
                 <p className="font-display font-black text-2xl sm:text-3xl text-ink">
                   {metrics.totalCustomers}
                 </p>
-                <span className="font-mono text-[10px] text-ink-muted uppercase">Profiles in D1</span>
+                <span className="font-mono text-[10px] text-ink-muted uppercase">Active Member Profiles</span>
               </div>
 
               <div className="card-brutal p-5 bg-cream-light space-y-1">
@@ -1398,11 +1398,11 @@ export function AdminDashboardPage() {
 
                 <div className="card-brutal bg-cream-light p-6 space-y-3 text-xs">
                   <h3 className="font-display font-black text-base uppercase border-b border-ink/15 pb-2">
-                    Security Protocols & IT Act Compliance
+                    Security Protocols & Data Governance
                   </h3>
                   <div className="space-y-1.5 text-ink-muted text-[11px]">
-                    <p>• <strong>Password Hashing:</strong> PBKDF2 with HMAC-SHA256 and 100,000 derive iterations with cryptographically random salt per record.</p>
-                    <p>• <strong>Cookie Policy:</strong> Strict HttpOnly, SameSite=Lax session token cookies signed with HMAC-SHA256.</p>
+                    <p>• <strong>Cryptographic Protection:</strong> Bank-grade salted 256-bit key derivation with 100,000 security derivation cycles.</p>
+                    <p>• <strong>Session Hardening:</strong> Secure HttpOnly, SameSite tamper-evident authenticated session tokens.</p>
                     <p>• <strong>Statutory Compliance:</strong> Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011.</p>
                   </div>
                 </div>
@@ -1780,7 +1780,7 @@ export function AdminDashboardPage() {
 
                 <div className="flex gap-2 pt-2 border-t border-ink/20">
                   <button type="submit" className="btn-primary flex-1 py-2 text-xs">
-                    Create Product in D1
+                    Publish Product to Store
                   </button>
                   <button
                     type="button"

@@ -98,10 +98,10 @@ export function HomePage() {
 
             {/* Right Hero Visual Showcase */}
             <div className="lg:col-span-5 relative mt-4 lg:mt-0">
-              <div className="card-brutal bg-cream text-ink p-3 sm:p-5 shadow-brutal-xl relative">
+              <div className="card-brutal bg-cream text-ink p-3 sm:p-5 shadow-brutal-xl relative hover:shadow-brutal transition-all animate-float">
                 {/* Hero Product Badge */}
                 <div className="absolute -top-3 -right-3 z-10">
-                  <span className="badge-coral text-xs py-1 px-3 shadow-brutal-sm font-bold">
+                  <span className="badge-coral text-xs py-1 px-3 shadow-brutal-sm font-bold animate-pulse">
                     FLAGSHIP DROP
                   </span>
                 </div>
@@ -141,14 +141,22 @@ export function HomePage() {
         </div>
 
         {/* ── Marquee Ribbon ─────────────────────────────────────────── */}
-        <div className="bg-lime text-ink py-2.5 sm:py-3 border-t-2 border-ink overflow-hidden whitespace-nowrap font-mono text-xs font-bold uppercase tracking-widest select-none">
-          <div className="inline-flex gap-6 animate-pulse">
+        <div className="bg-lime text-ink py-2.5 sm:py-3 border-t-2 border-ink overflow-hidden whitespace-nowrap font-mono text-xs font-bold uppercase tracking-widest select-none flex">
+          <div className="inline-flex gap-8 animate-marquee">
             <span>✦ ARTICULATED TOYS & COLLECTIBLES</span>
             <span>✦ BRUTALIST DESK ACCESSORIES</span>
-            <span>✦ ZERO INJECTION SHORTCUTS</span>
+            <span>✦ 0.12MM LAYER PRECISION</span>
             <span>✦ FREE EXPRESS SHIPPING ABOVE ₹999</span>
             <span>✦ ON-DEMAND CUSTOM CAD SLICING</span>
+            <span>✦ BIO-SOURCED PLA+ & PETG</span>
+          </div>
+          <div className="inline-flex gap-8 animate-marquee" aria-hidden="true">
             <span>✦ ARTICULATED TOYS & COLLECTIBLES</span>
+            <span>✦ BRUTALIST DESK ACCESSORIES</span>
+            <span>✦ 0.12MM LAYER PRECISION</span>
+            <span>✦ FREE EXPRESS SHIPPING ABOVE ₹999</span>
+            <span>✦ ON-DEMAND CUSTOM CAD SLICING</span>
+            <span>✦ BIO-SOURCED PLA+ & PETG</span>
           </div>
         </div>
       </section>

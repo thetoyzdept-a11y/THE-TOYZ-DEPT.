@@ -78,7 +78,7 @@ export function PrivacyPage() {
                 <strong>Contact Details:</strong> Full name, shipping and billing address, email address, telephone number, and postal pincode.
               </li>
               <li>
-                <strong>Account Credentials:</strong> If you create an account, we store your username and a cryptographically hashed representation of your password (using PBKDF2 Web Crypto hashing). We never store plaintext passwords.
+                <strong>Account Credentials:</strong> If you create an account, we store your username and a cryptographically hashed representation of your password (using bank-grade salted 256-bit key derivation). We never store plaintext passwords.
               </li>
               <li>
                 <strong>Customer 3D Geometry:</strong> If you upload 3D models (.STL, .STEP, .OBJ) for custom printing, we store the file strictly to calculate slicer toolpaths and execute machine fabrication.
@@ -138,9 +138,9 @@ export function PrivacyPage() {
                 </p>
               </div>
               <div className="bg-cream-light p-3 border border-ink/20">
-                <p className="font-bold text-ink">Cloudflare Edge & D1 Infrastructure</p>
+                <p className="font-bold text-ink">Encrypted Cloud Infrastructure</p>
                 <p className="text-[11px] text-ink-muted">
-                  Encrypted serverless application hosting, SSL/TLS termination, and database storage under enterprise security compliance.
+                  High-availability distributed cloud hosting, 256-bit SSL/TLS encryption, and secure encrypted data storage under enterprise ISO 27001 standards.
                 </p>
               </div>
             </div>

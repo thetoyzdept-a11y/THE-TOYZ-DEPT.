@@ -206,7 +206,7 @@ export function CustomerDashboardPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="badge-lime text-xs">Customer Command Center</span>
-              <span className="badge-dark text-[10px] font-mono">Member ID: {user.id.slice(0, 10)}</span>
+              <span className="badge-ink text-[10px] font-mono">Member ID: {user.id.slice(0, 10)}</span>
             </div>
             <h1 className="font-display font-black text-3xl sm:text-4xl uppercase tracking-tight">
               Welcome, {user.firstName || "Customer"}

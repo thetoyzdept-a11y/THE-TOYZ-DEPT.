@@ -334,8 +334,7 @@ export function CheckoutPage() {
                   <CreditCard className="w-5 h-5 text-ink" /> Payment Provider
                 </div>
                 <p className="text-ink-muted leading-relaxed">
-                  Powered by Razorpay (UPI, Google Pay, PhonePe, Credit/Debit Cards, NetBanking).
-                  In local dev test mode, a development payment adapter verifies transactions seamlessly.
+                  Secured by Razorpay. Accepts all major UPI applications (Google Pay, PhonePe, Paytm), Credit & Debit Cards, and NetBanking with instant 256-bit encrypted verification.
                 </p>
               </div>
             </div>

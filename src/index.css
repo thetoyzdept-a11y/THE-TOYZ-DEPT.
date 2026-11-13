@@ -62,6 +62,19 @@
   .badge-muted {
     @apply inline-flex items-center px-2 py-0.5 text-xs font-mono font-bold uppercase tracking-wider bg-cream-dark text-ink-muted border border-ink;
   }
+
+  /* Form Elements */
+  .input-brutal {
+    @apply w-full bg-cream-light border-2 border-ink text-ink font-mono text-sm px-4 py-3 placeholder-ink-muted/60 transition-all duration-150 focus:outline-none focus:bg-cream-light focus:border-ink focus:ring-2 focus:ring-lime focus:shadow-brutal-sm;
+  }
+
+  .glow-lime {
+    box-shadow: 0 0 20px -3px rgba(217, 255, 67, 0.45);
+  }
+
+  .glow-coral {
+    box-shadow: 0 0 20px -3px rgba(255, 105, 75, 0.45);
+  }
 }
 
 /* Custom scrollbars */
