@@ -65,16 +65,6 @@ export function LoginPage() {
     setForgotSent(true);
   };
 
-  const fillQuickCredentials = (role: "admin" | "customer") => {
-    if (role === "admin") {
-      setEmail("admin@thetoyzdept.in");
-      setPassword("Admin@123456");
-    } else {
-      setEmail("customer@thetoyzdept.in");
-      setPassword("Customer@123456");
-    }
-  };
-
   return (
     <div className="bg-cream min-h-screen py-16 flex items-center justify-center px-4">
       <div className="card-brutal bg-cream-light p-8 sm:p-10 w-full max-w-md space-y-6 shadow-brutal-xl">
@@ -189,29 +179,6 @@ export function LoginPage() {
             {submitting ? "Authenticating..." : "Sign In to Account"}
           </button>
         </form>
-
-        {/* Quick Dev Switcher for Seamless Testing */}
-        <div className="p-3 bg-cream border border-ink/20 space-y-2 text-xs font-mono">
-          <p className="text-ink-muted text-[10px] uppercase font-bold text-center">
-            ⚡ Quick Test Credentials:
-          </p>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => fillQuickCredentials("customer")}
-              className="flex-1 py-1 bg-cream-dark border border-ink text-[10px] uppercase font-bold hover:bg-lime"
-            >
-              Customer Test
-            </button>
-            <button
-              type="button"
-              onClick={() => fillQuickCredentials("admin")}
-              className="flex-1 py-1 bg-ink text-cream border border-ink text-[10px] uppercase font-bold hover:bg-lime hover:text-ink"
-            >
-              Admin Test
-            </button>
-          </div>
-        </div>
 
         <div className="text-center font-mono text-xs border-t border-ink/20 pt-4 text-ink-muted">
           New to THE TOYZ DEPT.?{" "}

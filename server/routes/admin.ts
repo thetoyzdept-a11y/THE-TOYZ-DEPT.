@@ -633,26 +633,33 @@ adminRouter.post("/change-password", async (c) => {
       return c.json({ error: "User not found" }, 404);
     }
 
-    // Verify current password if provided (also accept default seed password Admin@123456)
+    // Verify current password if provided
     if (currentPassword && currentPassword.trim() !== "" && currentPassword !== "PBKDF2 SHA-256") {
       const match = await verifyPassword(currentPassword, dbUser.password_hash);
-      const isSeed = currentPassword === "Admin@123456";
-      if (!match && !isSeed) {
+      if (!match) {
         return c.json({
           error: "Unauthorized",
-          message: "Current password does not match. (Initial default password is: Admin@123456)",
+          message: "Current password does not match your active account password.",
         }, 401);
       }
     }
 
     const newHash = await hashPassword(newPassword);
 
+    // Synchronize new password across all admin accounts (admin@thetoyzdept.in and thetoyzdept@gmail.com)
     await c.env.DB
-      .prepare("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?")
-      .bind(newHash, user.userId)
+      .prepare("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE role = 'admin'")
+      .bind(newHash)
       .run();
 
-    return c.json({ message: "Admin password updated successfully. Next sign in will require your new credentials." });
+    // Invalidate existing admin sessions in D1 to enforce re-authentication
+    await c.env.DB
+      .prepare("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE role = 'admin')")
+      .run();
+
+    return c.json({
+      message: "Admin password updated successfully. All existing sessions have been terminated. Please sign in with your new credentials.",
+    });
   } catch (err: any) {
     return c.json({ error: "Server Error", message: err.message }, 500);
   }

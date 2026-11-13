@@ -300,10 +300,14 @@ export function AdminDashboardPage() {
         currentPassword: currentAdminPass || undefined,
         newPassword: newAdminPass,
       });
-      setPassChangeSuccess(res.message || "Admin password successfully updated!");
+      setPassChangeSuccess((res.message || "Admin password successfully updated!") + " Redirecting to login to verify your new credentials...");
       setCurrentAdminPass("");
       setNewAdminPass("");
       setConfirmAdminPass("");
+      setTimeout(async () => {
+        await logout();
+        navigate("/login");
+      }, 2200);
     } catch (err: any) {
       setPassChangeError(err.message || "Failed to update admin password.");
     } finally {
@@ -1270,7 +1274,7 @@ export function AdminDashboardPage() {
                 </div>
 
                 <p className="text-xs text-ink-muted">
-                  Update the password for your administrator profile (<strong>{user?.email}</strong>). Requires at least 8 characters. Initial default password is <strong>Admin@123456</strong>.
+                  Update the password for your administrator profile (<strong>{user?.email}</strong>). Requires at least 8 characters.
                 </p>
 
                 {passChangeSuccess && (
@@ -1289,16 +1293,13 @@ export function AdminDashboardPage() {
 
                 <form onSubmit={handleChangeAdminPassword} className="space-y-3 text-xs">
                   <div>
-                    <label className="block font-bold uppercase mb-1 flex items-center justify-between">
-                      <span>Current Password</span>
-                      <span className="text-[10px] text-ink-muted font-normal lowercase">(default: Admin@123456 or leave blank)</span>
-                    </label>
+                    <label className="block font-bold uppercase mb-1">Current Password</label>
                     <div className="relative">
                       <input
                         type={showPassToggles.current ? "text" : "password"}
                         value={currentAdminPass}
                         onChange={(e) => setCurrentAdminPass(e.target.value)}
-                        placeholder="Admin@123456 (or leave blank)"
+                        placeholder="Enter your current password"
                         className="w-full bg-cream border-2 border-ink p-2.5 pr-9 text-xs font-bold"
                       />
                       <button
