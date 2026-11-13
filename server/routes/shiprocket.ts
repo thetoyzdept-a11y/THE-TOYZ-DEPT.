@@ -7,6 +7,7 @@ import {
   generateShiprocketAWB,
   trackShiprocketShipment,
 } from "../shiprocket";
+import { sendEmail, buildShipmentDispatchedEmail } from "../email";
 
 export const shippingRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -89,6 +90,34 @@ shippingRouter.post("/create-shipment/:orderId", requireAdmin, async (c) => {
       `Shipped via ${courierName}. AWB: ${awbCode}`
     )
     .run();
+
+  // 5. Trigger Shipment Dispatched Email via Resend
+  try {
+    const customerEmail =
+      order.user_email ||
+      (order.shipping_address_2 && order.shipping_address_2.includes("@") ? order.shipping_address_2 : null);
+
+    if (customerEmail) {
+      const emailContent = buildShipmentDispatchedEmail(order, awbCode, courierName, trackingUrl);
+      c.executionCtx?.waitUntil
+        ? c.executionCtx.waitUntil(
+            sendEmail(c.env, {
+              to: customerEmail,
+              subject: emailContent.subject,
+              html: emailContent.html,
+              text: emailContent.text,
+            })
+          )
+        : sendEmail(c.env, {
+            to: customerEmail,
+            subject: emailContent.subject,
+            html: emailContent.html,
+            text: emailContent.text,
+          }).catch((err) => console.error("Dispatch email failed:", err));
+    }
+  } catch (emailErr) {
+    console.warn("Could not send dispatch email:", emailErr);
+  }
 
   return c.json({
     success: true,

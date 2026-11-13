@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Env, Variables } from "../types";
 import { requireAuth, getCookie } from "../auth";
 import { getRazorpayCredentials, verifyRazorpaySignature } from "./razorpay";
+import { sendEmail, buildOrderConfirmationEmail } from "../email";
 
 export const checkoutRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -361,6 +362,34 @@ checkoutRouter.post("/verify", async (c) => {
     const cartId = getCookie(cookieHeader, "toyz_cart_id");
     if (cartId) {
       await c.env.DB.prepare("DELETE FROM cart_items WHERE cart_id = ?").bind(cartId).run();
+    }
+
+    // Trigger Branded Order Confirmation Email via Resend
+    try {
+      const customerEmail =
+        order.user_email ||
+        (order.shipping_address_2 && order.shipping_address_2.includes("@") ? order.shipping_address_2 : null);
+
+      if (customerEmail) {
+        const emailContent = buildOrderConfirmationEmail(order, orderItems.results || []);
+        c.executionCtx?.waitUntil
+          ? c.executionCtx.waitUntil(
+              sendEmail(c.env, {
+                to: customerEmail,
+                subject: emailContent.subject,
+                html: emailContent.html,
+                text: emailContent.text,
+              })
+            )
+          : sendEmail(c.env, {
+              to: customerEmail,
+              subject: emailContent.subject,
+              html: emailContent.html,
+              text: emailContent.text,
+            }).catch((err) => console.error("Email dispatch failed:", err));
+      }
+    } catch (emailErr) {
+      console.warn("Could not send confirmation email:", emailErr);
     }
 
     return c.json({
