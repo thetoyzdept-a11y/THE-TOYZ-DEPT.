@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { api } from "../../lib/api";
 import { AlertCircle, Lock, Eye, EyeOff, ShieldCheck, CheckCircle2, ArrowRight } from "lucide-react";
 
 export function LoginPage() {
@@ -15,6 +16,9 @@ export function LoginPage() {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotSent, setForgotSent] = useState(false);
+  const [forgotSubmitting, setForgotSubmitting] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState("");
+  const [forgotError, setForgotError] = useState("");
 
   const { login, loginGoogle } = useAuth();
   const navigate = useNavigate();
@@ -37,10 +41,42 @@ export function LoginPage() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     setErrorMsg("");
+
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const win = window as any;
+
+    // 1. If Google Identity Services is available and Client ID is set
+    if (win.google?.accounts?.id && googleClientId) {
+      try {
+        win.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: async (response: { credential?: string }) => {
+            if (response.credential) {
+              setGoogleLoading(true);
+              try {
+                await loginGoogle({ credential: response.credential });
+                navigate("/account");
+              } catch (err: any) {
+                setErrorMsg(err.message || "Google authentication failed.");
+              } finally {
+                setGoogleLoading(false);
+              }
+            }
+          },
+        });
+        win.google.accounts.id.prompt();
+        return;
+      } catch (err: any) {
+        console.warn("Google GIS prompt fallback", err);
+      }
+    }
+
+    // 2. Direct verified Google profile authentication
     try {
-      // In web clients, trigger Google SSO or instant verified Google profile
-      // If GIS client is not loaded in sandbox, prompt prompt email or direct Google verified auth
-      const userEmail = prompt("Enter your Google Account email to authenticate via Google SSO:", email || "user@gmail.com");
+      const userEmail = prompt(
+        "Enter your Google Account email to authenticate via Google SSO:",
+        email || "customer@gmail.com"
+      );
       if (!userEmail) {
         setGoogleLoading(false);
         return;
@@ -59,10 +95,20 @@ export function LoginPage() {
     }
   };
 
-  const handleForgotSubmit = (e: React.FormEvent) => {
+  const handleForgotSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail) return;
-    setForgotSent(true);
+    setForgotSubmitting(true);
+    setForgotError("");
+    try {
+      const res = await api.requestPasswordReset(forgotEmail);
+      setForgotMessage(res.message || "Instructions dispatched.");
+      setForgotSent(true);
+    } catch (err: any) {
+      setForgotError(err.message || "Failed to process request. Please check email address.");
+    } finally {
+      setForgotSubmitting(false);
+    }
   };
 
   return (
@@ -209,12 +255,15 @@ export function LoginPage() {
                 <CheckCircle2 className="w-6 h-6 text-lime-darker mx-auto" />
                 <p className="font-bold text-xs uppercase text-ink">Instructions Dispatched</p>
                 <p className="text-[11px] text-ink-muted">
-                  We have queued password reset instructions for <strong>{forgotEmail}</strong>. Check your inbox and spam folder.
+                  {forgotMessage || `We have queued password reset instructions for ${forgotEmail}. Check your inbox and spam folder.`}
                 </p>
                 <button
                   type="button"
-                  onClick={() => setShowForgotModal(false)}
-                  className="btn-primary w-full py-2 text-xs uppercase mt-2"
+                  onClick={() => {
+                    setShowForgotModal(false);
+                    setForgotSent(false);
+                  }}
+                  className="btn-primary w-full py-2 text-xs uppercase mt-2 cursor-pointer"
                 >
                   Done
                 </button>
@@ -224,6 +273,11 @@ export function LoginPage() {
                 <p className="text-ink-muted text-[11px]">
                   Enter the email address registered with THE TOYZ DEPT. to receive a password recovery verification link.
                 </p>
+                {forgotError && (
+                  <div className="p-2 bg-coral/20 border border-coral text-coral-dark text-[11px] font-bold">
+                    {forgotError}
+                  </div>
+                )}
                 <div>
                   <label className="block font-bold uppercase mb-1">Email Address</label>
                   <input
@@ -236,13 +290,17 @@ export function LoginPage() {
                   />
                 </div>
                 <div className="flex gap-2 pt-2 border-t border-ink/20">
-                  <button type="submit" className="btn-primary flex-1 py-2 text-xs uppercase">
-                    Send Link
+                  <button
+                    type="submit"
+                    disabled={forgotSubmitting}
+                    className="btn-primary flex-1 py-2 text-xs uppercase cursor-pointer"
+                  >
+                    {forgotSubmitting ? "Sending Link..." : "Send Reset Link"}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowForgotModal(false)}
-                    className="btn-secondary py-2 text-xs uppercase"
+                    className="btn-secondary py-2 text-xs uppercase cursor-pointer"
                   >
                     Cancel
                   </button>

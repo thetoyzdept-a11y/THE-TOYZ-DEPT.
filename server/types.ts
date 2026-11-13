@@ -12,6 +12,8 @@ export interface Env {
   SHIPROCKET_EMAIL?: string;
   SHIPROCKET_PASSWORD?: string;
   SHIPROCKET_PICKUP_LOCATION?: string;
+  RESEND_API_KEY?: string;
+  GOOGLE_CLIENT_ID?: string;
   ASSETS?: Fetcher;
 }
 

@@ -9,6 +9,7 @@ import {
   createSessionCookie,
   deleteSessionCookie,
 } from "../auth";
+import { sendEmail, buildPasswordResetEmail } from "../email";
 
 export const authRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -295,4 +296,135 @@ authRouter.post("/logout", async (c) => {
   }
   c.header("Set-Cookie", deleteSessionCookie());
   return c.json({ message: "Logged out successfully." });
+});
+
+// POST /api/auth/forgot-password
+authRouter.post("/forgot-password", async (c) => {
+  try {
+    const body = await c.req.json();
+    const schema = z.object({
+      email: z.string().email(),
+    });
+
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: "Validation Failed", message: "Please provide a valid email address." }, 400);
+    }
+
+    const email = parsed.data.email.toLowerCase().trim();
+
+    // Check if account exists
+    const user = await c.env.DB
+      .prepare("SELECT id, first_name, is_active FROM users WHERE email = ?")
+      .bind(email)
+      .first<{ id: string; first_name: string; is_active: number }>();
+
+    // For security, always respond with generic success message even if email not found
+    if (!user || !user.is_active) {
+      return c.json({
+        message: "If that email is registered with THE TOYZ DEPT., password recovery instructions have been sent.",
+      });
+    }
+
+    // Generate secure 32-byte hex token
+    const randomBytes = new Uint8Array(32);
+    crypto.getRandomValues(randomBytes);
+    const token = Array.from(randomBytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+
+    const resetId = "rst_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+    // Save token in D1
+    await c.env.DB
+      .prepare(`
+        INSERT INTO password_resets (id, user_id, email, token, expires_at, used)
+        VALUES (?, ?, ?, ?, ?, 0)
+      `)
+      .bind(resetId, user.id, email, token, expiresAt)
+      .run();
+
+    // Build reset link
+    const baseUrl = c.env.SITE_URL || "https://thetoyzdept.in";
+    const resetUrl = `${baseUrl.replace(/\/$/, "")}/reset-password?token=${token}`;
+
+    // Send email via Resend or log in console
+    const emailPayload = buildPasswordResetEmail(resetUrl, user.first_name);
+    await sendEmail(c.env, {
+      to: email,
+      subject: emailPayload.subject,
+      html: emailPayload.html,
+      text: emailPayload.text,
+    });
+
+    return c.json({
+      message: "If that email is registered with THE TOYZ DEPT., password recovery instructions have been sent.",
+      // Include token in non-production for local testing convenience
+      previewResetUrl: c.env.ENVIRONMENT !== "production" ? resetUrl : undefined,
+    });
+  } catch (err: any) {
+    return c.json({ error: "Server Error", message: err.message }, 500);
+  }
+});
+
+// POST /api/auth/reset-password
+authRouter.post("/reset-password", async (c) => {
+  try {
+    const body = await c.req.json();
+    const schema = z.object({
+      token: z.string().min(10),
+      newPassword: z.string().min(8, "Password must be at least 8 characters long"),
+    });
+
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: "Validation Failed", details: parsed.error.flatten() }, 400);
+    }
+
+    const { token, newPassword } = parsed.data;
+
+    // Look up token
+    const record = await c.env.DB
+      .prepare("SELECT id, user_id, email, expires_at, used FROM password_resets WHERE token = ?")
+      .bind(token)
+      .first<{ id: string; user_id: string; email: string; expires_at: string; used: number }>();
+
+    if (!record) {
+      return c.json({ error: "Invalid Token", message: "This password reset token is invalid or does not exist." }, 400);
+    }
+
+    if (record.used === 1) {
+      return c.json({ error: "Token Expired", message: "This password reset link has already been used." }, 400);
+    }
+
+    if (new Date(record.expires_at) < new Date()) {
+      return c.json({ error: "Token Expired", message: "This password reset link has expired (valid for 1 hour). Please request a new one." }, 400);
+    }
+
+    // Hash new password with PBKDF2
+    const newHash = await hashPassword(newPassword);
+
+    // Update user password in D1
+    await c.env.DB
+      .prepare("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?")
+      .bind(newHash, record.user_id)
+      .run();
+
+    // Mark token as used
+    await c.env.DB
+      .prepare("UPDATE password_resets SET used = 1 WHERE id = ?")
+      .bind(record.id)
+      .run();
+
+    // Invalidate existing sessions for security
+    await c.env.DB
+      .prepare("DELETE FROM sessions WHERE user_id = ?")
+      .bind(record.user_id)
+      .run();
+
+    return c.json({
+      message: "Password reset successful! You can now sign in with your new credentials.",
+    });
+  } catch (err: any) {
+    return c.json({ error: "Server Error", message: err.message }, 500);
+  }
 });

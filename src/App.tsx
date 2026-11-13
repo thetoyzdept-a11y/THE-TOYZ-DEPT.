@@ -18,6 +18,7 @@ import { CustomerDashboardPage } from "./pages/customer/Dashboard";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboard";
 import { LoginPage } from "./pages/auth/Login";
 import { RegisterPage } from "./pages/auth/Register";
+import { ResetPasswordPage } from "./pages/auth/ResetPassword";
 import {
   AboutPage,
   ShippingPage,
@@ -61,6 +62,7 @@ export function App() {
                 {/* Auth */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                 {/* Customer Dashboard */}
                 <Route path="/account" element={<CustomerDashboardPage />} />

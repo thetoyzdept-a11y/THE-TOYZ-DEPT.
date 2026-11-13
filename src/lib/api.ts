@@ -39,6 +39,8 @@ export const api = {
   login: (data: any) => request<any>("/auth/login", { method: "POST", body: JSON.stringify(data) }),
   loginGoogle: (data: any) => request<any>("/auth/google", { method: "POST", body: JSON.stringify(data) }),
   logout: () => request<any>("/auth/logout", { method: "POST" }),
+  requestPasswordReset: (email: string) => request<any>("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
+  resetPassword: (data: { token: string; newPassword: string }) => request<any>("/auth/reset-password", { method: "POST", body: JSON.stringify(data) }),
 
   // Products & Categories
   getCategories: () => request<{ categories: any[] }>("/categories"),
