@@ -1,6 +1,6 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
@@ -39,6 +39,89 @@ function ScrollToTop() {
   return null;
 }
 
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-cream">
+        <div className="card-brutal p-8 max-w-sm text-center space-y-4">
+          <div className="w-10 h-10 border-4 border-ink border-t-lime rounded-full animate-spin mx-auto" />
+          <p className="font-mono text-xs uppercase tracking-wider font-bold">
+            Verifying Administrative Security Credentials...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-[75vh] flex flex-col items-center justify-center p-6 bg-cream">
+        <div className="card-brutal p-8 max-w-lg mx-auto bg-cream-light border-2 border-ink shadow-brutal-xl space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="badge-coral text-xs">Security Exception // 403</span>
+            <span className="font-mono text-[10px] text-ink-muted uppercase">Access Prohibited</span>
+          </div>
+
+          <div>
+            <h2 className="font-display font-black text-2xl uppercase tracking-tight text-ink">
+              Admin Portal Restricted<span className="text-coral">.</span>
+            </h2>
+            <p className="font-mono text-xs text-ink-muted mt-2 leading-relaxed">
+              The Operations Control Center is strictly restricted to company administrative personnel (<span className="text-ink font-bold">thetoyzdept@gmail.com</span>). Customer accounts do not have access to this portal.
+            </p>
+          </div>
+
+          <div className="p-3 bg-cream border-2 border-ink font-mono text-xs space-y-1">
+            <p className="text-ink-muted text-[10px] uppercase">Currently Authenticated As:</p>
+            <p className="font-bold text-ink truncate">{user.email}</p>
+            <span className="badge-lime text-[10px] inline-block mt-1">Customer Account</span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Link to="/account" className="btn-primary text-xs flex-1 text-center py-3">
+              Go to Customer Dashboard
+            </Link>
+            <Link to="/shop" className="btn-secondary text-xs flex-1 text-center py-3">
+              Browse Store
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
+function CustomerRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-cream">
+        <div className="card-brutal p-8 max-w-sm text-center space-y-4">
+          <div className="w-10 h-10 border-4 border-ink border-t-lime rounded-full animate-spin mx-auto" />
+          <p className="font-mono text-xs uppercase tracking-wider font-bold">
+            Loading Customer Account...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 export function App() {
   return (
     <AuthProvider>
@@ -65,15 +148,12 @@ export function App() {
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                 {/* Customer Dashboard */}
-                <Route path="/account" element={<CustomerDashboardPage />} />
-                <Route path="/account/orders" element={<CustomerDashboardPage />} />
-                <Route path="/account/custom-requests" element={<CustomerDashboardPage />} />
-                <Route path="/account/addresses" element={<CustomerDashboardPage />} />
-                <Route path="/account/wishlist" element={<CustomerDashboardPage />} />
+                <Route path="/account" element={<CustomerRoute><CustomerDashboardPage /></CustomerRoute>} />
+                <Route path="/account/*" element={<CustomerRoute><CustomerDashboardPage /></CustomerRoute>} />
 
                 {/* Admin Dashboard */}
-                <Route path="/admin" element={<AdminDashboardPage />} />
-                <Route path="/admin/*" element={<AdminDashboardPage />} />
+                <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
+                <Route path="/admin/*" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
 
                 {/* Brand & Policies */}
                 <Route path="/about" element={<AboutPage />} />

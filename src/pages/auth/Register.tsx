@@ -14,8 +14,27 @@ export function RegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const { register, loginGoogle } = useAuth();
+  const { user, loading, register, loginGoogle } = useAuth();
   const navigate = useNavigate();
+
+  const handleRedirectAfterAuth = (authUser: any) => {
+    const isCompanyAdmin =
+      authUser?.role === "admin" &&
+      (authUser?.email?.toLowerCase() === "thetoyzdept@gmail.com" || authUser?.email?.toLowerCase() === "admin@thetoyzdept.in");
+
+    if (isCompanyAdmin) {
+      navigate("/admin", { replace: true });
+    } else {
+      navigate("/account", { replace: true });
+    }
+  };
+
+  // If already authenticated, redirect based on role
+  React.useEffect(() => {
+    if (!loading && user) {
+      handleRedirectAfterAuth(user);
+    }
+  }, [user, loading]);
 
   // Password strength calculation
   const getPasswordStrength = (pass: string) => {
@@ -40,14 +59,14 @@ export function RegisterPage() {
     setSubmitting(true);
 
     try {
-      await register({
+      const newUser = await register({
         firstName,
         lastName,
         email,
         phone,
         password,
       });
-      navigate("/account");
+      handleRedirectAfterAuth(newUser);
     } catch (err: any) {
       setErrorMsg(err.message || "Registration failed. Email may already be in use.");
     } finally {
@@ -79,12 +98,12 @@ export function RegisterPage() {
                 });
                 const info = await infoRes.json();
                 if (info.email) {
-                  await loginGoogle({
+                  const googleUser = await loginGoogle({
                     email: info.email,
                     firstName: info.given_name || info.name?.split(" ")[0] || "Collector",
                     lastName: info.family_name || info.name?.split(" ").slice(1).join(" ") || "User",
                   });
-                  navigate("/account");
+                  handleRedirectAfterAuth(googleUser);
                   return;
                 }
               } catch (err: any) {
@@ -109,12 +128,12 @@ export function RegisterPage() {
         return;
       }
       const namePart = userEmail.split("@")[0];
-      await loginGoogle({
+      const googleUser = await loginGoogle({
         email: userEmail,
         firstName: namePart.charAt(0).toUpperCase() + namePart.slice(1),
         lastName: "Collector",
       });
-      navigate("/account");
+      handleRedirectAfterAuth(googleUser);
     } catch (err: any) {
       setErrorMsg(err.message || "Google registration failed.");
     } finally {

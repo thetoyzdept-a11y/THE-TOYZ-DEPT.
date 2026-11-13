@@ -67,7 +67,7 @@ export const CURATED_FILAMENT_COLORS = [
 ];
 
 export function AdminDashboardPage() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, loading: authLoading, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
   // Active Admin Module
@@ -331,12 +331,13 @@ export function AdminDashboardPage() {
   };
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isAdmin) {
-      navigate("/login");
+      navigate("/account");
       return;
     }
     loadAllAdminData();
-  }, [isAdmin, navigate]);
+  }, [isAdmin, authLoading, navigate]);
 
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 
 export function CustomerDashboardPage() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, loading: authLoading, isAdmin, logout } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
@@ -76,6 +76,7 @@ export function CustomerDashboardPage() {
   const [newPostalCode, setNewPostalCode] = useState("");
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate("/login");
       return;
@@ -106,7 +107,7 @@ export function CustomerDashboardPage() {
     }
 
     loadDashboardData();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleOpenOrderDetails = async (orderId: string) => {
     setOrderModalLoading(true);

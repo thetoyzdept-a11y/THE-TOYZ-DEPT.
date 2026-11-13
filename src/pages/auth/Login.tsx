@@ -20,8 +20,27 @@ export function LoginPage() {
   const [forgotMessage, setForgotMessage] = useState("");
   const [forgotError, setForgotError] = useState("");
 
-  const { login, loginGoogle } = useAuth();
+  const { user, loading, login, loginGoogle } = useAuth();
   const navigate = useNavigate();
+
+  const handleRedirectAfterAuth = (authUser: any) => {
+    const isCompanyAdmin =
+      authUser?.role === "admin" &&
+      (authUser?.email?.toLowerCase() === "thetoyzdept@gmail.com" || authUser?.email?.toLowerCase() === "admin@thetoyzdept.in");
+
+    if (isCompanyAdmin) {
+      navigate("/admin", { replace: true });
+    } else {
+      navigate("/account", { replace: true });
+    }
+  };
+
+  // If already authenticated, redirect immediately based on role
+  React.useEffect(() => {
+    if (!loading && user) {
+      handleRedirectAfterAuth(user);
+    }
+  }, [user, loading]);
 
   React.useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -38,8 +57,8 @@ export function LoginPage() {
               if (response.credential) {
                 setGoogleLoading(true);
                 try {
-                  await loginGoogle({ credential: response.credential });
-                  navigate("/account");
+                  const loggedIn = await loginGoogle({ credential: response.credential });
+                  handleRedirectAfterAuth(loggedIn);
                 } catch (err: any) {
                   setErrorMsg(err.message || "Google authentication failed.");
                 } finally {
@@ -67,8 +86,8 @@ export function LoginPage() {
     setSubmitting(true);
 
     try {
-      await login({ email, password });
-      navigate("/account");
+      const loggedIn = await login({ email, password });
+      handleRedirectAfterAuth(loggedIn);
     } catch (err: any) {
       setErrorMsg(err.message || "Invalid email or password.");
     } finally {
@@ -101,12 +120,12 @@ export function LoginPage() {
                 });
                 const info = await infoRes.json();
                 if (info.email) {
-                  await loginGoogle({
+                  const loggedIn = await loginGoogle({
                     email: info.email,
                     firstName: info.given_name || info.name?.split(" ")[0] || "Collector",
                     lastName: info.family_name || info.name?.split(" ").slice(1).join(" ") || "User",
                   });
-                  navigate("/account");
+                  handleRedirectAfterAuth(loggedIn);
                   return;
                 }
               } catch (err: any) {
@@ -135,12 +154,12 @@ export function LoginPage() {
         return;
       }
       const namePart = userEmail.split("@")[0];
-      await loginGoogle({
+      const loggedIn = await loginGoogle({
         email: userEmail,
         firstName: namePart.charAt(0).toUpperCase() + namePart.slice(1),
         lastName: "Collector",
       });
-      navigate("/account");
+      handleRedirectAfterAuth(loggedIn);
     } catch (err: any) {
       setErrorMsg(err.message || "Google authentication failed.");
     } finally {

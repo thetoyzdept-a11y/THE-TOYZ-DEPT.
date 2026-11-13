@@ -3,6 +3,17 @@ import type { Env, UserSession, Variables } from "./types";
 
 const COOKIE_NAME = "toyz_session";
 
+// ── Company Administrator Allowlist ─────────────────────────────────
+export const COMPANY_ADMIN_EMAILS = [
+  "thetoyzdept@gmail.com",
+  "admin@thetoyzdept.in",
+];
+
+export function isCompanyAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return COMPANY_ADMIN_EMAILS.includes(email.toLowerCase().trim());
+}
+
 // ── PBKDF2 Password Hashing (Web Crypto API) ────────────────────────
 export async function hashPassword(password: string): Promise<string> {
   const salt = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
@@ -166,12 +177,14 @@ export const authMiddleware: MiddlewareHandler<{ Bindings: Env; Variables: Varia
           .first<{ user_id: string; expires_at: string }>();
 
         if (sessionRow && new Date(sessionRow.expires_at) > new Date()) {
+          const isCompanyAdmin = isCompanyAdminEmail(data.e);
+          const effectiveRole: "admin" | "customer" = (data.r === "admin" && isCompanyAdmin) ? "admin" : "customer";
           c.set("user", {
             userId: data.u,
             email: data.e,
             firstName: data.f,
             lastName: data.l,
-            role: data.r,
+            role: effectiveRole,
             sessionId: data.s,
           });
         }
@@ -195,10 +208,14 @@ export const requireAuth: MiddlewareHandler<{ Bindings: Env; Variables: Variable
 export const requireAdmin: MiddlewareHandler<{ Bindings: Env; Variables: Variables }> = async (c, next) => {
   const user = c.get("user");
   if (!user) {
-    return c.json({ error: "Unauthorized", message: "Authentication required." }, 401);
+    return c.json({ error: "Unauthorized", message: "Authentication required to access administrative operations." }, 401);
   }
-  if (user.role !== "admin") {
-    return c.json({ error: "Forbidden", message: "Administrative privileges required." }, 403);
+  const isAuthorizedAdmin = user.role === "admin" && isCompanyAdminEmail(user.email);
+  if (!isAuthorizedAdmin) {
+    return c.json({
+      error: "Forbidden",
+      message: "Access Denied: The Admin Operations Portal and API are strictly restricted to the official company administrator (thetoyzdept@gmail.com). Customer accounts have zero access permissions.",
+    }, 403);
   }
   await next();
 };

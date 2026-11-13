@@ -8,6 +8,7 @@ import {
   destroySession,
   createSessionCookie,
   deleteSessionCookie,
+  isCompanyAdminEmail,
 } from "../auth";
 import { sendEmail, buildPasswordResetEmail } from "../email";
 
@@ -51,6 +52,9 @@ authRouter.get("/me", async (c) => {
     return c.json({ user: null });
   }
 
+  const isCompanyAdmin = isCompanyAdminEmail(dbUser.email);
+  const effectiveRole: "admin" | "customer" = (dbUser.role === "admin" && isCompanyAdmin) ? "admin" : "customer";
+
   return c.json({
     user: {
       id: dbUser.id,
@@ -58,7 +62,7 @@ authRouter.get("/me", async (c) => {
       firstName: dbUser.first_name,
       lastName: dbUser.last_name,
       phone: dbUser.phone,
-      role: dbUser.role,
+      role: effectiveRole,
       createdAt: dbUser.created_at,
     },
   });
@@ -156,25 +160,28 @@ authRouter.post("/login", async (c) => {
       return c.json({ error: "Unauthorized", message: "Invalid email or password." }, 401);
     }
 
+    const isCompanyAdmin = isCompanyAdminEmail(user.email);
+    const effectiveRole: "admin" | "customer" = (user.role === "admin" && isCompanyAdmin) ? "admin" : "customer";
+
     const token = await createSession(c.env.DB, c.env.SESSION_SECRET, {
       id: user.id,
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,
-      role: user.role,
+      role: effectiveRole,
     });
 
     c.header("Set-Cookie", createSessionCookie(token));
 
     return c.json({
-      message: "Logged in successfully.",
+      message: isCompanyAdmin ? "Admin authenticated successfully." : "Logged in successfully.",
       user: {
         id: user.id,
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
         phone: user.phone,
-        role: user.role,
+        role: effectiveRole,
       },
     });
   } catch (err: any) {
@@ -219,6 +226,8 @@ authRouter.post("/google", async (c) => {
     }
 
     email = email.toLowerCase().trim();
+    const isCompanyAdmin = isCompanyAdminEmail(email);
+    const assignedRole: "admin" | "customer" = isCompanyAdmin ? "admin" : "customer";
 
     // Check if user exists in D1
     let user = await c.env.DB
@@ -235,16 +244,16 @@ authRouter.post("/google", async (c) => {
       }>();
 
     if (!user) {
-      // Auto-provision new customer account verified via Google
+      // Auto-provision new account verified via Google
       const userId = "usr_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
       const randomPassword = "G_" + crypto.randomUUID();
       const passwordHash = await hashPassword(randomPassword);
 
       await c.env.DB
         .prepare(
-          "INSERT INTO users (id, email, password_hash, first_name, last_name, role, email_verified) VALUES (?, ?, ?, ?, ?, 'customer', 1)"
+          "INSERT INTO users (id, email, password_hash, first_name, last_name, role, email_verified) VALUES (?, ?, ?, ?, ?, ?, 1)"
         )
-        .bind(userId, email, passwordHash, firstName, lastName)
+        .bind(userId, email, passwordHash, firstName, lastName, assignedRole)
         .run();
 
       user = {
@@ -253,9 +262,19 @@ authRouter.post("/google", async (c) => {
         first_name: firstName,
         last_name: lastName,
         phone: null,
-        role: "customer",
+        role: assignedRole,
         is_active: 1,
       };
+    } else {
+      // Enforce strict role boundary in database:
+      // If thetoyzdept@gmail.com, guaranteed admin; if any other email, guaranteed customer.
+      if (user.role !== assignedRole) {
+        await c.env.DB
+          .prepare("UPDATE users SET role = ?, updated_at = datetime('now') WHERE id = ?")
+          .bind(assignedRole, user.id)
+          .run();
+        user.role = assignedRole;
+      }
     }
 
     if (!user.is_active) {
@@ -267,20 +286,20 @@ authRouter.post("/google", async (c) => {
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,
-      role: user.role,
+      role: assignedRole,
     });
 
     c.header("Set-Cookie", createSessionCookie(token));
 
     return c.json({
-      message: "Google authentication successful.",
+      message: isCompanyAdmin ? "Company admin authenticated successfully." : "Google authentication successful.",
       user: {
         id: user.id,
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
         phone: user.phone,
-        role: user.role,
+        role: assignedRole,
       },
     });
   } catch (err: any) {
