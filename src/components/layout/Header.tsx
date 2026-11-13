@@ -39,11 +39,11 @@ export function Header() {
       {/* ── Top Announcement Ticker ──────────────────────────────────── */}
       <div className="bg-ink text-cream py-2 px-4 text-center border-b-2 border-ink">
         <div className="flex items-center justify-center gap-2 overflow-hidden whitespace-nowrap text-xs font-mono tracking-wider uppercase">
-          <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING</span>
+          <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
           <span className="opacity-60 hidden sm:inline">•</span>
-          <span className="hidden sm:inline">ON ALL ORDERS OVER ₹999</span>
+          <span className="hidden sm:inline">+999 DESK AURA GUARANTEED</span>
           <span className="opacity-60">•</span>
-          <span>PRECISION 3D-PRINTED IN INDIA</span>
+          <span>DISPATCHED FROM BENGALURU IN 24-48H</span>
         </div>
       </div>
 

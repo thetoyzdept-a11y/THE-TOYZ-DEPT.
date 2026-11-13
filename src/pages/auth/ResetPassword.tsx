@@ -102,13 +102,13 @@ export function ResetPasswordPage() {
               Password Configured!
             </h2>
             <p className="text-xs text-ink-muted leading-relaxed">
-              Your new password is now active and protected with bank-grade 256-bit encryption. All previous active sessions have been safely terminated.
+              Your new password is live! You're back in the game. Go claim that plastic dopamine before someone else buys it.
             </p>
             <Link
               to="/login"
               className="btn-primary w-full py-3 text-xs uppercase block text-center"
             >
-              Sign In to Your Account
+              Sign In to Your Account 🚀
             </Link>
           </div>
         ) : (

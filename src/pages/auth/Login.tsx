@@ -184,67 +184,79 @@ export function LoginPage() {
   };
 
   return (
-    <div className="bg-cream min-h-[calc(100vh-80px)] py-12 md:py-16 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch animate-fade-in">
-        {/* ── Left Hero Panel (Studio Identity) ───────────────────────── */}
-        <div className="hidden lg:flex lg:col-span-5 bg-ink text-cream p-8 border-2 border-ink shadow-brutal-xl flex-col justify-between relative overflow-hidden">
-          {/* Subtle background industrial grid */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#D9FF43_1px,transparent_1px)] [background-size:16px_16px]" />
+    <div className="bg-cream min-h-[calc(100vh-80px)] py-10 md:py-16 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch animate-fade-in">
+        {/* ── Left Hero Panel: Product Hype Showcase ─────────────────── */}
+        <div className="hidden lg:flex lg:col-span-5 bg-ink text-cream p-8 border-2 border-ink shadow-brutal-xl flex-col justify-between relative overflow-hidden group">
+          {/* Subtle background matrix dots */}
+          <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#D9FF43_1px,transparent_1px)] [background-size:16px_16px]" />
 
           <div className="relative z-10 space-y-6">
-            <div className="flex items-center gap-2">
-              <span className="badge-lime text-[10px]">Studio Access</span>
-              <span className="font-mono text-[10px] text-cream/60 uppercase">Est. 2026 // BLR</span>
+            <div className="flex items-center justify-between">
+              <span className="badge-lime text-[10px] animate-pulse">✦ DROP ZONE // 2026</span>
+              <span className="font-mono text-[10px] text-cream/60 uppercase">+999 DESK AURA</span>
             </div>
 
             <div>
               <h2 className="font-display font-black text-3xl uppercase tracking-tight text-cream leading-tight">
-                Things you didn't know you needed<span className="text-coral">.</span>
+                Back for more plastic dopamine<span className="text-coral">?</span>
               </h2>
-              <p className="font-mono text-xs text-cream/70 mt-3 leading-relaxed">
-                Design-led 3D collectibles, articulated kinetic toys & precision desktop objects manufactured on-demand.
+              <p className="font-mono text-xs text-cream/70 mt-2 leading-relaxed">
+                Your desk called. It said it’s still boring and needs another articulated dragon.
               </p>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-cream/15 font-mono text-xs">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-lime text-ink flex items-center justify-center flex-shrink-0 font-bold text-[10px] border border-ink mt-0.5">
-                  ✓
-                </div>
-                <div>
-                  <p className="font-bold text-cream uppercase">Instant 1-Click Access</p>
-                  <p className="text-[11px] text-cream/60">Connect seamlessly with your Google Account.</p>
+            {/* Featured Product Preview Tile inside Login */}
+            <div className="p-3 bg-cream/10 border-2 border-cream/20 hover:border-lime transition-colors space-y-2">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/images/products/dragon-1.jpg"
+                  alt="Articulated Cyber Dragon"
+                  className="w-14 h-14 object-cover border-2 border-ink shadow-brutal-sm flex-shrink-0 group-hover:scale-105 transition-transform"
+                />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="badge-coral text-[9px] py-0 px-1 font-bold">TOP SELLER</span>
+                    <span className="font-mono text-[10px] text-cream/50">48 JOINTS</span>
+                  </div>
+                  <p className="font-display font-bold text-xs uppercase text-cream truncate mt-0.5">
+                    Articulated Cyber Dragon
+                  </p>
+                  <p className="font-mono text-[10px] text-lime font-bold">₹1,299</p>
                 </div>
               </div>
+            </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-coral text-cream flex items-center justify-center flex-shrink-0 font-bold text-[10px] border border-ink mt-0.5">
-                  ⚡
-                </div>
-                <div>
-                  <p className="font-bold text-cream uppercase">Live Studio Telemetry</p>
-                  <p className="text-[11px] text-cream/60">Track your print queue, slice status & courier dispatch.</p>
-                </div>
+            <div className="space-y-3 pt-2 font-mono text-xs">
+              <div className="flex items-start gap-2.5">
+                <span className="text-lime font-bold">⚡</span>
+                <p className="text-cream/80 text-[11px] leading-tight">
+                  <strong className="text-cream uppercase">ADHD Approved:</strong> Fluid clicky ball-joints to survive 2-hour Zoom calls.
+                </p>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-cream text-ink flex items-center justify-center flex-shrink-0 font-bold text-[10px] border border-ink mt-0.5">
-                  ★
-                </div>
-                <div>
-                  <p className="font-bold text-cream uppercase">Custom 3D Print Lab</p>
-                  <p className="text-[11px] text-cream/60">Upload your STL models for instant custom quotation.</p>
-                </div>
+              <div className="flex items-start gap-2.5">
+                <span className="text-coral font-bold">🔥</span>
+                <p className="text-cream/80 text-[11px] leading-tight">
+                  <strong className="text-cream uppercase">Coworker Magnet:</strong> Warning: People will try to steal stuff off your desk.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="text-cream font-bold">📦</span>
+                <p className="text-cream/80 text-[11px] leading-tight">
+                  <strong className="text-cream uppercase">Lightning Dispatch:</strong> Packed and shipped before buyer's regret kicks in.
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="relative z-10 pt-6 border-t border-cream/15 flex items-center justify-between font-mono text-[10px] text-cream/50 uppercase">
+          <div className="relative z-10 pt-4 border-t border-cream/15 flex items-center justify-between font-mono text-[10px] text-cream/60 uppercase">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-lime animate-pulse" />
-              Studio Live
+              <span className="w-2 h-2 rounded-full bg-lime animate-ping" />
+              Printers Cooking 24/7
             </span>
-            <span>0.12mm Precision</span>
+            <span>Zero Injection Junk</span>
           </div>
         </div>
 
@@ -252,14 +264,14 @@ export function LoginPage() {
         <div className="lg:col-span-7 card-brutal bg-cream-light p-6 sm:p-10 shadow-brutal-xl space-y-6 flex flex-col justify-center">
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="badge-lime text-xs">Member Login</span>
-              <span className="font-mono text-[10px] text-ink-muted uppercase">Secure Session</span>
+              <span className="badge-lime text-xs font-bold">MEMBER ACCESS</span>
+              <span className="font-mono text-[10px] text-ink-muted uppercase">1-Tap Login</span>
             </div>
             <h1 className="font-display font-black text-3xl uppercase tracking-tight text-ink">
               Sign In to The Dept<span className="text-coral">.</span>
             </h1>
             <p className="font-mono text-xs text-ink-muted uppercase">
-              Access your orders, custom 3D quotations, and saved wishlist
+              Track your prints, manage drops & review custom quotes
             </p>
           </div>
 
@@ -296,14 +308,14 @@ export function LoginPage() {
                   d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.25 2.63 1.26 6.61l4.01 3.15c.95-2.85 3.6-4.96 6.73-4.96z"
                 />
               </svg>
-              {googleLoading ? "Authorizing with Google..." : "Continue with Google"}
+              {googleLoading ? "Connecting..." : "Continue with Google (Instant)"}
             </button>
           </div>
 
           <div className="relative flex items-center justify-center my-1">
             <div className="border-t border-ink/20 w-full" />
             <span className="bg-cream-light px-3 font-mono text-[10px] uppercase text-ink-muted font-bold absolute">
-              Or With Email Credentials
+              Or The Old Fashioned Way
             </span>
           </div>
 
@@ -314,7 +326,7 @@ export function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
+                placeholder="you@email.com"
                 required
                 className="input-brutal text-xs"
               />
@@ -332,7 +344,7 @@ export function LoginPage() {
                   }}
                   className="text-[10px] text-coral hover:underline font-bold uppercase transition-colors"
                 >
-                  Forgot Password?
+                  Forgot?
                 </button>
               </div>
               <div className="relative">
@@ -348,7 +360,7 @@ export function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3 text-ink-muted hover:text-ink cursor-pointer transition-colors"
-                  title={showPassword ? "Hide password" : "Show password"}
+                  title={showPassword ? "Hide" : "Show"}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -358,23 +370,22 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="btn-primary w-full py-3.5 text-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="btn-primary w-full py-3.5 text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
             >
               <Lock className="w-3.5 h-3.5" />
-              {submitting ? "Authenticating Session..." : "Sign In to Account"}
+              {submitting ? "Signing in..." : "Enter The Toyz Dept →"}
             </button>
           </form>
 
           <div className="text-center font-mono text-xs border-t border-ink/20 pt-4 text-ink-muted">
-            New to THE TOYZ DEPT.?{" "}
+            First time here?{" "}
             <Link to="/register" className="text-coral font-bold uppercase hover:underline ml-1">
-              Create an Account →
+              Join The Dept & Claim Drops →
             </Link>
           </div>
 
-          <div className="flex items-center justify-center gap-1.5 font-mono text-[9px] text-ink-muted/80 uppercase pt-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-lime-darker" />
-            <span>256-Bit SSL Encryption • Secure Cloud Architecture</span>
+          <div className="flex items-center justify-center gap-1.5 font-mono text-[10px] text-ink-muted/80 uppercase pt-1">
+            <span>✨ Zero spam • We only send you cool plastic</span>
           </div>
         </div>
       </div>
@@ -385,7 +396,7 @@ export function LoginPage() {
           <div className="card-brutal bg-cream-light p-6 sm:p-8 w-full max-w-md space-y-5 shadow-brutal-xl font-mono text-xs border-2 border-ink">
             <div className="border-b-2 border-ink pb-3 flex items-center justify-between">
               <div>
-                <span className="badge-lime text-[10px] uppercase">Account Security</span>
+                <span className="badge-lime text-[10px] uppercase">Don't Panic</span>
                 <h3 className="font-display font-black text-xl uppercase text-ink mt-1">
                   Reset Password<span className="text-coral">.</span>
                 </h3>
@@ -393,7 +404,7 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(false)}
-                className="w-8 h-8 border-2 border-ink bg-cream hover:bg-coral hover:text-cream font-bold flex items-center justify-center text-sm transition-colors"
+                className="w-8 h-8 border-2 border-ink bg-cream hover:bg-coral hover:text-cream font-bold flex items-center justify-center text-sm transition-colors cursor-pointer"
               >
                 ✕
               </button>
@@ -402,9 +413,9 @@ export function LoginPage() {
             {forgotSent ? (
               <div className="p-5 bg-lime/20 border-2 border-ink space-y-3 text-center">
                 <CheckCircle2 className="w-8 h-8 text-lime-darker mx-auto" />
-                <p className="font-bold text-xs uppercase text-ink">Instructions Dispatched</p>
+                <p className="font-bold text-xs uppercase text-ink">Link Sent to Inbox!</p>
                 <p className="text-[11px] text-ink-muted leading-relaxed">
-                  {forgotMessage || `We have dispatched password recovery instructions to ${forgotEmail}. Please check your inbox and spam folder.`}
+                  {forgotMessage || `Check ${forgotEmail} for your reset link. Check your spam if it's hiding.`}
                 </p>
                 <button
                   type="button"
@@ -414,13 +425,13 @@ export function LoginPage() {
                   }}
                   className="btn-primary w-full py-2.5 text-xs uppercase mt-2 cursor-pointer"
                 >
-                  Return to Sign In
+                  Back to Sign In
                 </button>
               </div>
             ) : (
               <form onSubmit={handleForgotSubmit} className="space-y-4">
                 <p className="text-ink-muted text-xs leading-relaxed">
-                  Enter your registered email address and we'll send a secure one-time recovery link to restore access to your account.
+                  Drop your email below and we'll send a 1-click magic link so you can get back to browsing drops.
                 </p>
                 {forgotError && (
                   <div className="p-2.5 bg-coral/20 border border-coral text-coral-dark text-[11px] font-bold">
@@ -428,13 +439,13 @@ export function LoginPage() {
                   </div>
                 )}
                 <div>
-                  <label className="block font-bold uppercase mb-1">Email Address</label>
+                  <label className="block font-bold uppercase mb-1">Your Email</label>
                   <input
                     type="email"
                     required
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
-                    placeholder="name@example.com"
+                    placeholder="you@email.com"
                     className="input-brutal text-xs"
                   />
                 </div>
@@ -444,7 +455,7 @@ export function LoginPage() {
                     disabled={forgotSubmitting}
                     className="btn-primary flex-1 py-3 text-xs uppercase cursor-pointer"
                   >
-                    {forgotSubmitting ? "Dispatching..." : "Send Reset Link"}
+                    {forgotSubmitting ? "Sending..." : "Send Magic Link ⚡"}
                   </button>
                   <button
                     type="button"

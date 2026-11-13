@@ -468,9 +468,9 @@ export function AdminDashboardPage() {
             </Link>
             <button
               onClick={loadAllAdminData}
-              className="p-2 bg-cream/10 hover:bg-cream/20 text-cream border border-cream/30 text-xs font-mono uppercase flex items-center gap-1.5"
+              className="p-2 bg-cream/10 hover:bg-cream/20 text-cream border border-cream/30 text-xs font-mono uppercase flex items-center gap-1.5 cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" /> Sync Cloud Data
+              <RefreshCw className="w-4 h-4" /> Refresh Live Ops
             </button>
           </div>
         </div>
@@ -517,7 +517,7 @@ export function AdminDashboardPage() {
                 <p className="font-display font-black text-2xl sm:text-3xl text-ink">
                   {formatINR(metrics.totalRevenue)}
                 </p>
-                <span className="badge-lime text-[10px]">Verified Store Ledgers</span>
+                <span className="badge-lime text-[10px]">Total Revenue 💰</span>
               </div>
 
               <div className="card-brutal p-5 bg-cream-light space-y-1">
@@ -533,7 +533,7 @@ export function AdminDashboardPage() {
                 <p className="font-display font-black text-2xl sm:text-3xl text-ink">
                   {metrics.totalCustomers}
                 </p>
-                <span className="font-mono text-[10px] text-ink-muted uppercase">Active Member Profiles</span>
+                <span className="font-mono text-[10px] text-ink-muted uppercase">Active Customers 👥</span>
               </div>
 
               <div className="card-brutal p-5 bg-cream-light space-y-1">
@@ -1398,12 +1398,12 @@ export function AdminDashboardPage() {
 
                 <div className="card-brutal bg-cream-light p-6 space-y-3 text-xs">
                   <h3 className="font-display font-black text-base uppercase border-b border-ink/15 pb-2">
-                    Security Protocols & Data Governance
+                    Access Control & Data Security
                   </h3>
                   <div className="space-y-1.5 text-ink-muted text-[11px]">
-                    <p>• <strong>Cryptographic Protection:</strong> Bank-grade salted 256-bit key derivation with 100,000 security derivation cycles.</p>
-                    <p>• <strong>Session Hardening:</strong> Secure HttpOnly, SameSite tamper-evident authenticated session tokens.</p>
-                    <p>• <strong>Statutory Compliance:</strong> Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011.</p>
+                    <p>• <strong>Strict Separation:</strong> The Admin Dashboard is strictly locked to the company account (thetoyzdept@gmail.com). Customers are separated completely and routed to their own accounts.</p>
+                    <p>• <strong>Live Persistence:</strong> Orders, customer accounts, custom STL print requests, and inventory sync in real-time.</p>
+                    <p>• <strong>Payment & Logistics:</strong> Direct integration with Razorpay Webhooks and Shiprocket fulfillment.</p>
                   </div>
                 </div>
               </div>
@@ -1780,7 +1780,7 @@ export function AdminDashboardPage() {
 
                 <div className="flex gap-2 pt-2 border-t border-ink/20">
                   <button type="submit" className="btn-primary flex-1 py-2 text-xs">
-                    Publish Product to Store
+                    Drop Product to Store 🚀
                   </button>
                   <button
                     type="button"

@@ -73,10 +73,10 @@ export function ShopPage() {
             <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tight">
               {selectedCategory
                 ? categories.find((c) => c.slug === selectedCategory)?.name || "Department"
-                : "All Objects & Collectibles"}
+                : "All Objects & Drops"}
             </h1>
             <p className="font-mono text-xs text-ink-muted uppercase mt-1">
-              {products.length} Objects fabricated & ready to dispatch
+              {products.length} Plastic Dopamine Drops • Dispatched from Bengaluru
             </p>
           </div>
 
@@ -192,13 +192,14 @@ export function ShopPage() {
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="card-brutal bg-cream-light p-12 text-center max-w-lg mx-auto my-12">
-            <h3 className="font-display font-black text-2xl uppercase mb-2">No Objects Matched</h3>
-            <p className="font-mono text-xs text-ink-muted mb-6">
-              We couldn't find any products matching your specific query or filter criteria.
+          <div className="card-brutal bg-cream-light p-12 text-center max-w-lg mx-auto my-12 space-y-4">
+            <span className="badge-coral text-xs">404 DROPS NOT FOUND</span>
+            <h3 className="font-display font-black text-2xl uppercase mb-1">Nothing Here.</h3>
+            <p className="font-mono text-xs text-ink-muted leading-relaxed">
+              Either you typed pure gibberish, or our 3D printers haven't fabricated that yet. Hit the reset button to browse the good stuff.
             </p>
-            <button onClick={clearAllFilters} className="btn-primary text-xs">
-              Reset Filters
+            <button onClick={clearAllFilters} className="btn-primary text-xs cursor-pointer">
+              Reset Filters & Feed Dopamine ⚡
             </button>
           </div>
         ) : (

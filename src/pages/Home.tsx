@@ -53,45 +53,44 @@ export function HomePage() {
             <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-lime text-ink border border-ink text-xs font-mono font-bold uppercase tracking-wider shadow-brutal-sm">
                 <Sparkles className="w-3.5 h-3.5" />
-                Precision 3D-Printed Collectibles
+                +999 DESK AURA // TACTILE 3D DROPS
               </div>
 
               <h1 className="font-display font-black text-3xl sm:text-6xl lg:text-7xl uppercase tracking-tighter leading-[0.95]">
-                THINGS YOU <br className="hidden sm:inline" />
+                YOUR DESK IS <br className="hidden sm:inline" />
                 <span className="text-lime underline decoration-coral decoration-4 underline-offset-8">
-                  DIDN'T KNOW
+                  DEPRESSING
                 </span>{" "}
                 <br className="hidden sm:inline" />
-                YOU NEEDED<span className="text-coral">.</span>
+                WE FIXED THAT<span className="text-coral">.</span>
               </h1>
 
               <p className="text-cream/80 text-sm sm:text-lg max-w-xl mx-auto lg:mx-0 font-body leading-relaxed">
-                Tactile articulated creatures, brutalist desk gear, and bespoke CAD engineering.
-                Designed in-house, sliced with micrometer precision, and 3D printed in India.
+                Tactile articulated dragons, kinetic gear cubes, and unapologetic desk companions designed to cure corporate burnout, satisfy your ADHD, and make your coworkers thoroughly jealous.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
-                <Link to="/shop" className="btn-primary w-full sm:w-auto text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 text-center flex items-center justify-center gap-2">
-                  <span>Explore Drops</span> <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Link to="/shop" className="btn-primary w-full sm:w-auto text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 text-center flex items-center justify-center gap-2 cursor-pointer">
+                  <span>Feed Your Dopamine</span> <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
-                <Link to="/custom-prints" className="btn-secondary w-full sm:w-auto text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 bg-transparent text-cream border-cream hover:bg-cream hover:text-ink text-center">
-                  Upload 3D CAD
+                <Link to="/custom-prints" className="btn-secondary w-full sm:w-auto text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 bg-transparent text-cream border-cream hover:bg-cream hover:text-ink text-center cursor-pointer">
+                  Upload Custom STL
                 </Link>
               </div>
 
               {/* Stat badges */}
               <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-6 border-t border-cream/20 text-center">
                 <div>
-                  <p className="font-display font-black text-xl sm:text-3xl text-lime">0.12mm</p>
-                  <p className="font-mono text-[10px] sm:text-xs text-cream/60 uppercase">Layer Detail</p>
+                  <p className="font-display font-black text-xl sm:text-3xl text-lime">48+</p>
+                  <p className="font-mono text-[10px] sm:text-xs text-cream/60 uppercase">Fluid Joints</p>
                 </div>
                 <div>
-                  <p className="font-display font-black text-xl sm:text-3xl text-coral">24–48h</p>
-                  <p className="font-mono text-[10px] sm:text-xs text-cream/60 uppercase">Dispatch Target</p>
+                  <p className="font-display font-black text-xl sm:text-3xl text-coral">10/10</p>
+                  <p className="font-mono text-[10px] sm:text-xs text-cream/60 uppercase">Tactile Dopamine</p>
                 </div>
                 <div>
-                  <p className="font-display font-black text-xl sm:text-3xl text-cream">100%</p>
-                  <p className="font-mono text-[10px] sm:text-xs text-cream/60 uppercase">Bio PLA+ / PETG</p>
+                  <p className="font-display font-black text-xl sm:text-3xl text-cream">24–48h</p>
+                  <p className="font-mono text-[10px] sm:text-xs text-cream/60 uppercase">Dispatched Quick</p>
                 </div>
               </div>
             </div>
@@ -143,20 +142,26 @@ export function HomePage() {
         {/* ── Marquee Ribbon ─────────────────────────────────────────── */}
         <div className="bg-lime text-ink py-2.5 sm:py-3 border-t-2 border-ink overflow-hidden whitespace-nowrap font-mono text-xs font-bold uppercase tracking-widest select-none flex">
           <div className="inline-flex gap-8 animate-marquee">
-            <span>✦ ARTICULATED TOYS & COLLECTIBLES</span>
-            <span>✦ BRUTALIST DESK ACCESSORIES</span>
-            <span>✦ 0.12MM LAYER PRECISION</span>
-            <span>✦ FREE EXPRESS SHIPPING ABOVE ₹999</span>
-            <span>✦ ON-DEMAND CUSTOM CAD SLICING</span>
-            <span>✦ BIO-SOURCED PLA+ & PETG</span>
+            <span>✦ ARTICULATED DRAGONS</span>
+            <span>✦ CLICKY GEAR CUBES</span>
+            <span>✦ TACTILE PLASTIC DOPAMINE</span>
+            <span>✦ YOUR COWORKERS WILL TRY TO STEAL THIS</span>
+            <span>✦ 100% ADHD APPROVED</span>
+            <span>✦ MECHA FLEXI REX</span>
+            <span>✦ +999 DESK AURA</span>
+            <span>✦ PRINTED IN BENGALURU</span>
+            <span>✦ DISPATCHED BEFORE REGRET</span>
           </div>
           <div className="inline-flex gap-8 animate-marquee" aria-hidden="true">
-            <span>✦ ARTICULATED TOYS & COLLECTIBLES</span>
-            <span>✦ BRUTALIST DESK ACCESSORIES</span>
-            <span>✦ 0.12MM LAYER PRECISION</span>
-            <span>✦ FREE EXPRESS SHIPPING ABOVE ₹999</span>
-            <span>✦ ON-DEMAND CUSTOM CAD SLICING</span>
-            <span>✦ BIO-SOURCED PLA+ & PETG</span>
+            <span>✦ ARTICULATED DRAGONS</span>
+            <span>✦ CLICKY GEAR CUBES</span>
+            <span>✦ TACTILE PLASTIC DOPAMINE</span>
+            <span>✦ YOUR COWORKERS WILL TRY TO STEAL THIS</span>
+            <span>✦ 100% ADHD APPROVED</span>
+            <span>✦ MECHA FLEXI REX</span>
+            <span>✦ +999 DESK AURA</span>
+            <span>✦ PRINTED IN BENGALURU</span>
+            <span>✦ DISPATCHED BEFORE REGRET</span>
           </div>
         </div>
       </section>
@@ -321,28 +326,28 @@ export function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-lime text-ink text-xs font-mono font-bold uppercase tracking-wider">
-                  <UploadCloud className="w-4 h-4" /> Customer CAD Fabrication
+                  <UploadCloud className="w-4 h-4" /> Got A Weird 3D Idea?
                 </div>
                 <h2 className="font-display font-black text-2xl sm:text-4xl lg:text-5xl uppercase tracking-tight text-cream">
                   Have an STL or STEP file? <br />
-                  <span className="text-lime">We Print Your Designs.</span>
+                  <span className="text-lime">We Print It In Bengaluru.</span>
                 </h2>
                 <p className="text-cream/80 text-xs sm:text-base font-body max-w-2xl leading-relaxed">
-                  Upload your 3D CAD geometry (.STL, .STEP, .OBJ). Our engineering desk performs automated wall-thickness slicing, material volume calculation, and delivers an itemized binding quotation within 2 hours.
+                  Got a custom CAD prototype, mechanical bracket, or desk figurine? Drop your .STL or .STEP file. We check wall thickness, calculate exact material costs, and deliver a clean quotation in under 2 hours.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono text-cream/70">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-lime" />
-                    <span>0.12mm–0.20mm Slicing</span>
+                    <span>0.12mm Ultra Detail</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-lime" />
-                    <span>PLA+, Tough PETG, Silk</span>
+                    <span>PLA+, Silk Dual-Tone, PETG</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-lime" />
-                    <span>Pan-India Courier Dispatch</span>
+                    <span>Express Pan-India Delivery</span>
                   </div>
                 </div>
               </div>
@@ -350,15 +355,15 @@ export function HomePage() {
               <div className="lg:col-span-4 flex flex-col gap-3">
                 <Link
                   to="/custom-prints"
-                  className="btn-primary text-center py-4 text-xs sm:text-sm uppercase tracking-wider"
+                  className="btn-primary text-center py-4 text-xs sm:text-sm uppercase tracking-wider cursor-pointer"
                 >
-                  Upload 3D Model Now
+                  Upload 3D Model Now ⚡
                 </Link>
                 <Link
                   to="/pricing"
-                  className="btn-secondary text-center py-3 bg-transparent text-cream border-cream hover:bg-cream hover:text-ink text-xs uppercase"
+                  className="btn-secondary text-center py-3 bg-transparent text-cream border-cream hover:bg-cream hover:text-ink text-xs uppercase cursor-pointer"
                 >
-                  View Slicing Rates & Formula
+                  View Slicing Rates
                 </Link>
               </div>
             </div>
@@ -370,10 +375,10 @@ export function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <p className="font-mono text-xs font-bold uppercase text-coral tracking-widest mb-1">
-            VERIFIED FIELD IMPRESSIONS
+            VERIFIED DESK IMPRESSIONS
           </p>
           <h2 className="font-display font-black text-2xl sm:text-4xl uppercase tracking-tight">
-            Loved by Designers & Makers
+            Loved by Desk Dwellers & Makers
           </h2>
         </div>
 
@@ -385,14 +390,14 @@ export function HomePage() {
               ))}
             </div>
             <h4 className="font-display font-bold uppercase text-sm">
-              "Incredible fluid articulation"
+              "10/10 Desk Security"
             </h4>
             <p className="font-mono text-xs text-ink/80 leading-relaxed">
-              "The Cyber Dragon bends and coils like liquid silk. The dual-color filament shifts color as you move it in your hands. Best desk toy I own."
+              "My coworker reached for my Cyber Dragon during standup and I nearly bit his hand off. The dual-color green shift is mesmerizing. Best purchase of 2026."
             </p>
             <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-ink">Vikram R.</span>
-              <span className="badge-lime text-[9px]">Verified Buyer (Bengaluru)</span>
+              <span className="font-bold text-ink">Aditya K.</span>
+              <span className="badge-lime text-[9px]">Verified Collector (Bengaluru)</span>
             </div>
           </div>
 
@@ -403,14 +408,14 @@ export function HomePage() {
               ))}
             </div>
             <h4 className="font-display font-bold uppercase text-sm">
-              "Brutal aesthetic & perfect tolerances"
+              "Meeting Survival Tool"
             </h4>
             <p className="font-mono text-xs text-ink/80 leading-relaxed">
-              "Ordered the concrete planter and the cable dock. The textured finish looks like miniature brutalist architecture on my workstation. Super fast dispatch!"
+              "I haven't listened to a single word in our 9 AM Zoom calls because I was twirling this gear cube. Aggressively satisfying tactile click. Everyone asks where I got it."
             </p>
             <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-ink">Ananya S.</span>
-              <span className="badge-lime text-[9px]">Verified Buyer (Mumbai)</span>
+              <span className="font-bold text-ink">Sneha M.</span>
+              <span className="badge-lime text-[9px]">Verified Buyer (Gurugram)</span>
             </div>
           </div>
 
@@ -421,14 +426,14 @@ export function HomePage() {
               ))}
             </div>
             <h4 className="font-display font-bold uppercase text-sm">
-              "Fast custom CAD slicing & delivery"
+              "+500 Desk Aura Instantly"
             </h4>
             <p className="font-mono text-xs text-ink/80 leading-relaxed">
-              "Uploaded a mechanical bracket prototype STL. Received quotation in an hour and had the printed part on my desk in 3 days. Dimensions matched within 0.1mm."
+              "The Mecha Flexi Rex stands guard beside my dual monitors judging my pull requests. Arrived in 2 days from Bengaluru packed like a military artifact."
             </p>
             <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-ink">Karthik M.</span>
-              <span className="badge-lime text-[9px]">CAD Client (Hyderabad)</span>
+              <span className="font-bold text-ink">Tanmay P.</span>
+              <span className="badge-lime text-[9px]">Verified Buyer (Pune)</span>
             </div>
           </div>
         </div>

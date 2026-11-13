@@ -142,63 +142,75 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="bg-cream min-h-[calc(100vh-80px)] py-12 md:py-16 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch animate-fade-in">
-        {/* ── Left Hero Panel (Studio Identity) ───────────────────────── */}
-        <div className="hidden lg:flex lg:col-span-5 bg-ink text-cream p-8 border-2 border-ink shadow-brutal-xl flex-col justify-between relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#D9FF43_1px,transparent_1px)] [background-size:16px_16px]" />
+    <div className="bg-cream min-h-[calc(100vh-80px)] py-10 md:py-16 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch animate-fade-in">
+        {/* ── Left Hero Panel (Studio Identity & Hype) ─────────────────── */}
+        <div className="hidden lg:flex lg:col-span-5 bg-ink text-cream p-8 border-2 border-ink shadow-brutal-xl flex-col justify-between relative overflow-hidden group">
+          <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#D9FF43_1px,transparent_1px)] [background-size:16px_16px]" />
 
           <div className="relative z-10 space-y-6">
-            <div className="flex items-center gap-2">
-              <span className="badge-lime text-[10px]">Join Dept</span>
-              <span className="font-mono text-[10px] text-cream/60 uppercase">Member Registration</span>
+            <div className="flex items-center justify-between">
+              <span className="badge-lime text-[10px] animate-pulse">✦ MEMBER ACCESS // 2026</span>
+              <span className="font-mono text-[10px] text-cream/60 uppercase">+500 DESK AURA</span>
             </div>
 
             <div>
               <h2 className="font-display font-black text-3xl uppercase tracking-tight text-cream leading-tight">
-                Unlock Collector & Studio Privileges<span className="text-coral">.</span>
+                Claim your plastic addiction<span className="text-coral">.</span>
               </h2>
-              <p className="font-mono text-xs text-cream/70 mt-3 leading-relaxed">
-                Save delivery destinations, review live 3D print slicing quotations, and manage custom object drops.
+              <p className="font-mono text-xs text-cream/70 mt-2 leading-relaxed">
+                Zero boring corporate merch. Only tactile articulated artifacts and kinetic dopamine.
               </p>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-cream/15 font-mono text-xs">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-lime text-ink flex items-center justify-center flex-shrink-0 font-bold text-[10px] border border-ink mt-0.5">
-                  ✓
-                </div>
-                <div>
-                  <p className="font-bold text-cream uppercase">Saved Delivery Book</p>
-                  <p className="text-[11px] text-cream/60">One-tap express checkout with saved pin codes.</p>
+            {/* Featured Product Preview Tile inside Register */}
+            <div className="p-3 bg-cream/10 border-2 border-cream/20 hover:border-lime transition-colors space-y-2">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/images/products/rex-1.jpg"
+                  alt="Mecha Flexi Rex"
+                  className="w-14 h-14 object-cover border-2 border-ink shadow-brutal-sm flex-shrink-0 group-hover:scale-105 transition-transform"
+                />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="badge-coral text-[9px] py-0 px-1 font-bold">DESK COMPANION</span>
+                    <span className="font-mono text-[10px] text-cream/50">18 JOINTS</span>
+                  </div>
+                  <p className="font-display font-bold text-xs uppercase text-cream truncate mt-0.5">
+                    Mecha Flexi Rex
+                  </p>
+                  <p className="font-mono text-[10px] text-lime font-bold">₹899</p>
                 </div>
               </div>
+            </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-coral text-cream flex items-center justify-center flex-shrink-0 font-bold text-[10px] border border-ink mt-0.5">
-                  ⚡
-                </div>
-                <div>
-                  <p className="font-bold text-cream uppercase">Custom Print Requests</p>
-                  <p className="text-[11px] text-cream/60">Upload 3D STL files directly to our engineering queue.</p>
-                </div>
+            <div className="space-y-3 pt-2 font-mono text-xs">
+              <div className="flex items-start gap-2.5">
+                <span className="text-lime font-bold">⚡</span>
+                <p className="text-cream/80 text-[11px] leading-tight">
+                  <strong className="text-cream uppercase">ADHD Approved:</strong> Tactile fidget joints to survive endless Zoom meetings.
+                </p>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-cream text-ink flex items-center justify-center flex-shrink-0 font-bold text-[10px] border border-ink mt-0.5">
-                  ★
-                </div>
-                <div>
-                  <p className="font-bold text-cream uppercase">Tax Invoices & Tracking</p>
-                  <p className="text-[11px] text-cream/60">Instant GST invoices and real-time courier tracking.</p>
-                </div>
+              <div className="flex items-start gap-2.5">
+                <span className="text-coral font-bold">🔥</span>
+                <p className="text-cream/80 text-[11px] leading-tight">
+                  <strong className="text-cream uppercase">Assert Desk Dominance:</strong> Instant coworker envy when they visit your workstation.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="text-cream font-bold">📦</span>
+                <p className="text-cream/80 text-[11px] leading-tight">
+                  <strong className="text-cream uppercase">Lightning Dispatch:</strong> Printed and shipped right out of Bengaluru in 24-48h.
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="relative z-10 pt-6 border-t border-cream/15 flex items-center justify-between font-mono text-[10px] text-cream/50 uppercase">
+          <div className="relative z-10 pt-4 border-t border-cream/15 flex items-center justify-between font-mono text-[10px] text-cream/50 uppercase">
             <span>Free Express Shipping &gt; ₹999</span>
-            <span>Bambu Lab Studio</span>
+            <span>Bengaluru HQ</span>
           </div>
         </div>
 
@@ -206,14 +218,14 @@ export function RegisterPage() {
         <div className="lg:col-span-7 card-brutal bg-cream-light p-6 sm:p-10 shadow-brutal-xl space-y-6 flex flex-col justify-center">
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="badge-lime text-xs">New Account</span>
-              <span className="font-mono text-[10px] text-ink-muted uppercase">Fast Registration</span>
+              <span className="badge-lime text-xs">Join The Dept</span>
+              <span className="font-mono text-[10px] text-ink-muted uppercase">1-Tap Google Access</span>
             </div>
             <h1 className="font-display font-black text-3xl uppercase tracking-tight text-ink">
               Create Account<span className="text-coral">.</span>
             </h1>
             <p className="font-mono text-xs text-ink-muted uppercase">
-              Enter your details or register with 1-click Google SSO
+              Join the club, save addresses & track your tactile plastic drops
             </p>
           </div>
 
@@ -250,7 +262,7 @@ export function RegisterPage() {
                   d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.25 2.63 1.26 6.61l4.01 3.15c.95-2.85 3.6-4.96 6.73-4.96z"
                 />
               </svg>
-              {googleLoading ? "Authorizing with Google..." : "Sign Up with Google"}
+              {googleLoading ? "Connecting with Google..." : "Continue with Google"}
             </button>
           </div>
 
@@ -353,20 +365,19 @@ export function RegisterPage() {
               className="btn-primary w-full py-3.5 text-xs flex items-center justify-center gap-2 cursor-pointer"
             >
               <UserPlus className="w-3.5 h-3.5" />
-              {submitting ? "Creating Account..." : "Create Account & Sign In"}
+              {submitting ? "Creating Account..." : "Claim Account & Start Collecting 🚀"}
             </button>
           </form>
 
           <div className="text-center font-mono text-xs border-t border-ink/20 pt-4 text-ink-muted">
-            Already have an account?{" "}
+            Already feeding your addiction?{" "}
             <Link to="/login" className="text-coral font-bold uppercase hover:underline ml-1">
               Sign In Here →
             </Link>
           </div>
 
-          <div className="flex items-center justify-center gap-1.5 font-mono text-[9px] text-ink-muted/80 uppercase pt-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-lime-darker" />
-            <span>256-Bit SSL Encryption • Secure Cloud Architecture</span>
+          <div className="flex items-center justify-center gap-1.5 font-mono text-[10px] text-ink-muted/80 uppercase pt-1">
+            <span>✨ Zero spam • Instant drop alerts • Pure plastic dopamine</span>
           </div>
         </div>
       </div>

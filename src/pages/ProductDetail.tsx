@@ -237,22 +237,22 @@ export function ProductDetailPage() {
               </div>
             )}
 
-            {/* Engineering Highlights */}
+            {/* Tactile Aura Highlights */}
             <div className="grid grid-cols-3 gap-3 pt-4">
               <div className="card-brutal p-3 bg-cream-light text-center">
-                <Truck className="w-4 h-4 mx-auto mb-1 text-ink" />
-                <p className="font-mono text-[10px] font-bold uppercase text-ink">Free Shipping</p>
-                <p className="font-mono text-[9px] text-ink-muted">Above ₹999 in India</p>
+                <Sparkles className="w-4 h-4 mx-auto mb-1 text-lime-darker" />
+                <p className="font-mono text-[10px] font-bold uppercase text-ink">+999 Desk Aura</p>
+                <p className="font-mono text-[9px] text-ink-muted">Immediate presence</p>
               </div>
               <div className="card-brutal p-3 bg-cream-light text-center">
-                <ShieldCheck className="w-4 h-4 mx-auto mb-1 text-lime-darker" />
-                <p className="font-mono text-[10px] font-bold uppercase text-ink">100% Recyclable</p>
-                <p className="font-mono text-[9px] text-ink-muted">Corn-derived PLA+</p>
+                <Cpu className="w-4 h-4 mx-auto mb-1 text-ink" />
+                <p className="font-mono text-[10px] font-bold uppercase text-ink">ADHD Approved</p>
+                <p className="font-mono text-[9px] text-ink-muted">10/10 tactile joints</p>
               </div>
               <div className="card-brutal p-3 bg-cream-light text-center">
                 <RotateCcw className="w-4 h-4 mx-auto mb-1 text-coral" />
-                <p className="font-mono text-[10px] font-bold uppercase text-ink">QC Guarantee</p>
-                <p className="font-mono text-[9px] text-ink-muted">Manual inspection</p>
+                <p className="font-mono text-[10px] font-bold uppercase text-ink">Coworker Magnet</p>
+                <p className="font-mono text-[9px] text-ink-muted">High theft risk</p>
               </div>
             </div>
           </div>
@@ -287,6 +287,16 @@ export function ProductDetailPage() {
             <p className="text-sm text-ink-muted font-body leading-relaxed border-t border-ink/15 pt-4">
               {product.short_description || product.description}
             </p>
+
+            {/* Tactical Zoom Meeting Hazard Warning */}
+            <div className="p-3 bg-coral/15 border-2 border-coral font-mono text-xs space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-coral-dark uppercase">
+                <span>⚠️</span> Tactical Meeting Hazard
+              </div>
+              <p className="text-ink-muted text-[11px] leading-relaxed">
+                Aggressively satisfying. Fidgeting with this during 9 AM Zoom calls may cause complete loss of focus on whatever slide deck your manager is presenting.
+              </p>
+            </div>
 
             {/* Variant Selector */}
             {product.variants && product.variants.length > 0 && (
@@ -374,9 +384,9 @@ export function ProductDetailPage() {
                   type="button"
                   onClick={handleAddToCart}
                   disabled={isOutOfStock}
-                  className="btn-primary flex-1 py-3 text-sm"
+                  className="btn-primary flex-1 py-3 text-sm cursor-pointer"
                 >
-                  Add to Cart +
+                  Add to Tray +
                 </button>
               </div>
 
@@ -385,9 +395,9 @@ export function ProductDetailPage() {
                 type="button"
                 onClick={handleBuyNow}
                 disabled={isOutOfStock}
-                className="btn-dark w-full py-3.5 text-sm"
+                className="btn-dark w-full py-3.5 text-sm cursor-pointer"
               >
-                Instant Buy Now <ArrowRight className="w-4 h-4" />
+                Instant Buy Drop ⚡ <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 

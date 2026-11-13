@@ -191,10 +191,10 @@ export function CheckoutPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b-2 border-ink pb-6 mb-10">
           <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter">
-            Secure Checkout<span className="text-coral">.</span>
+            Lock In Your Order<span className="text-coral">.</span>
           </h1>
           <p className="font-mono text-xs text-ink-muted uppercase mt-1">
-            Server-Authoritative Pricing • 256-Bit SSL Encrypted
+            ⚡ Instant UPI & Cards • Dispatched from Bengaluru in 24-48h
           </p>
         </div>
 
@@ -331,10 +331,10 @@ export function CheckoutPage() {
               {/* Payment Method Notice */}
               <div className="card-brutal p-6 bg-lime/25 border-2 border-ink space-y-2 font-mono text-xs">
                 <div className="flex items-center gap-2 font-display font-bold uppercase text-ink text-sm">
-                  <CreditCard className="w-5 h-5 text-ink" /> Payment Provider
+                  <CreditCard className="w-5 h-5 text-ink" /> Instant & Seamless Payment
                 </div>
                 <p className="text-ink-muted leading-relaxed">
-                  Secured by Razorpay. Accepts all major UPI applications (Google Pay, PhonePe, Paytm), Credit & Debit Cards, and NetBanking with instant 256-bit encrypted verification.
+                  Powered by Razorpay. Supports all UPI apps (Google Pay, PhonePe, Paytm), Cards, and NetBanking. Dispatched within 24–48 hours with live tracking updates directly to your inbox.
                 </p>
               </div>
             </div>

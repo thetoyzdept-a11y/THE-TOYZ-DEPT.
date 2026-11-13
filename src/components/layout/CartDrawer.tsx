@@ -66,7 +66,7 @@ export function CartDrawer() {
               {cart.amountToFreeShipping > 0 ? (
                 <div>
                   <div className="flex items-center justify-between text-xs font-mono uppercase mb-1.5">
-                    <span className="flex items-center gap-1.5 text-lime">
+                    <span className="flex items-center gap-1.5 text-lime font-bold">
                       <Truck className="w-3.5 h-3.5" />
                       Add {formatINR(cart.amountToFreeShipping)} for Free Shipping
                     </span>
@@ -84,7 +84,7 @@ export function CartDrawer() {
               ) : (
                 <div className="flex items-center gap-2 text-xs font-mono uppercase text-lime font-bold">
                   <Truck className="w-4 h-4" />
-                  Unlocked Free Express Shipping across India!
+                  ✨ Free Express Shipping Unlocked! The universe approves.
                 </div>
               )}
             </div>
@@ -94,21 +94,21 @@ export function CartDrawer() {
           <div className="flex-1 overflow-y-auto p-5 divide-y divide-ink/15">
             {!cart || cart.items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                <div className="w-16 h-16 bg-cream-dark border-2 border-ink flex items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-cream-dark border-2 border-ink flex items-center justify-center mb-4 shadow-brutal-sm">
                   <ShoppingBag className="w-8 h-8 text-ink/40" />
                 </div>
                 <h3 className="font-display font-black text-lg uppercase mb-1">
-                  Your Cart is Empty
+                  Your Tray is Dry
                 </h3>
-                <p className="font-mono text-xs text-ink-muted mb-6 max-w-xs">
-                  Nothing has been dropped into your tray yet. Check our new arrivals.
+                <p className="font-mono text-xs text-ink-muted mb-6 max-w-xs leading-relaxed">
+                  Your desk called. It's still boring. Drop an articulated beast or fidget gear to fix it.
                 </p>
                 <Link
                   to="/shop"
                   onClick={closeCart}
-                  className="btn-primary text-xs"
+                  className="btn-primary text-xs cursor-pointer"
                 >
-                  Explore Catalogue
+                  Feed Your Desk Dopamine ⚡
                 </Link>
               </div>
             ) : (
@@ -248,9 +248,9 @@ export function CartDrawer() {
               {/* Checkout Button */}
               <button
                 onClick={handleCheckoutClick}
-                className="btn-primary w-full py-3.5 text-sm"
+                className="btn-primary w-full py-3.5 text-sm cursor-pointer"
               >
-                Proceed to Checkout
+                Lock In The Drop 🚀
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
