@@ -37,18 +37,25 @@ export function Header() {
   return (
     <>
       {/* ── Top Announcement Ticker ──────────────────────────────────── */}
-      <div className="bg-ink text-cream py-2 px-4 text-center border-b-2 border-ink">
-        <div className="flex items-center justify-center gap-2 overflow-hidden whitespace-nowrap text-xs font-mono tracking-wider uppercase">
+      <div className="bg-ink text-cream py-2 border-b-2 border-ink overflow-hidden whitespace-nowrap select-none flex font-mono text-xs uppercase tracking-widest">
+        <div className="inline-flex gap-8 animate-marquee">
           <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
-          <span className="opacity-60 hidden sm:inline">•</span>
-          <span className="hidden sm:inline">+999 DESK AURA GUARANTEED</span>
-          <span className="opacity-60">•</span>
-          <span>DISPATCHED FROM BENGALURU IN 24-48H</span>
+          <span>✦ +999 DESK AURA GUARANTEED</span>
+          <span>✦ DISPATCHED FROM BENGALURU IN 24-48H</span>
+          <span>✦ 100% ADHD APPROVED TACTILE FIDGETS</span>
+          <span>✦ ZERO BORING CORPORATE MERCH</span>
+        </div>
+        <div className="inline-flex gap-8 animate-marquee" aria-hidden="true">
+          <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
+          <span>✦ +999 DESK AURA GUARANTEED</span>
+          <span>✦ DISPATCHED FROM BENGALURU IN 24-48H</span>
+          <span>✦ 100% ADHD APPROVED TACTILE FIDGETS</span>
+          <span>✦ ZERO BORING CORPORATE MERCH</span>
         </div>
       </div>
 
       {/* ── Main Navigation Header ───────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-cream border-b-2 border-ink shadow-sm">
+      <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b-2 border-ink shadow-sm transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Mobile menu toggle */}
@@ -56,7 +63,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 -ml-2 text-ink hover:bg-cream-dark transition-colors"
+                className="p-2 -ml-2 text-ink hover:bg-cream-dark border-2 border-transparent hover:border-ink transition-colors cursor-pointer"
                 aria-label="Open navigation menu"
               >
                 <Menu className="w-6 h-6" />
@@ -65,12 +72,12 @@ export function Header() {
 
             {/* Brand Wordmark Treatment */}
             <div className="flex items-center">
-              <Link to="/" className="group flex items-center gap-2">
-                <div className="w-8 h-8 md:w-9 md:h-9 bg-ink border-2 border-ink flex items-center justify-center text-lime font-display font-black text-lg shadow-brutal-sm group-hover:bg-lime group-hover:text-ink transition-all">
+              <Link to="/" className="group flex items-center gap-2.5">
+                <div className="w-8 h-8 md:w-9 md:h-9 bg-ink border-2 border-ink flex items-center justify-center text-lime font-display font-black text-lg shadow-brutal-sm group-hover:bg-lime group-hover:text-ink group-hover:rotate-6 transition-all duration-200">
                   T
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-display font-black text-xl md:text-2xl tracking-tighter uppercase leading-none">
+                  <span className="font-display font-black text-xl md:text-2xl tracking-tighter uppercase leading-none group-hover:text-coral transition-colors">
                     THE TOYZ DEPT<span className="text-coral">.</span>
                   </span>
                   <span className="font-mono text-[9px] md:text-[10px] tracking-widest text-ink-muted uppercase font-bold">
@@ -80,42 +87,33 @@ export function Header() {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
+            {/* Desktop Navigation (Sleek, unique, non-redundant) */}
+            <nav className="hidden lg:flex items-center gap-8 font-display font-bold text-xs uppercase tracking-wider">
               <Link
                 to="/shop"
-                className="font-display font-bold text-sm tracking-wider uppercase hover:text-coral transition-colors py-1"
+                className="hover:text-coral transition-colors py-1 flex items-center gap-2 group"
               >
-                Shop All
-              </Link>
-              <Link
-                to="/shop?category=collectibles"
-                className="font-display font-bold text-sm tracking-wider uppercase hover:text-coral transition-colors py-1"
-              >
-                Collectibles
-              </Link>
-              <Link
-                to="/shop?category=desk-objects"
-                className="font-display font-bold text-sm tracking-wider uppercase hover:text-coral transition-colors py-1"
-              >
-                Desk Objects
-              </Link>
-              <Link
-                to="/shop?category=home-stuff"
-                className="font-display font-bold text-sm tracking-wider uppercase hover:text-coral transition-colors py-1"
-              >
-                Home Stuff
+                <span>Store Drops</span>
+                <span className="badge-lime text-[9px] py-0 px-1 font-mono group-hover:bg-ink group-hover:text-lime transition-colors">
+                  12 Drops
+                </span>
               </Link>
               <Link
                 to="/custom-prints"
-                className="font-display font-bold text-sm tracking-wider uppercase text-ink hover:text-coral transition-colors py-1 flex items-center gap-1.5"
+                className="hover:text-coral transition-colors py-1 flex items-center gap-2 group"
               >
-                <span className="w-2 h-2 rounded-full bg-lime border border-ink animate-ping" />
-                Custom Prints
+                <span className="w-2 h-2 rounded-full bg-lime border border-ink animate-pulse" />
+                <span>Custom 3D Lab</span>
+              </Link>
+              <Link
+                to="/about"
+                className="hover:text-coral transition-colors py-1"
+              >
+                Our Studio
               </Link>
               <Link
                 to="/track-order"
-                className="font-display font-bold text-sm tracking-wider uppercase text-ink-muted hover:text-ink transition-colors py-1"
+                className="hover:text-coral transition-colors py-1 text-ink-muted hover:text-ink"
               >
                 Track Order
               </Link>
@@ -310,55 +308,71 @@ export function Header() {
               </div>
 
               {/* Navigation Links */}
-              <nav className="mt-6 flex flex-col gap-2 font-display font-bold text-lg uppercase tracking-wider">
+              <nav className="mt-6 flex flex-col gap-2 font-display font-bold text-base uppercase tracking-wider">
                 <Link
                   to="/shop"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
                 >
-                  Shop All
-                  <ChevronRight className="w-5 h-5 text-ink-muted" />
-                </Link>
-                <Link
-                  to="/shop?category=collectibles"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
-                >
-                  Collectibles
-                  <ChevronRight className="w-5 h-5 text-ink-muted" />
-                </Link>
-                <Link
-                  to="/shop?category=desk-objects"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
-                >
-                  Desk Objects
-                  <ChevronRight className="w-5 h-5 text-ink-muted" />
-                </Link>
-                <Link
-                  to="/shop?category=home-stuff"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
-                >
-                  Home Stuff
-                  <ChevronRight className="w-5 h-5 text-ink-muted" />
+                  <span>Store Drops</span>
+                  <span className="badge-lime text-[10px] font-mono">12 Drops</span>
                 </Link>
                 <Link
                   to="/custom-prints"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 bg-lime/40 hover:bg-lime border border-ink transition-all"
+                  className="flex items-center justify-between py-3 px-3 bg-lime/30 hover:bg-lime border border-ink transition-all"
                 >
-                  <span>Custom Prints</span>
-                  <span className="badge-coral text-[10px]">Upload STL</span>
+                  <span className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-lime border border-ink animate-pulse" />
+                    Custom 3D Lab
+                  </span>
+                  <span className="badge-coral text-[9px]">Upload STL</span>
+                </Link>
+                <Link
+                  to="/about"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                >
+                  Our Studio
+                  <ChevronRight className="w-4 h-4 text-ink-muted" />
                 </Link>
                 <Link
                   to="/track-order"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all text-sm"
+                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
                 >
-                  Track Order
+                  Track Your Drop
+                  <ChevronRight className="w-4 h-4 text-ink-muted" />
                 </Link>
               </nav>
+
+              {/* Quick Department Tags */}
+              <div className="mt-6 pt-4 border-t border-ink/20 space-y-2">
+                <p className="font-mono text-[10px] uppercase font-bold text-ink-muted">Quick Departments</p>
+                <div className="flex flex-wrap gap-1.5 font-mono text-xs">
+                  <Link
+                    to="/shop?category=collectibles"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-2 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px]"
+                  >
+                    🐉 Collectibles
+                  </Link>
+                  <Link
+                    to="/shop?category=desk-objects"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-2 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px]"
+                  >
+                    ⚡ Desk Gear
+                  </Link>
+                  <Link
+                    to="/shop?category=home-stuff"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-2 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px]"
+                  >
+                    🏠 Decor
+                  </Link>
+                </div>
+              </div>
             </div>
 
             {/* Bottom Account & System Links */}
