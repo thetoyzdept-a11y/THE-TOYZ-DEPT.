@@ -4,6 +4,7 @@ import type { Env, Variables } from "../types";
 import { requireAuth, getCookie } from "../auth";
 import { getRazorpayCredentials, verifyRazorpaySignature } from "./razorpay";
 import { sendEmail, buildOrderConfirmationEmail } from "../email";
+import { createShiprocketOrder } from "../shiprocket";
 
 export const checkoutRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -404,6 +405,33 @@ checkoutRouter.post("/verify", async (c) => {
       }
     } catch (emailErr) {
       console.warn("Could not send confirmation email:", emailErr);
+    }
+
+    // Auto-Push Order directly into Shiprocket Seller Dashboard under Channel 12931117 (THE TOYZ DEPT.)
+    try {
+      const orderPayload = {
+        ...order,
+        shipping_email: order.shipping_email || customerEmail,
+      };
+      const autoSyncShiprocket = async () => {
+        try {
+          const srRes = await createShiprocketOrder(c.env, orderPayload, orderItems.results || []);
+          if (srRes.success && srRes.shiprocketOrderId) {
+            await c.env.DB
+              .prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime('now') WHERE id = ?")
+              .bind(srRes.shiprocketOrderId.toString(), srRes.shipmentId?.toString() || null, orderId)
+              .run();
+          }
+        } catch (e) {
+          console.warn("Shiprocket auto-sync background error:", e);
+        }
+      };
+
+      c.executionCtx?.waitUntil
+        ? c.executionCtx.waitUntil(autoSyncShiprocket())
+        : autoSyncShiprocket().catch((e) => console.warn(e));
+    } catch (srErr) {
+      console.warn("Could not auto-push to Shiprocket:", srErr);
     }
 
     return c.json({

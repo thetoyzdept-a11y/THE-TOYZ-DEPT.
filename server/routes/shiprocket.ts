@@ -179,6 +179,47 @@ shippingRouter.post("/create-shipment/:orderId", requireAdmin, async (c) => {
 });
 
 /**
+ * Admin: POST /api/shipping/sync-all-unsynced
+ * Synchronizes all confirmed orders to Shiprocket under channel 12931117
+ */
+shippingRouter.post("/sync-all-unsynced", requireAdmin, async (c) => {
+  const unsyncedOrders = await c.env.DB
+    .prepare(`
+      SELECT * FROM orders 
+      WHERE (shiprocket_order_id IS NULL OR shiprocket_order_id = '') 
+        AND status NOT IN ('pending', 'cancelled')
+      ORDER BY created_at DESC
+    `)
+    .all<any>();
+
+  const results: any[] = [];
+  for (const ord of (unsyncedOrders.results || [])) {
+    const itemsRes = await c.env.DB
+      .prepare("SELECT * FROM order_items WHERE order_id = ?")
+      .bind(ord.id)
+      .all<any>();
+
+    const items = itemsRes.results || [];
+    const shipRes = await createShiprocketOrder(c.env, ord, items);
+    if (shipRes.success && shipRes.shiprocketOrderId) {
+      await c.env.DB
+        .prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime('now') WHERE id = ?")
+        .bind(shipRes.shiprocketOrderId.toString(), shipRes.shipmentId?.toString() || null, ord.id)
+        .run();
+      results.push({ orderNumber: ord.order_number, success: true, shiprocketOrderId: shipRes.shiprocketOrderId });
+    } else {
+      results.push({ orderNumber: ord.order_number, success: false, error: shipRes.error });
+    }
+  }
+
+  return c.json({
+    syncedCount: results.filter((r) => r.success).length,
+    totalAttempted: results.length,
+    details: results,
+  });
+});
+
+/**
  * Public: GET /api/shipping/track/:awb
  * Live shipment milestone tracking
  */

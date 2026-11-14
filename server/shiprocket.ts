@@ -124,6 +124,14 @@ export async function checkCourierServiceability(
   }
 }
 
+export const SHIPROCKET_CHANNEL_ID = 12931117; // THE TOYZ DEPT. Store Channel
+
+function sanitizeText(str: string, fallback: string = ""): string {
+  if (!str) return fallback;
+  const cleaned = str.normalize("NFKD").replace(/[^\w\s.,-]/gi, "").trim();
+  return cleaned || fallback;
+}
+
 /**
  * Create a new order in Shiprocket
  */
@@ -141,32 +149,37 @@ export async function createShiprocketOrder(
 
   // Format order date: YYYY-MM-DD HH:mm
   const orderDate = new Date().toISOString().replace("T", " ").substring(0, 16);
+  const fullName = sanitizeText(order.shipping_name, "Customer");
+  const nameParts = fullName.split(" ");
+  const firstName = nameParts[0] || "Customer";
+  const lastName = nameParts.slice(1).join(" ") || "Collector";
 
   const payload = {
     order_id: order.order_number,
     order_date: orderDate,
     pickup_location: pickupLocation,
-    billing_customer_name: order.shipping_name.split(" ")[0] || "Customer",
-    billing_last_name: order.shipping_name.split(" ").slice(1).join(" ") || "",
-    billing_address: order.shipping_address_1,
-    billing_address_2: order.shipping_address_2 || "",
-    billing_city: order.shipping_city,
-    billing_pincode: order.shipping_postal_code,
-    billing_state: order.shipping_state,
-    billing_country: order.shipping_country || "India",
-    billing_email: order.user_email || "thetoyzdept@gmail.com",
-    billing_phone: order.shipping_phone.replace(/[^0-9]/g, "").slice(-10),
+    channel_id: SHIPROCKET_CHANNEL_ID,
+    billing_customer_name: firstName,
+    billing_last_name: lastName,
+    billing_address: sanitizeText(order.shipping_address_1, "Address Line 1"),
+    billing_address_2: sanitizeText(order.shipping_address_2 || "", ""),
+    billing_city: sanitizeText(order.shipping_city, "Gadag"),
+    billing_pincode: (order.shipping_postal_code || "").toString().replace(/[^0-9]/g, "").slice(0, 6) || "582101",
+    billing_state: sanitizeText(order.shipping_state, "Karnataka"),
+    billing_country: "India",
+    billing_email: order.shipping_email || order.user_email || "thetoyzdept@gmail.com",
+    billing_phone: (order.shipping_phone || "").toString().replace(/[^0-9]/g, "").slice(-10) || "9019465897",
     shipping_is_billing: true,
     order_items: items.map((it: any) => ({
       name: it.product_name + (it.variant_name ? ` - ${it.variant_name}` : ""),
       sku: it.variant_sku || it.product_id || "TTD-ITEM",
-      units: it.quantity,
-      selling_price: (it.unit_price / 100).toFixed(2),
+      units: it.quantity || 1,
+      selling_price: ((it.unit_price || 100) / 100).toFixed(2),
       discount: 0,
       tax: 0,
     })),
     payment_method: "Prepaid",
-    sub_total: (order.total_amount / 100).toFixed(2),
+    sub_total: ((order.total_amount || 100) / 100).toFixed(2),
     length: 15,
     breadth: 15,
     height: 10,

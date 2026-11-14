@@ -147,6 +147,8 @@ export const api = {
     request<any>(`/shipping/serviceability?pincode=${encodeURIComponent(pincode)}`),
   createShiprocketShipment: (orderId: string) =>
     request<any>(`/shipping/create-shipment/${orderId}`, { method: "POST" }),
+  syncAllShiprocketOrders: () =>
+    request<any>("/shipping/sync-all-unsynced", { method: "POST" }),
   trackShiprocketAwb: (awb: string) =>
     request<any>(`/shipping/track/${encodeURIComponent(awb)}`),
 };

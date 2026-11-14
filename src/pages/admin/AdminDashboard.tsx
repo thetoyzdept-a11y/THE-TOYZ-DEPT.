@@ -145,6 +145,7 @@ export function AdminDashboardPage() {
   const [statusTrackingNum, setStatusTrackingNum] = useState("");
   const [statusNote, setStatusNote] = useState("");
   const [shiprocketLoading, setShiprocketLoading] = useState<string | null>(null);
+  const [syncingAllShiprocket, setSyncingAllShiprocket] = useState(false);
 
   const handleShiprocketDispatch = async (orderId: string) => {
     try {
@@ -157,6 +158,19 @@ export function AdminDashboardPage() {
       alert("Shiprocket Error: " + err.message);
     } finally {
       setShiprocketLoading(null);
+    }
+  };
+
+  const handleSyncAllShiprocket = async () => {
+    try {
+      setSyncingAllShiprocket(true);
+      const res = await api.syncAllShiprocketOrders();
+      alert(`Shiprocket Sync Complete!\nSuccessfully pushed ${res.syncedCount} of ${res.totalAttempted} orders into Shiprocket Seller Dashboard (Channel 12931117: THE TOYZ DEPT.).`);
+      await loadAllAdminData();
+    } catch (err: any) {
+      alert("Shiprocket Sync Error: " + err.message);
+    } finally {
+      setSyncingAllShiprocket(false);
     }
   };
 
@@ -749,6 +763,18 @@ export function AdminDashboardPage() {
                 <p className="font-mono text-xs text-ink-muted uppercase">
                   Monitor payments, print slips, update production status & dispatch via Shiprocket
                 </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSyncAllShiprocket}
+                  disabled={syncingAllShiprocket}
+                  className="px-3.5 py-2 bg-lime text-ink border-2 border-ink font-mono text-xs font-bold uppercase shadow-brutal-sm hover:bg-ink hover:text-lime transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  title="Push all confirmed website orders into Shiprocket Seller Dashboard"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${syncingAllShiprocket ? "animate-spin" : ""}`} />
+                  <span>{syncingAllShiprocket ? "Syncing Shiprocket..." : "Sync Orders to Shiprocket"}</span>
+                </button>
               </div>
             </div>
 
