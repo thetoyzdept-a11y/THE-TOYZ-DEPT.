@@ -81,7 +81,7 @@ export function PrivacyPage() {
                 <strong>Account Credentials:</strong> If you create an account, we store your username and a cryptographically hashed representation of your password using one-way salted hashing. We never store plaintext passwords.
               </li>
               <li>
-                <strong>Customer 3D Geometry:</strong> If you upload 3D models (.STL, .STEP, .OBJ) for custom printing, we store the file strictly to calculate slicer toolpaths and execute machine fabrication.
+                <strong>Shipping & Delivery Records:</strong> Name, physical postal address, pincode, and phone number necessary for courier consignment generation and live tracking milestones.
               </li>
               <li>
                 <strong>Technical Information:</strong> IP address, device browser type, and diagnostic access timestamps collected automatically via Cloudflare serverless edge infrastructure for DDoS prevention.

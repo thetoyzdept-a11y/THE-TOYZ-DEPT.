@@ -262,7 +262,7 @@ export function ContactPage() {
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Provide detailed questions regarding products, materials, shipping timelines, or custom print specifications..."
+                    placeholder="Provide detailed questions regarding products, materials, shipping timelines, or drop specifications..."
                     className="w-full bg-cream text-ink border-2 border-ink p-3 text-xs font-mono focus:outline-none focus:border-coral"
                   />
                 </div>

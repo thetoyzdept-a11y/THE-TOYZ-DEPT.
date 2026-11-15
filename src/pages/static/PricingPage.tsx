@@ -127,7 +127,7 @@ export function PricingPage() {
             <h3 className="font-display font-bold text-sm uppercase">Need Clarification on Pricing or Quotations?</h3>
           </div>
           <p className="text-cream/70 text-[11px] leading-relaxed">
-            If you have questions about commercial bulk pricing, educational discounts for students/designers, or specific custom print tolerances, please contact our desk:
+            If you have questions about commercial bulk pricing, desk setup packages, or specific edition finishes, please contact our desk:
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-2 text-[11px]">
             <a href={`mailto:${BUSINESS_PROFILE.contact.email}`} className="text-lime underline">

@@ -56,13 +56,13 @@ export function HomePage() {
                 +999 DESK AURA // TACTILE 3D DROPS
               </div>
 
-              <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-[1.1] sm:leading-[0.95] text-cream">
-                <span className="block sm:inline">YOUR DESK IS </span>
-                <span className="inline-block bg-lime text-ink px-2.5 py-0.5 sm:px-3 sm:py-1 shadow-brutal-sm border border-ink my-1 sm:my-0 font-black">
+              <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-tight sm:leading-[0.95] text-cream">
+                <span className="block sm:inline mb-1 sm:mb-0">YOUR DESK IS </span>
+                <span className="inline-block bg-lime text-ink px-2.5 py-1 sm:px-3 sm:py-1 shadow-brutal-sm border-2 border-ink my-1.5 sm:my-0 font-black">
                   DEPRESSING
                 </span>
                 <span className="text-coral">.</span>{" "}
-                <span className="block sm:inline text-cream">WE FIXED THAT</span>
+                <span className="block sm:inline text-cream mt-1 sm:mt-0">WE FIXED THAT</span>
                 <span className="text-lime">!</span>
               </h1>
 

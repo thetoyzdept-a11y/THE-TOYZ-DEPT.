@@ -125,9 +125,9 @@ export function AboutPage() {
               <div className="w-10 h-10 bg-ink text-cream flex items-center justify-center border border-ink">
                 <Hammer className="w-5 h-5" />
               </div>
-              <h3 className="font-display font-bold uppercase text-base text-ink">Custom 3D Printing Service</h3>
+              <h3 className="font-display font-bold uppercase text-base text-ink">Limited Drops & Collectibles</h3>
               <p className="text-xs font-mono text-ink-muted leading-relaxed">
-                On-demand CAD model slicing, tolerance checking, and custom print fabrication for mechanical engineers, designers, architecture students, and makers.
+                Curated tactile articulated desk companions, kinetic stress-relieving sculptures, and limited-run desktop monoliths fabricated in Bengaluru.
               </p>
             </div>
           </div>

@@ -279,6 +279,143 @@ checkoutRouter.post("/create-order", async (c) => {
   }
 });
 
+/**
+ * Centralized, idempotent order fulfillment logic.
+ * Called by both /verify (browser client return) and /webhooks/razorpay (server-to-server webhook).
+ * Ensures zero dropped orders, auto-deducts stock, sends Resend confirmation email,
+ * and pushes to Shiprocket Channel 12931117.
+ */
+export async function fulfillPaidOrder(
+  env: Env,
+  orderId: string,
+  razorpayPaymentId: string | null,
+  razorpaySignature: string | null = null,
+  executionCtx?: ExecutionContext
+): Promise<{ success: boolean; error?: string }> {
+  const order = await env.DB
+    .prepare("SELECT * FROM orders WHERE id = ?")
+    .bind(orderId)
+    .first<any>();
+
+  if (!order) {
+    return { success: false, error: "Order not found" };
+  }
+
+  // Update payment record in payments table
+  await env.DB
+    .prepare(`
+      UPDATE payments SET 
+        razorpay_payment_id = COALESCE(?, razorpay_payment_id),
+        razorpay_signature = COALESCE(?, razorpay_signature),
+        status = 'captured',
+        updated_at = datetime('now')
+      WHERE order_id = ?
+    `)
+    .bind(razorpayPaymentId, razorpaySignature, orderId)
+    .run();
+
+  const isTransitioningFromPending = order.status === "pending";
+
+  // Transition order to payment_confirmed if pending
+  if (isTransitioningFromPending) {
+    await env.DB
+      .prepare(`
+        UPDATE orders SET 
+          status = 'payment_confirmed',
+          razorpay_payment_id = COALESCE(?, razorpay_payment_id),
+          payment_status = 'captured',
+          payment_method = 'razorpay',
+          updated_at = datetime('now')
+        WHERE id = ?
+      `)
+      .bind(razorpayPaymentId, orderId)
+      .run();
+
+    // Deduct stock in variants
+    const orderItemsRes = await env.DB
+      .prepare("SELECT variant_id, quantity FROM order_items WHERE order_id = ?")
+      .bind(orderId)
+      .all<any>();
+
+    for (const it of (orderItemsRes.results || [])) {
+      if (it.variant_id) {
+        await env.DB
+          .prepare("UPDATE product_variants SET stock = MAX(0, stock - ?), updated_at = datetime('now') WHERE id = ?")
+          .bind(it.quantity, it.variant_id)
+          .run();
+      }
+    }
+
+    // Insert order status history
+    await env.DB
+      .prepare("INSERT INTO order_status_history (id, order_id, from_status, to_status, note) VALUES (?, ?, 'pending', 'payment_confirmed', 'Payment verified and captured successfully.')")
+      .bind("osh_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16), orderId)
+      .run();
+  } else if (!order.razorpay_payment_id && razorpayPaymentId) {
+    await env.DB
+      .prepare("UPDATE orders SET razorpay_payment_id = ?, updated_at = datetime('now') WHERE id = ?")
+      .bind(razorpayPaymentId, orderId)
+      .run();
+  }
+
+  // Fetch full order items for email & Shiprocket
+  const fullItemsRes = await env.DB
+    .prepare("SELECT * FROM order_items WHERE order_id = ?")
+    .bind(orderId)
+    .all<any>();
+  const items = fullItemsRes.results || [];
+
+  const customerEmail =
+    order.shipping_email ||
+    order.user_email ||
+    (order.shipping_address_2 && order.shipping_address_2.includes("@") ? order.shipping_address_2 : null);
+
+  // Send Resend confirmation email if transitioning from pending
+  if (isTransitioningFromPending && customerEmail) {
+    try {
+      const emailContent = buildOrderConfirmationEmail(order, items);
+      const emailPromise = sendEmail(env, {
+        to: customerEmail,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      });
+      executionCtx?.waitUntil
+        ? executionCtx.waitUntil(emailPromise)
+        : emailPromise.catch((err) => console.error("Email dispatch failed:", err));
+    } catch (emailErr) {
+      console.warn("Could not send confirmation email:", emailErr);
+    }
+  }
+
+  // Auto-push order to Shiprocket (Channel 12931117) if not already pushed
+  if (!order.shiprocket_order_id) {
+    const orderPayload = {
+      ...order,
+      shipping_email: customerEmail || order.shipping_email,
+    };
+    const autoSyncShiprocket = async () => {
+      try {
+        const srRes = await createShiprocketOrder(env, orderPayload, items);
+        if (srRes.success && srRes.shiprocketOrderId) {
+          await env.DB
+            .prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime('now') WHERE id = ?")
+            .bind(srRes.shiprocketOrderId.toString(), srRes.shipmentId?.toString() || null, orderId)
+            .run();
+        }
+      } catch (e) {
+        console.warn("Shiprocket auto-sync background error:", e);
+      }
+    };
+
+    executionCtx?.waitUntil
+      ? executionCtx.waitUntil(autoSyncShiprocket())
+      : autoSyncShiprocket().catch((e) => console.warn(e));
+  }
+
+  return { success: true };
+}
+
 // POST /api/checkout/verify
 checkoutRouter.post("/verify", async (c) => {
   try {
@@ -323,54 +460,6 @@ checkoutRouter.post("/verify", async (c) => {
       return c.json({ success: false, error: "Payment verification failed: Signature mismatch." }, 400);
     }
 
-    // Payment successfully confirmed!
-    await c.env.DB
-      .prepare(`
-        UPDATE payments SET 
-          razorpay_payment_id = ?,
-          razorpay_signature = ?,
-          status = 'captured',
-          updated_at = datetime('now')
-        WHERE order_id = ?
-      `)
-      .bind(razorpayPaymentId || "pay_mock_" + Date.now(), razorpaySignature || "mock_sig", orderId)
-      .run();
-
-    // Transition Order to payment_confirmed and store payment references
-    await c.env.DB
-      .prepare(`
-        UPDATE orders SET 
-          status = 'payment_confirmed',
-          razorpay_payment_id = ?,
-          payment_status = 'captured',
-          payment_method = 'razorpay',
-          updated_at = datetime('now')
-        WHERE id = ?
-      `)
-      .bind(razorpayPaymentId || "pay_mock_" + Date.now(), orderId)
-      .run();
-
-    // Update stock in variants
-    const orderItems = await c.env.DB
-      .prepare("SELECT variant_id, quantity FROM order_items WHERE order_id = ?")
-      .bind(orderId)
-      .all<any>();
-
-    for (const it of (orderItems.results || [])) {
-      if (it.variant_id) {
-        await c.env.DB
-          .prepare("UPDATE product_variants SET stock = MAX(0, stock - ?), updated_at = datetime('now') WHERE id = ?")
-          .bind(it.quantity, it.variant_id)
-          .run();
-      }
-    }
-
-    // Record status history
-    await c.env.DB
-      .prepare("INSERT INTO order_status_history (id, order_id, from_status, to_status, note) VALUES (?, ?, 'pending', 'payment_confirmed', 'Payment verified successfully.')")
-      .bind("osh_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16), orderId)
-      .run();
-
     // Clear cart items
     const cookieHeader = c.req.header("Cookie") || null;
     const cartId = getCookie(cookieHeader, "toyz_cart_id");
@@ -378,61 +467,14 @@ checkoutRouter.post("/verify", async (c) => {
       await c.env.DB.prepare("DELETE FROM cart_items WHERE cart_id = ?").bind(cartId).run();
     }
 
-    // Trigger Branded Order Confirmation Email via Resend
-    try {
-      const customerEmail =
-        order.shipping_email ||
-        order.user_email ||
-        (order.shipping_address_2 && order.shipping_address_2.includes("@") ? order.shipping_address_2 : null);
-
-      if (customerEmail) {
-        const emailContent = buildOrderConfirmationEmail(order, orderItems.results || []);
-        c.executionCtx?.waitUntil
-          ? c.executionCtx.waitUntil(
-              sendEmail(c.env, {
-                to: customerEmail,
-                subject: emailContent.subject,
-                html: emailContent.html,
-                text: emailContent.text,
-              })
-            )
-          : sendEmail(c.env, {
-              to: customerEmail,
-              subject: emailContent.subject,
-              html: emailContent.html,
-              text: emailContent.text,
-            }).catch((err) => console.error("Email dispatch failed:", err));
-      }
-    } catch (emailErr) {
-      console.warn("Could not send confirmation email:", emailErr);
-    }
-
-    // Auto-Push Order directly into Shiprocket Seller Dashboard under Channel 12931117 (THE TOYZ DEPT.)
-    try {
-      const orderPayload = {
-        ...order,
-        shipping_email: order.shipping_email || customerEmail,
-      };
-      const autoSyncShiprocket = async () => {
-        try {
-          const srRes = await createShiprocketOrder(c.env, orderPayload, orderItems.results || []);
-          if (srRes.success && srRes.shiprocketOrderId) {
-            await c.env.DB
-              .prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime('now') WHERE id = ?")
-              .bind(srRes.shiprocketOrderId.toString(), srRes.shipmentId?.toString() || null, orderId)
-              .run();
-          }
-        } catch (e) {
-          console.warn("Shiprocket auto-sync background error:", e);
-        }
-      };
-
-      c.executionCtx?.waitUntil
-        ? c.executionCtx.waitUntil(autoSyncShiprocket())
-        : autoSyncShiprocket().catch((e) => console.warn(e));
-    } catch (srErr) {
-      console.warn("Could not auto-push to Shiprocket:", srErr);
-    }
+    // Run unified, idempotent fulfillment (updates status, stock, emails buyer & pushes to Shiprocket)
+    await fulfillPaidOrder(
+      c.env,
+      orderId,
+      razorpayPaymentId || "pay_mock_" + Date.now(),
+      razorpaySignature || "mock_sig",
+      c.executionCtx
+    );
 
     return c.json({
       success: true,
@@ -490,27 +532,36 @@ checkoutRouter.post("/webhooks/razorpay", async (c) => {
       .bind(eventRecordId, event.event || "unknown", eventId, rawBody)
       .run();
 
-    // Process event
+    // Process event: Full autonomous fulfillment for captured payments or paid orders
     if (event.event === "payment.captured" || event.event === "order.paid") {
       const paymentEntity = event.payload?.payment?.entity;
       const orderEntity = event.payload?.order?.entity;
       const razorpayOrderId = orderEntity?.id || paymentEntity?.order_id;
 
       if (razorpayOrderId) {
-        const paymentRow = await c.env.DB
-          .prepare("SELECT order_id FROM payments WHERE razorpay_order_id = ?")
+        let orderRow = await c.env.DB
+          .prepare("SELECT id FROM orders WHERE razorpay_order_id = ?")
           .bind(razorpayOrderId)
-          .first<{ order_id: string }>();
+          .first<{ id: string }>();
 
-        if (paymentRow) {
-          await c.env.DB
-            .prepare("UPDATE orders SET status = 'payment_confirmed', updated_at = datetime('now') WHERE id = ?")
-            .bind(paymentRow.order_id)
-            .run();
-          await c.env.DB
-            .prepare("UPDATE payments SET status = 'captured', razorpay_payment_id = ?, updated_at = datetime('now') WHERE razorpay_order_id = ?")
-            .bind(paymentEntity?.id || null, razorpayOrderId)
-            .run();
+        if (!orderRow) {
+          const paymentRow = await c.env.DB
+            .prepare("SELECT order_id FROM payments WHERE razorpay_order_id = ?")
+            .bind(razorpayOrderId)
+            .first<{ order_id: string }>();
+          if (paymentRow) {
+            orderRow = { id: paymentRow.order_id };
+          }
+        }
+
+        if (orderRow) {
+          await fulfillPaidOrder(
+            c.env,
+            orderRow.id,
+            paymentEntity?.id || null,
+            null,
+            c.executionCtx
+          );
         }
       }
     }

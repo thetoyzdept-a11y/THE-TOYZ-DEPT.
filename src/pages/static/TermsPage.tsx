@@ -189,10 +189,10 @@ export function TermsPage() {
           {/* Section 14 */}
           <div className="space-y-2">
             <h2 className="font-display font-bold text-lg uppercase text-ink">
-              14. Custom 3D Printing Service Terms
+              14. Additive Manufacturing & Surface Characteristics
             </h2>
             <p>
-              Customers uploading 3D CAD files (.STL, .STEP, .OBJ) agree that our custom printing service manufactures physical objects according to the geometry provided. We perform basic automated wall-thickness and manifold checks, but we do not guarantee the structural fitness, mechanical suitability, or engineering load-bearing capacity of customer-designed parts for critical or hazardous applications.
+              All physical objects offered on THE TOYZ DEPT. are produced via high-precision additive manufacturing (3D printing). Customers acknowledge that layer-based fabrication produces distinct tactile micro-layer lines, seam finishes, and authentic industrial textures that are natural characteristics of the medium and do not constitute manufacturing defects.
             </p>
           </div>
 

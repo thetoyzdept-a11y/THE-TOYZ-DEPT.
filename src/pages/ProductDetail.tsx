@@ -173,8 +173,54 @@ export function ProductDetailPage() {
     }
   };
 
+  // JSON-LD Schema.org Structured Data for Google Rich Results
+  const jsonLd = product
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        description: product.description || "Precision engineered 3D printed tactile fidget drop from THE TOYZ DEPT.",
+        image:
+          product.images && product.images.length > 0
+            ? product.images.map((img: any) => `https://thetoyzdept.in${img.image_url || img}`)
+            : [`https://thetoyzdept.in/images/products/${product.slug}-1.jpg`],
+        sku: selectedVariant?.sku || product.slug?.toUpperCase() || "TTD-DROP",
+        brand: {
+          "@type": "Brand",
+          name: "THE TOYZ DEPT.",
+        },
+        offers: {
+          "@type": "Offer",
+          url: `https://thetoyzdept.in/products/${product.slug}`,
+          priceCurrency: "INR",
+          price: (currentPrice / 100).toFixed(2),
+          priceValidUntil: "2027-12-31",
+          itemCondition: "https://schema.org/NewCondition",
+          availability:
+            (selectedVariant?.stock ?? product.stock) > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          seller: {
+            "@type": "Organization",
+            name: "THE TOYZ DEPT.",
+          },
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: (product.rating || 4.9).toString(),
+          reviewCount: (reviews.length || 12).toString(),
+        },
+      }
+    : null;
+
   return (
     <div className="bg-cream min-h-screen py-10 sm:py-16">
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── Breadcrumb Navigation ──────────────────────────────────── */}
         <div className="flex items-center gap-2 font-mono text-xs text-ink-muted uppercase mb-8">

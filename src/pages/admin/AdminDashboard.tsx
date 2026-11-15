@@ -888,6 +888,19 @@ export function AdminDashboardPage() {
                       </td>
                       <td className="p-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {ord.status === "pending" && ord.shipping_phone && (
+                            <a
+                              href={`https://wa.me/91${ord.shipping_phone.replace(/[^0-9]/g, "").slice(-10)}?text=${encodeURIComponent(
+                                `Hi ${ord.shipping_name || "there"}! We noticed you initiated order #${ord.order_number} (₹${(ord.total_amount / 100).toFixed(2)}) on THE TOYZ DEPT. Did you face any payment issues? Let us know if you need any assistance!`
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-1 bg-[#25D366] text-white hover:bg-ink hover:text-[#25D366] text-[10px] uppercase font-bold border border-ink inline-flex items-center gap-1 cursor-pointer"
+                              title="Recover abandoned order via WhatsApp"
+                            >
+                              <Phone className="w-3 h-3" /> WhatsApp
+                            </a>
+                          )}
                           <button
                             onClick={() => handleViewOrderDetails(ord.id)}
                             className="px-2 py-1 bg-cream text-ink hover:bg-lime text-[10px] uppercase font-bold border border-ink inline-flex items-center gap-1"

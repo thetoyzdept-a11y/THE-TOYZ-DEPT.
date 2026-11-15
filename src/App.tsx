@@ -5,6 +5,8 @@ import { CartProvider } from "./context/CartContext";
 import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
 import { CartDrawer } from "./components/layout/CartDrawer";
+import { WhatsAppWidget } from "./components/layout/WhatsAppWidget";
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
 
 // Pages
 import { HomePage } from "./pages/Home";
@@ -198,20 +200,23 @@ function AppLayout() {
         </footer>
       )}
       <CartDrawer />
+      <WhatsAppWidget />
     </div>
   );
 }
 
 export function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <AppLayout />
-        </BrowserRouter>
-      </CartProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <AppLayout />
+          </BrowserRouter>
+        </CartProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

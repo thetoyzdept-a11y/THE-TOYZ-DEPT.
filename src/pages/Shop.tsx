@@ -106,12 +106,12 @@ export function ShopPage() {
           </div>
         </div>
 
-        {/* ── Dynamic Category Filter Dock (Edge-to-Edge Touch Scroll) ─── */}
-        <div className="mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+        {/* ── Dynamic Category Filter Dock (Adaptive Responsive Wrap) ─── */}
+        <div className="mb-4">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 py-1">
             <button
               onClick={() => updateParam("category", "")}
-              className={`px-3.5 py-2 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+              className={`px-3 py-2 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 cursor-pointer ${
                 selectedCategory === ""
                   ? "bg-ink text-lime border-ink shadow-brutal-sm"
                   : "bg-cream text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"
@@ -126,7 +126,7 @@ export function ShopPage() {
               <button
                 key={cat.id}
                 onClick={() => updateParam("category", cat.slug)}
-                className={`px-3.5 py-2 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+                className={`px-3 py-2 text-xs font-mono font-bold uppercase border-2 transition-all flex items-center gap-1.5 cursor-pointer ${
                   selectedCategory === cat.slug
                     ? "bg-ink text-lime border-ink shadow-brutal-sm"
                     : "bg-cream text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"

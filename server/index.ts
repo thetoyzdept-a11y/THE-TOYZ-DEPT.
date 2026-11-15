@@ -80,6 +80,17 @@ app.route("/api/admin", adminRouter);
 app.route("/api/shipping", shippingRouter);
 app.route("/api", complianceRouter); // Mounts /api/contact, /api/grievance, /api/business-profile
 
+// Direct Webhook aliases for external payment & logistics gateways
+app.post("/api/webhooks/razorpay", async (c) => {
+  const url = new URL("/webhooks/razorpay", c.req.url);
+  return checkoutRouter.fetch(new Request(url.toString(), c.req.raw), c.env, c.executionCtx);
+});
+
+app.post("/api/webhooks/shiprocket", async (c) => {
+  const url = new URL("/webhook", c.req.url);
+  return shippingRouter.fetch(new Request(url.toString(), c.req.raw), c.env, c.executionCtx);
+});
+
 // Public R2 Asset Streaming Endpoint
 app.get("/api/assets/:key{.+}", async (c) => {
   const key = c.req.param("key");
