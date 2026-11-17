@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from "react
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { Header } from "./components/layout/Header";
+import { AdminHeader } from "./components/layout/AdminHeader";
 import { Footer } from "./components/layout/Footer";
 import { CartDrawer } from "./components/layout/CartDrawer";
 import { WhatsAppWidget } from "./components/layout/WhatsAppWidget";
@@ -130,7 +131,7 @@ function AppLayout() {
 
   return (
     <div className="flex flex-col min-h-screen bg-cream text-ink">
-      <Header />
+      {isAdminPage ? <AdminHeader /> : <Header />}
       <main className="flex-1">
         <Routes>
           {/* Storefront */}

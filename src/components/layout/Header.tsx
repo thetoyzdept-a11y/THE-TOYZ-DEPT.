@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import {
@@ -13,6 +13,9 @@ import {
   FileCode,
   LogOut,
   ChevronRight,
+  Package,
+  Heart,
+  MapPin,
 } from "lucide-react";
 
 export function Header() {
@@ -22,6 +25,13 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Automatically dismiss mobile drawer and search popup on ANY page transition or query change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname, location.search]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,14 +180,17 @@ export function Header() {
                       <p className="font-mono text-[10px] text-ink-muted truncate">{user.email}</p>
                     </div>
                     <div className="py-1 font-display text-xs font-bold uppercase tracking-wider">
-                      <Link to="/account" className="block px-4 py-2 hover:bg-lime transition-colors">
-                        My Dashboard
-                      </Link>
-                      <Link to="/account/orders" className="block px-4 py-2 hover:bg-lime transition-colors">
+                      <Link to="/account?tab=orders" className="block px-4 py-2 hover:bg-lime transition-colors">
                         Orders & Invoices
                       </Link>
-                      <Link to="/account/wishlist" className="block px-4 py-2 hover:bg-lime transition-colors">
+                      <Link to="/account?tab=wishlist" className="block px-4 py-2 hover:bg-lime transition-colors">
                         Saved Wishlist
+                      </Link>
+                      <Link to="/account?tab=addresses" className="block px-4 py-2 hover:bg-lime transition-colors">
+                        Saved Addresses
+                      </Link>
+                      <Link to="/account?tab=profile" className="block px-4 py-2 hover:bg-lime transition-colors">
+                        Profile Info
                       </Link>
                       {isAdmin && (
                         <Link to="/admin" className="block px-4 py-2 bg-ink text-lime hover:bg-lime hover:text-ink transition-colors border-t border-ink">
@@ -186,7 +199,7 @@ export function Header() {
                       )}
                       <button
                         onClick={() => logout()}
-                        className="w-full text-left px-4 py-2 text-coral hover:bg-coral hover:text-cream border-t border-ink transition-colors flex items-center justify-between"
+                        className="w-full text-left px-4 py-2 text-coral hover:bg-coral hover:text-cream border-t border-ink transition-colors flex items-center justify-between cursor-pointer"
                       >
                         Sign Out
                         <LogOut className="w-3.5 h-3.5" />
@@ -383,12 +396,12 @@ export function Header() {
             </div>
 
             {/* Bottom Account & System Links */}
-            <div className="pt-6 border-t-2 border-ink space-y-3">
+            <div className="pt-6 border-t-2 border-ink space-y-2">
               {isAdmin && (
                 <Link
                   to="/admin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="btn-dark w-full text-xs"
+                  className="btn-dark w-full text-xs flex items-center justify-center gap-2 mb-2"
                 >
                   <Shield className="w-4 h-4 text-lime" />
                   Admin Dashboard
@@ -396,18 +409,64 @@ export function Header() {
               )}
 
               {user ? (
-                <div className="space-y-2">
+                <div className="space-y-1.5 font-mono text-xs">
+                  <div className="p-2.5 bg-cream-light border border-ink mb-2">
+                    <p className="font-bold text-ink uppercase truncate">
+                      {user.firstName} {user.lastName || ""}
+                    </p>
+                    <p className="text-[10px] text-ink-muted truncate">{user.email}</p>
+                  </div>
+
                   <Link
-                    to="/account"
+                    to="/account?tab=orders"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="btn-secondary w-full text-xs"
+                    className="flex items-center justify-between p-2 bg-cream hover:bg-lime border border-ink/40 font-bold uppercase transition-colors"
                   >
-                    <User className="w-4 h-4" />
-                    Account ({user.firstName})
+                    <span className="flex items-center gap-2">
+                      <Package className="w-4 h-4" /> My Orders & Invoices
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
                   </Link>
+
+                  <Link
+                    to="/account?tab=wishlist"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-2 bg-cream hover:bg-lime border border-ink/40 font-bold uppercase transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Heart className="w-4 h-4 text-coral" /> Saved Wishlist
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
+                  </Link>
+
+                  <Link
+                    to="/account?tab=addresses"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-2 bg-cream hover:bg-lime border border-ink/40 font-bold uppercase transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" /> Saved Addresses
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
+                  </Link>
+
+                  <Link
+                    to="/account?tab=profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-2 bg-cream hover:bg-lime border border-ink/40 font-bold uppercase transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <User className="w-4 h-4" /> Profile Details
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
+                  </Link>
+
                   <button
-                    onClick={() => { logout(); setMobileMenuOpen(false); }}
-                    className="w-full text-center text-xs font-mono uppercase text-coral hover:underline py-1"
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-center text-xs font-mono font-bold uppercase text-coral hover:bg-coral hover:text-cream border border-coral py-2 mt-2 transition-colors cursor-pointer"
                   >
                     Sign Out
                   </button>

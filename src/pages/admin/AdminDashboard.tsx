@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../lib/api";
 import { formatINR, formatDate, getOrderStatusBadge, getCustomRequestStatusBadge } from "../../lib/utils";
@@ -69,11 +69,37 @@ export const CURATED_FILAMENT_COLORS = [
 export function AdminDashboardPage() {
   const { user, loading: authLoading, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Active Admin Module
-  const [activeModule, setActiveModule] = useState<
-    "overview" | "products" | "orders" | "custom" | "inventory" | "customers" | "settings" | "inquiries" | "security"
-  >("overview");
+  // Active Admin Module synced with URL search query and path
+  const VALID_MODULES = [
+    "overview",
+    "orders",
+    "products",
+    "inventory",
+    "customers",
+    "settings",
+    "inquiries",
+    "security",
+  ] as const;
+
+  type AdminModule = (typeof VALID_MODULES)[number];
+
+  const resolveModule = (): AdminModule => {
+    const qTab = (searchParams.get("tab") || searchParams.get("module")) as AdminModule;
+    if (qTab && VALID_MODULES.includes(qTab)) return qTab;
+    for (const mod of VALID_MODULES) {
+      if (location.pathname.includes(`/admin/${mod}`)) return mod;
+    }
+    return "overview";
+  };
+
+  const activeModule = resolveModule();
+
+  const setActiveModule = (mod: AdminModule) => {
+    setSearchParams({ tab: mod });
+  };
 
   // State data
   const [metrics, setMetrics] = useState<any>(null);

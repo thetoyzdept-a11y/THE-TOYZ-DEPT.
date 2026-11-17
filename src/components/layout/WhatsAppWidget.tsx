@@ -7,17 +7,19 @@ export function WhatsAppWidget() {
   const location = useLocation();
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // Do not render in admin console or checkout payment screen to avoid distractions
+  // Do not render in admin console, and avoid popups on account or checkout screens
   const isAdmin = location.pathname.startsWith("/admin");
+  const isAccount = location.pathname.startsWith("/account");
+  const isCheckout = location.pathname.startsWith("/checkout");
 
   useEffect(() => {
-    // Show tooltip after 2.5 seconds on customer storefront if not dismissed
+    // Show tooltip after 2.5 seconds on public storefront if not dismissed
     const dismissed = sessionStorage.getItem("ttd_wa_tooltip_dismissed");
-    if (!dismissed && !isAdmin) {
+    if (!dismissed && !isAdmin && !isAccount && !isCheckout) {
       const timer = setTimeout(() => setShowTooltip(true), 2500);
       return () => clearTimeout(timer);
     }
-  }, [isAdmin]);
+  }, [isAdmin, isAccount, isCheckout]);
 
   if (isAdmin) return null;
 

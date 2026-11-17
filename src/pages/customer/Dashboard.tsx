@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { api } from "../../lib/api";
@@ -34,16 +34,28 @@ export function CustomerDashboardPage() {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Active Tab: 'orders' | 'addresses' | 'wishlist' | 'profile' | 'support'
-  const getInitialTab = () => {
+  const VALID_TABS = ["orders", "addresses", "wishlist", "profile", "support"] as const;
+  type CustomerTab = (typeof VALID_TABS)[number];
+
+  const resolveTab = (): CustomerTab => {
+    const qTab = searchParams.get("tab") as CustomerTab;
+    if (qTab && VALID_TABS.includes(qTab)) return qTab;
     if (location.pathname.includes("/orders")) return "orders";
     if (location.pathname.includes("/addresses")) return "addresses";
     if (location.pathname.includes("/wishlist")) return "wishlist";
+    if (location.pathname.includes("/profile")) return "profile";
+    if (location.pathname.includes("/support")) return "support";
     return "orders";
   };
 
-  const [activeTab, setActiveTab] = useState<"orders" | "addresses" | "wishlist" | "profile" | "support">(getInitialTab());
+  const activeTab = resolveTab();
+
+  const handleTabChange = (newTab: CustomerTab) => {
+    setSearchParams({ tab: newTab });
+  };
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [wishlist, setWishlist] = useState<any[]>([]);
@@ -180,6 +192,13 @@ export function CustomerDashboardPage() {
 
   if (!user) return null;
 
+  const displayName =
+    user.firstName && user.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user.firstName === "THE"
+      ? "THE TOYZ DEPT."
+      : user.firstName || user.email?.split("@")[0] || "Collector";
+
   return (
     <div className="bg-cream min-h-screen py-10 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -191,7 +210,7 @@ export function CustomerDashboardPage() {
               <span className="badge-ink text-[10px] font-mono">Member ID: {user.id.slice(0, 10)}</span>
             </div>
             <h1 className="font-display font-black text-3xl sm:text-4xl uppercase tracking-tight">
-              Welcome, {user.firstName || "Customer"}
+              Welcome, {displayName}
             </h1>
             <p className="font-mono text-xs text-ink-muted uppercase mt-0.5">
               Account: {user.email} • Priority Dispatch Active
@@ -216,7 +235,7 @@ export function CustomerDashboardPage() {
         {/* ── Customer Quick Metrics Overview ──────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div
-            onClick={() => setActiveTab("orders")}
+            onClick={() => handleTabChange("orders")}
             className="card-brutal p-4 bg-cream-light cursor-pointer hover:bg-lime/20 transition-all font-mono"
           >
             <div className="flex items-center justify-between mb-1">
@@ -228,7 +247,7 @@ export function CustomerDashboardPage() {
           </div>
 
           <div
-            onClick={() => setActiveTab("wishlist")}
+            onClick={() => handleTabChange("wishlist")}
             className="card-brutal p-4 bg-cream-light cursor-pointer hover:bg-lime/20 transition-all font-mono"
           >
             <div className="flex items-center justify-between mb-1">
@@ -240,7 +259,7 @@ export function CustomerDashboardPage() {
           </div>
 
           <div
-            onClick={() => setActiveTab("support")}
+            onClick={() => handleTabChange("support")}
             className="card-brutal p-4 bg-lime/20 border-2 border-ink cursor-pointer hover:bg-lime/30 transition-all font-mono"
           >
             <div className="flex items-center justify-between mb-1">
@@ -258,8 +277,8 @@ export function CustomerDashboardPage() {
           <div className="lg:col-span-3 space-y-4">
             <div className="card-brutal p-2 bg-cream-light space-y-1 font-display font-bold text-xs uppercase tracking-wider">
               <button
-                onClick={() => setActiveTab("orders")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all ${
+                onClick={() => handleTabChange("orders")}
+                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
                   activeTab === "orders" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
                 }`}
               >
@@ -270,8 +289,8 @@ export function CustomerDashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("addresses")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all ${
+                onClick={() => handleTabChange("addresses")}
+                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
                   activeTab === "addresses" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
                 }`}
               >
@@ -282,8 +301,8 @@ export function CustomerDashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("wishlist")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all ${
+                onClick={() => handleTabChange("wishlist")}
+                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
                   activeTab === "wishlist" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
                 }`}
               >
@@ -294,8 +313,8 @@ export function CustomerDashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("profile")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all ${
+                onClick={() => handleTabChange("profile")}
+                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
                   activeTab === "profile" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
                 }`}
               >
@@ -305,8 +324,8 @@ export function CustomerDashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("support")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all ${
+                onClick={() => handleTabChange("support")}
+                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
                   activeTab === "support" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
                 }`}
               >
