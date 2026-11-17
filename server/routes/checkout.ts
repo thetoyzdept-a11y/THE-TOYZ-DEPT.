@@ -290,7 +290,7 @@ export async function fulfillPaidOrder(
   orderId: string,
   razorpayPaymentId: string | null,
   razorpaySignature: string | null = null,
-  executionCtx?: ExecutionContext
+  executionCtx?: any
 ): Promise<{ success: boolean; error?: string }> {
   const order = await env.DB
     .prepare("SELECT * FROM orders WHERE id = ?")

@@ -38,6 +38,7 @@ import {
   EyeOff,
   Palette,
   Image as ImageIcon,
+  Truck,
 } from "lucide-react";
 
 export const STUDIO_PHOTO_PRESETS = [
@@ -77,6 +78,7 @@ export function AdminDashboardPage() {
     "overview",
     "orders",
     "products",
+    "custom",
     "inventory",
     "customers",
     "settings",

@@ -78,7 +78,7 @@ export function RegisterPage() {
     setGoogleLoading(true);
     setErrorMsg("");
 
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const googleClientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     const win = window as any;
 
     if (win.google?.accounts?.oauth2 && googleClientId) {
@@ -96,7 +96,7 @@ export function RegisterPage() {
                 const infoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
                   headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
                 });
-                const info = await infoRes.json();
+                const info = (await infoRes.json()) as any;
                 if (info.email) {
                   const googleUser = await loginGoogle({
                     email: info.email,

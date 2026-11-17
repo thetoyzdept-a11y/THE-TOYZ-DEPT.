@@ -43,7 +43,7 @@ export function LoginPage() {
   }, [user, loading]);
 
   React.useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     if (!clientId) return;
 
     const interval = setInterval(() => {
@@ -99,7 +99,7 @@ export function LoginPage() {
     setGoogleLoading(true);
     setErrorMsg("");
 
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const googleClientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     const win = window as any;
 
     // 1. Google Identity Services: User-initiated popup via initTokenClient
@@ -118,7 +118,7 @@ export function LoginPage() {
                 const infoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
                   headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
                 });
-                const info = await infoRes.json();
+                const info = (await infoRes.json()) as any;
                 if (info.email) {
                   const loggedIn = await loginGoogle({
                     email: info.email,

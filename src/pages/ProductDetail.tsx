@@ -208,7 +208,7 @@ export function ProductDetailPage() {
         aggregateRating: {
           "@type": "AggregateRating",
           ratingValue: (product.rating || 4.9).toString(),
-          reviewCount: (reviews.length || 12).toString(),
+          reviewCount: (product.reviews?.length || 12).toString(),
         },
       }
     : null;

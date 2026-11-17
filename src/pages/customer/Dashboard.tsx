@@ -350,7 +350,7 @@ export function CustomerDashboardPage() {
                   <Mail className="w-3 h-3" /> {BUSINESS_PROFILE.contact.email}
                 </a>
                 <p className="flex items-center gap-1.5 text-ink-muted text-[10px]">
-                  <Clock className="w-3 h-3" /> {BUSINESS_PROFILE.contact.hours}
+                  <Clock className="w-3 h-3" /> {BUSINESS_PROFILE.contact.supportHours}
                 </p>
               </div>
             </div>
@@ -740,10 +740,10 @@ export function CustomerDashboardPage() {
                         </a>
                       </p>
                       <p>
-                        <strong className="uppercase">Support Hours:</strong> {BUSINESS_PROFILE.contact.hours}
+                        <strong className="uppercase">Support Hours:</strong> {BUSINESS_PROFILE.contact.supportHours}
                       </p>
                       <p>
-                        <strong className="uppercase">Grievance Officer:</strong> {BUSINESS_PROFILE.compliance.grievanceOfficer.name} (Designation: {BUSINESS_PROFILE.compliance.grievanceOfficer.designation})
+                        <strong className="uppercase">Grievance Officer:</strong> {BUSINESS_PROFILE.grievanceOfficer.name} (Designation: {BUSINESS_PROFILE.grievanceOfficer.designation})
                       </p>
                     </div>
 
