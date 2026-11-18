@@ -12,6 +12,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Lock,
+  Tag,
 } from "lucide-react";
 
 const INDIAN_STATES = [
@@ -39,6 +40,31 @@ export function CheckoutPage() {
   const [customerNotes, setCustomerNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Promo code state on checkout
+  const [checkoutCouponInput, setCheckoutCouponInput] = useState("");
+  const [checkoutCouponLoading, setCheckoutCouponLoading] = useState(false);
+  const [checkoutCouponError, setCheckoutCouponError] = useState("");
+
+  const handleApplyCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!checkoutCouponInput.trim()) return;
+    setCheckoutCouponLoading(true);
+    setCheckoutCouponError("");
+    try {
+      await refreshCart(checkoutCouponInput.trim());
+      const updatedCart = await api.getCart(checkoutCouponInput.trim());
+      if (updatedCart.cart?.appliedCoupon) {
+        setCheckoutCouponInput("");
+      } else {
+        setCheckoutCouponError("Coupon code is invalid, expired, or minimum cart threshold not met.");
+      }
+    } catch (err: any) {
+      setCheckoutCouponError(err.message || "Invalid coupon code");
+    } finally {
+      setCheckoutCouponLoading(false);
+    }
+  };
 
   useEffect(() => {
     // If user has saved addresses, load default
@@ -363,6 +389,58 @@ export function CheckoutPage() {
                       <span className="font-display font-bold text-xs text-ink">{formatINR(item.totalPrice)}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* Promo / Coupon Code Input */}
+                <div className="border-t-2 border-ink pt-3 font-mono text-xs">
+                  {cart.appliedCoupon ? (
+                    <div className="flex items-center justify-between p-2.5 bg-lime/20 border-2 border-ink">
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-ink" />
+                        <div>
+                          <span className="font-bold text-ink uppercase tracking-wider">{cart.appliedCoupon.code}</span>
+                          <span className="text-[10px] text-ink-muted ml-1.5 font-bold">(-{formatINR(cart.discount)})</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await refreshCart("");
+                        }}
+                        className="text-[10px] uppercase font-bold text-coral hover:underline cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleApplyCoupon} className="space-y-1.5">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={checkoutCouponInput}
+                          onChange={(e) => {
+                            setCheckoutCouponInput(e.target.value.toUpperCase());
+                            setCheckoutCouponError("");
+                          }}
+                          placeholder="PROMO CODE (E.G. WELCOME10)"
+                          className="flex-1 bg-cream border-2 border-ink px-3 py-2 text-xs uppercase font-mono font-bold focus:outline-none focus:ring-1 focus:ring-lime"
+                        />
+                        <button
+                          type="submit"
+                          disabled={checkoutCouponLoading || !checkoutCouponInput.trim()}
+                          className="btn-dark py-2 px-3 text-xs uppercase font-mono font-bold disabled:opacity-40 cursor-pointer flex-shrink-0"
+                        >
+                          {checkoutCouponLoading ? "..." : "Apply"}
+                        </button>
+                      </div>
+                      {checkoutCouponError && (
+                        <p className="text-[11px] font-mono text-coral font-bold flex items-center gap-1">
+                          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span>{checkoutCouponError}</span>
+                        </p>
+                      )}
+                    </form>
+                  )}
                 </div>
 
                 {/* Cost Calculations */}

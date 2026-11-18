@@ -127,6 +127,28 @@ export const api = {
   changeAdminPassword: (data: { currentPassword?: string; newPassword: string }) =>
     request<any>("/admin/change-password", { method: "POST", body: JSON.stringify(data) }),
   getAdminAccounts: () => request<{ admins: any[] }>("/admin/accounts"),
+  getAdminCoupons: () => request<{ coupons: any[] }>("/admin/coupons"),
+  createAdminCoupon: (data: {
+    code: string;
+    description?: string;
+    discount_type: "percentage" | "fixed";
+    discount_value: number;
+    minimum_order_amount?: number;
+    max_uses?: number;
+    is_active?: number | boolean;
+  }) =>
+    request<{ success: boolean; coupon: any; message?: string }>("/admin/coupons", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  toggleAdminCoupon: (id: string) =>
+    request<{ success: boolean; id: string; is_active: number; message: string }>(`/admin/coupons/${id}/toggle`, {
+      method: "PATCH",
+    }),
+  deleteAdminCoupon: (id: string) =>
+    request<{ success: boolean; message: string }>(`/admin/coupons/${id}`, {
+      method: "DELETE",
+    }),
   uploadAdminAsset: async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);

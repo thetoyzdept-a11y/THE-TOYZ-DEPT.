@@ -676,3 +676,155 @@ adminRouter.get("/accounts", async (c) => {
     return c.json({ admins: [] });
   }
 });
+
+// ── 10. Coupons & Discounts Management ──────────────────────────────
+
+// GET /api/admin/coupons
+adminRouter.get("/coupons", async (c) => {
+  try {
+    const coupons = await c.env.DB
+      .prepare("SELECT * FROM coupons ORDER BY created_at DESC")
+      .all<any>();
+    return c.json({ coupons: coupons.results || [] });
+  } catch (err: any) {
+    return c.json({ error: "Failed to load coupons", message: err.message }, 500);
+  }
+});
+
+// POST /api/admin/coupons
+adminRouter.post("/coupons", async (c) => {
+  try {
+    const body = (await c.req.json().catch(() => ({}))) as any;
+    const {
+      code,
+      description,
+      discount_type,
+      discount_value,
+      minimum_order_amount,
+      max_uses,
+      is_active,
+    } = body;
+
+    if (!code || typeof code !== "string" || !code.trim()) {
+      return c.json({ error: "Coupon code is required" }, 400);
+    }
+
+    const cleanCode = code.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+    if (!cleanCode) {
+      return c.json({ error: "Invalid coupon code format. Use alphanumeric characters only." }, 400);
+    }
+
+    if (!["percentage", "fixed"].includes(discount_type)) {
+      return c.json({ error: "Discount type must be either 'percentage' or 'fixed'" }, 400);
+    }
+
+    const rawValue = Number(discount_value);
+    if (isNaN(rawValue) || rawValue <= 0) {
+      return c.json({ error: "Discount value must be greater than 0" }, 400);
+    }
+
+    if (discount_type === "percentage" && rawValue > 100) {
+      return c.json({ error: "Percentage discount cannot exceed 100%" }, 400);
+    }
+
+    // Check if code already exists
+    const existing = await c.env.DB
+      .prepare("SELECT id FROM coupons WHERE code = ?")
+      .bind(cleanCode)
+      .first();
+
+    if (existing) {
+      return c.json({ error: `Coupon code '${cleanCode}' already exists.` }, 400);
+    }
+
+    const couponId = "cpn_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    // If fixed discount, input is in rupees -> convert to paise (x100). If percentage, keep raw percent.
+    const storedDiscountValue = discount_type === "fixed" ? Math.round(rawValue * 100) : Math.round(rawValue);
+    // Minimum order amount: input is in rupees -> convert to paise (x100)
+    const storedMinOrder = minimum_order_amount ? Math.round(Number(minimum_order_amount) * 100) : 0;
+    const storedMaxUses = max_uses && Number(max_uses) > 0 ? Math.round(Number(max_uses)) : null;
+    const activeState = is_active === 0 || is_active === false ? 0 : 1;
+
+    await c.env.DB
+      .prepare(`
+        INSERT INTO coupons (
+          id, code, description, discount_type, discount_value,
+          minimum_order_amount, max_uses, used_count, is_active, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, datetime('now'), datetime('now'))
+      `)
+      .bind(
+        couponId,
+        cleanCode,
+        description ? description.trim() : null,
+        discount_type,
+        storedDiscountValue,
+        storedMinOrder,
+        storedMaxUses,
+        activeState
+      )
+      .run();
+
+    const created = await c.env.DB
+      .prepare("SELECT * FROM coupons WHERE id = ?")
+      .bind(couponId)
+      .first();
+
+    return c.json({ success: true, coupon: created, message: `Coupon '${cleanCode}' created successfully!` });
+  } catch (err: any) {
+    return c.json({ error: "Failed to create coupon", message: err.message }, 500);
+  }
+});
+
+// PATCH /api/admin/coupons/:id/toggle
+adminRouter.patch("/coupons/:id/toggle", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const coupon = await c.env.DB
+      .prepare("SELECT * FROM coupons WHERE id = ?")
+      .bind(id)
+      .first<any>();
+
+    if (!coupon) {
+      return c.json({ error: "Coupon not found" }, 404);
+    }
+
+    const nextState = coupon.is_active === 1 ? 0 : 1;
+    await c.env.DB
+      .prepare("UPDATE coupons SET is_active = ?, updated_at = datetime('now') WHERE id = ?")
+      .bind(nextState, id)
+      .run();
+
+    return c.json({
+      success: true,
+      id,
+      is_active: nextState,
+      message: `Coupon '${coupon.code}' ${nextState === 1 ? "activated" : "deactivated"} successfully.`,
+    });
+  } catch (err: any) {
+    return c.json({ error: "Failed to toggle coupon status", message: err.message }, 500);
+  }
+});
+
+// DELETE /api/admin/coupons/:id
+adminRouter.delete("/coupons/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const coupon = await c.env.DB
+      .prepare("SELECT * FROM coupons WHERE id = ?")
+      .bind(id)
+      .first<any>();
+
+    if (!coupon) {
+      return c.json({ error: "Coupon not found" }, 404);
+    }
+
+    await c.env.DB
+      .prepare("DELETE FROM coupons WHERE id = ?")
+      .bind(id)
+      .run();
+
+    return c.json({ success: true, message: `Coupon '${coupon.code}' deleted successfully.` });
+  } catch (err: any) {
+    return c.json({ error: "Failed to delete coupon", message: err.message }, 500);
+  }
+});

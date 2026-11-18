@@ -16,6 +16,7 @@ import {
   X,
   DollarSign,
   ChevronRight,
+  Tag,
 } from "lucide-react";
 
 export function AdminHeader() {
@@ -36,6 +37,7 @@ export function AdminHeader() {
     { id: "overview", label: "Overview", icon: DollarSign },
     { id: "orders", label: "Orders", icon: Package },
     { id: "products", label: "Products", icon: Layers },
+    { id: "coupons", label: "Coupons", icon: Tag },
     { id: "inventory", label: "Inventory", icon: Sliders },
     { id: "customers", label: "Customers", icon: Users },
     { id: "inquiries", label: "Inquiries", icon: Mail },

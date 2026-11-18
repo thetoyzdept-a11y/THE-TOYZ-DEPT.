@@ -351,6 +351,14 @@ export async function fulfillPaidOrder(
       .prepare("INSERT INTO order_status_history (id, order_id, from_status, to_status, note) VALUES (?, ?, 'pending', 'payment_confirmed', 'Payment verified and captured successfully.')")
       .bind("osh_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16), orderId)
       .run();
+
+    // Increment coupon used_count if a coupon code was redeemed
+    if (order.coupon_code) {
+      await env.DB
+        .prepare("UPDATE coupons SET used_count = used_count + 1, updated_at = datetime('now') WHERE code = ?")
+        .bind(order.coupon_code)
+        .run();
+    }
   } else if (!order.razorpay_payment_id && razorpayPaymentId) {
     await env.DB
       .prepare("UPDATE orders SET razorpay_payment_id = ?, updated_at = datetime('now') WHERE id = ?")
