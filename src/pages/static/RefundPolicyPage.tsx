@@ -18,8 +18,21 @@ export function RefundPolicyPage() {
             Refund & Cancellation Policy<span className="text-lime">.</span>
           </h1>
           <p className="font-mono text-xs sm:text-sm text-ink-muted uppercase mt-2">
-            Clear, transparent return terms • 48-Hour Transit Damage Protection • 5–7 Business Day Refunds
+            100% Prepaid Store • Strict No COD • 48-Hour Unboxing Damage Guarantee • 5–7 Day Refunds
           </p>
+        </div>
+
+        {/* Strict No COD & 100% Prepaid Policy Alert */}
+        <div className="p-5 bg-lime/20 border-2 border-ink flex items-start gap-3 shadow-brutal-sm font-mono text-xs">
+          <ShieldCheck className="w-5 h-5 text-ink flex-shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <strong className="font-display font-black uppercase text-sm text-ink block">
+              100% Prepaid Store // Strict No Cash on Delivery (COD) Policy
+            </strong>
+            <p className="text-ink/80 text-[11px] leading-relaxed">
+              To guarantee that every drop arrives in pristine, factory-fresh collector condition, <strong>THE TOYZ DEPT. operates strictly on a 100% prepaid model</strong>. We do <strong>NOT offer Cash on Delivery (COD)</strong>. In e-commerce, COD incurs heavy 35%+ return rates from fake bookings, forcing sellers to inflate prices to cover courier losses. By accepting only verified prepaid checkouts via Razorpay (UPI, GPay, PhonePe, Cards, NetBanking), we eliminate logistics waste, protect our precision 3D printing inventory, and maintain honest, competitive pricing for our community.
+            </p>
+          </div>
         </div>
 
         {/* 3 Core Highlights */}
@@ -68,12 +81,21 @@ export function RefundPolicyPage() {
             <div className="bg-cream-light p-4 border border-ink/20 space-y-2 text-xs">
               <p className="font-bold text-ink uppercase">Eligibility for Return or Replacement:</p>
               <ul className="list-disc list-inside space-y-1 pl-2 text-ink-muted">
-                <li>The parcel arrived broken, crushed, or visibly damaged in transit.</li>
-                <li>The product has severe structural layer delamination or frozen non-moving joints.</li>
-                <li>The incorrect model, color, or variant was dispatched.</li>
+                <li>The parcel arrived broken, crushed, or visibly damaged in courier transit.</li>
+                <li>The item has severe structural delamination or non-functioning articulated joints.</li>
+                <li>An incorrect model, color, or variant was accidentally packed.</li>
               </ul>
-              <p className="pt-2 text-ink">
-                <strong>Reporting Deadline:</strong> You must notify us at <strong>{BUSINESS_PROFILE.contact.email}</strong> within <strong>48 hours of delivery</strong> with your Order Number, photos of the damaged item, and a clear unboxing video.
+              <div className="p-3 bg-cream border-2 border-ink mt-2">
+                <p className="font-bold text-ink uppercase text-[11px] flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 text-coral" />
+                  <span>Mandatory Unboxing Video Requirement:</span>
+                </p>
+                <p className="text-[11px] text-ink-muted mt-1 leading-relaxed">
+                  To protect our business against fraudulent claims and courier tampering, all damage or defect claims <strong>MUST be accompanied by a single, continuous, uncut 360° unboxing video</strong>. The video must start by clearly showing the sealed outer cardboard box with the visible Shiprocket shipping label before opening, and capture the item being unpacked. Claims without a continuous unboxing video cannot be entertained.
+                </p>
+              </div>
+              <p className="pt-1 text-ink">
+                <strong>Reporting Deadline:</strong> Email <strong>{BUSINESS_PROFILE.contact.email}</strong> or WhatsApp us within <strong>48 hours of delivery</strong> with your Order Number and unboxing video link.
               </p>
             </div>
           </div>
@@ -86,16 +108,19 @@ export function RefundPolicyPage() {
             <p>Returns and refunds are NOT accepted under the following conditions:</p>
             <ul className="list-disc list-inside space-y-1.5 pl-3 text-xs">
               <li>
-                <strong>Inherent 3D Print Surface Characteristics:</strong> Faint horizontal layer lines (0.12mm–0.20mm) and micro-seam lines are inherent to FDM additive manufacturing and are not defects.
+                <strong>Inherent 3D Print Surface Characteristics:</strong> Faint horizontal layer lines (0.12mm–0.20mm), micro-textures, and minor z-seam lines are authentic characteristics of precision FDM additive manufacturing and are not defects.
               </li>
               <li>
-                <strong>Buyer's Remorse:</strong> Changes of mind, selecting the wrong color or size after the item has dispatched.
+                <strong>Buyer's Remorse:</strong> Change of mind, accidental orders, or selecting the wrong color or model variant after the order is processed.
               </li>
               <li>
-                <strong>Misuse & Thermal Exposure:</strong> Leaving PLA+ objects inside hot parked cars or direct sunlight exceeding 55°C, dropping prints on hard concrete, or forceful joint hyperextension.
+                <strong>Misuse & Thermal Exposure:</strong> Leaving thermoplastic PLA+ objects inside hot parked cars or direct sunlight exceeding 55°C, dropping prints on hard concrete, or forceful joint hyperextension.
               </li>
               <li>
                 <strong>Delayed Reporting:</strong> Inquiries reported after the 48-hour post-delivery window has expired.
+              </li>
+              <li>
+                <strong>Absence of Unboxing Video:</strong> Claims lacking an uncut video recording of the package opening.
               </li>
             </ul>
           </div>
@@ -103,19 +128,19 @@ export function RefundPolicyPage() {
           {/* Section 3: Cancellation Policy */}
           <div className="space-y-3">
             <h2 className="font-display font-bold text-lg uppercase text-ink">
-              3. Order Cancellation Policy
+              3. Order Cancellation Policy (Strict 2-Hour Window)
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="bg-cream-light p-4 border border-ink/20 space-y-1">
-                <p className="font-bold text-ink uppercase">Before Dispatch:</p>
-                <p className="text-ink-muted">
-                  Standard orders can be cancelled anytime before courier pickup. Email {BUSINESS_PROFILE.contact.email} with your order number. A 100% immediate refund is initiated.
+                <p className="font-bold text-ink uppercase">Within 2 Hours of Ordering:</p>
+                <p className="text-ink-muted leading-relaxed">
+                  You may cancel your order strictly within 2 hours of payment before printing schedules and material slicers are allocated. Email {BUSINESS_PROFILE.contact.email} with your order number. A 100% full refund is immediately credited via Razorpay.
                 </p>
               </div>
               <div className="bg-cream-light p-4 border border-ink/20 space-y-1">
-                <p className="font-bold text-ink uppercase">After Dispatch:</p>
-                <p className="text-ink-muted">
-                  Once an order has been picked up by the courier and assigned an active Air Waybill (AWB), the shipment cannot be cancelled while in transit.
+                <p className="font-bold text-ink uppercase">After 2 Hours or After Dispatch:</p>
+                <p className="text-ink-muted leading-relaxed">
+                  Once high-precision printing begins or an Air Waybill (AWB) is booked with Shiprocket, orders cannot be cancelled, recalled, or diverted in transit.
                 </p>
               </div>
             </div>

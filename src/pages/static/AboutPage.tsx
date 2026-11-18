@@ -84,7 +84,7 @@ export function AboutPage() {
               </div>
               <div>
                 <p className="text-ink-muted text-[10px] uppercase">Dispatch Location</p>
-                <p className="font-bold text-ink">Gadag, Karnataka, India</p>
+                <p className="font-bold text-ink">Karnataka, India</p>
               </div>
               <div>
                 <p className="text-ink-muted text-[10px] uppercase">Delivery Network</p>

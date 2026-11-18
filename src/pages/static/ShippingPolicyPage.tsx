@@ -18,8 +18,21 @@ export function ShippingPolicyPage() {
             Shipping & Delivery Policy<span className="text-coral">.</span>
           </h1>
           <p className="font-mono text-xs sm:text-sm text-ink-muted uppercase mt-2">
-            Pan-India Delivery • Free Shipping on Orders ₹999+ • Live Courier Tracking
+            100% Prepaid Dispatch • No COD • Pan-India Delivery • Free Shipping on Orders ₹999+ • Live Courier Tracking
           </p>
+        </div>
+
+        {/* 100% Prepaid & No COD Notice */}
+        <div className="p-5 bg-lime/20 border-2 border-ink flex items-start gap-3 shadow-brutal-sm font-mono text-xs">
+          <ShieldCheck className="w-5 h-5 text-ink flex-shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <strong className="font-display font-black uppercase text-sm text-ink block">
+              Prepaid Express Shipping // No Cash on Delivery (COD) Policy
+            </strong>
+            <p className="text-ink/80 text-[11px] leading-relaxed">
+              All consignments from THE TOYZ DEPT. are dispatched on a <strong>100% prepaid basis</strong> via Razorpay. We do NOT offer Cash on Delivery (COD). Prepaid fulfillment guarantees immediate booking with top-tier air couriers (BlueDart, Delhivery, DTDC), eliminates delivery delays, and guarantees your item arrives safely.
+            </p>
+          </div>
         </div>
 
         {/* 4 Feature Highlights */}
@@ -83,7 +96,7 @@ export function ShippingPolicyPage() {
               2. Origin & Courier Partners
             </h2>
             <p>
-              All shipments originate directly from our central 3D-printing facility in <strong>Gadag, Karnataka, PIN: 582101</strong>. We partner with India’s leading domestic couriers integrated through Shiprocket:
+              All shipments originate directly from our central design & 3D-printing facility in <strong>Karnataka, India</strong>. We partner with India’s leading domestic couriers integrated through Shiprocket:
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 text-center font-display font-bold text-xs uppercase text-ink">
               <div className="bg-cream-light p-3 border border-ink/20">Delhivery Express</div>

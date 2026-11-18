@@ -127,10 +127,10 @@ export function TermsPage() {
           {/* Section 8 */}
           <div className="space-y-2">
             <h2 className="font-display font-bold text-lg uppercase text-ink">
-              8. Payment Terms & Third-Party Payment Gateway
+              8. 100% Prepaid Policy & No Cash on Delivery (COD)
             </h2>
             <p>
-              Payments on the Website are processed securely through <strong>Razorpay</strong>, an authorized payment aggregator compliant with PCI-DSS Level 1 standards. Customers may pay via UPI, Debit/Credit Cards, Net Banking, or supported Wallets. THE TOYZ DEPT. does NOT store, process, or have access to your sensitive card CVV, PIN, or net banking passwords. You agree that chargebacks or fraudulent disputes raised without first contacting our customer support shall be defended with complete transaction and courier proof.
+              THE TOYZ DEPT. operates strictly as a <strong>100% prepaid e-commerce platform</strong>. We do <strong>NOT offer Cash on Delivery (COD)</strong> under any circumstances. All orders must be fully paid and settled at checkout through <strong>Razorpay</strong>, an authorized payment aggregator compliant with PCI-DSS Level 1 security standards. Customers may complete payment via UPI (Google Pay, PhonePe, Paytm, BHIM, CRED), Credit/Debit Cards (Visa, Mastercard, RuPay), Net Banking, or supported Wallets. Operating as a prepaid-only studio eliminates bogus bookings and fraudulent returns, prevents severe logistics damage to fragile articulated 3D prints, and allows us to pass maximum cost savings directly to genuine collectors. THE TOYZ DEPT. never stores or accesses your private card CVV or banking credentials.
             </p>
           </div>
 
@@ -167,12 +167,14 @@ export function TermsPage() {
           {/* Section 12 */}
           <div className="space-y-2">
             <h2 className="font-display font-bold text-lg uppercase text-ink">
-              12. Cancellation Policy
+              12. Order Cancellation Policy (2-Hour Window)
             </h2>
             <p>
-              <strong>Standard Catalog Orders:</strong> May be cancelled freely prior to order dispatch by contacting our support desk. Once dispatched and assigned an Air Waybill (AWB), the order cannot be cancelled in transit.
+              Because all catalog drops, fidget companions, and desk geometries are precision-crafted in our additive manufacturing facility, production queues and filament spool assignments are triggered promptly following order placement.
               <br />
-              <strong>Custom 3D Printing Orders:</strong> Custom customer-uploaded CAD prints are manufactured on-demand to unique customer specifications. Once digital slicing is approved and machine printing begins, custom orders cannot be cancelled or refunded.
+              <strong>Cancellation Window:</strong> Standard orders may be cancelled strictly within <strong>two (2) hours of payment confirmation</strong> by contacting our support desk at {BUSINESS_PROFILE.contact.email} with your Order Number.
+              <br />
+              <strong>Post-Window & Transit Restrictions:</strong> Once 3D printing execution begins, packaging is completed, or a Shiprocket Air Waybill (AWB) is generated, orders cannot be cancelled, modified, or recalled in transit.
             </p>
           </div>
 
@@ -204,7 +206,7 @@ export function TermsPage() {
             <p>
               All trademarks, product photos, graphics, brand logos, and 3D designs displayed on the Website are the exclusive intellectual property of THE TOYZ DEPT. or its licensors.
               <br />
-              When you upload a 3D model for custom fabrication, you expressly warrant and represent that you own all copyright, trademark, and patent rights in the model, or hold a valid commercial license. You agree to defend, indemnify, and hold harmless THE TOYZ DEPT. and its proprietor against any claims, losses, or legal costs arising from intellectual property infringement claims related to files you submitted.
+              When you upload a 3D model for custom fabrication, you expressly warrant and represent that you own all copyright, trademark, and patent rights in the model, or hold a valid commercial license. You agree to defend, indemnify, and hold harmless THE TOYZ DEPT. and its operators against any claims, losses, or legal costs arising from intellectual property infringement claims related to files you submitted.
             </p>
           </div>
 
@@ -240,7 +242,7 @@ export function TermsPage() {
               18. Limitation of Liability
             </h2>
             <p>
-              To the maximum extent permitted by applicable Indian law, in no event shall THE TOYZ DEPT., its proprietor, affiliates, or logistics partners be liable for any indirect, incidental, punitive, or consequential damages resulting from the use of products purchased on the Website. Our aggregate liability for any claim shall not exceed the actual monetary amount paid by the customer for the specific item in dispute.
+              To the maximum extent permitted by applicable Indian law, in no event shall THE TOYZ DEPT., its operators, affiliates, or logistics partners be liable for any indirect, incidental, punitive, or consequential damages resulting from the use of products purchased on the Website. Our aggregate liability for any claim shall not exceed the actual monetary amount paid by the customer for the specific item in dispute.
             </p>
           </div>
 
@@ -250,7 +252,7 @@ export function TermsPage() {
               19. Indemnification
             </h2>
             <p>
-              You agree to indemnify, defend, and hold harmless THE TOYZ DEPT., its proprietor Abhishek H, and service partners from and against any claims, liabilities, damages, losses, and legal expenses arising out of your violation of these Terms, submission of unlawful 3D files, or misuse of products.
+              You agree to indemnify, defend, and hold harmless THE TOYZ DEPT., its management, staff, and service partners from and against any claims, liabilities, damages, losses, and legal expenses arising out of your violation of these Terms, submission of unlawful 3D files, or misuse of products.
             </p>
           </div>
 

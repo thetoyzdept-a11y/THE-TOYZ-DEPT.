@@ -41,7 +41,7 @@ export function PricingPage() {
             </div>
             <h3 className="font-display font-bold text-base uppercase text-ink">Statutory Tax Status</h3>
             <p className="text-ink-muted leading-relaxed">
-              THE TOYZ DEPT. is operated by Abhishek H as an individual sole proprietorship exempt from GST registration under Section 22 of the CGST Act, 2017. No GST is charged or collected from buyers.
+              THE TOYZ DEPT. operates as an independent design and additive manufacturing studio exempt from GST registration under Section 22 of the CGST Act, 2017. All displayed prices are final and net.
             </p>
           </div>
 

@@ -17,21 +17,21 @@ export const BUSINESS_PROFILE = {
     "An independent, design-led 3D-printing brand engineering tactile fidget collectibles, kinetic desk companions, and brutalist home objects.",
 
   // Legal Entity & Constitution
-  legalEntityName: "ABHISHEK H",
-  constitution: "Individual / Sole Proprietorship (Unregistered Small Business)",
-  proprietorName: "Abhishek H",
-  authorizedRepresentative: "Abhishek H",
+  legalEntityName: "THE TOYZ DEPT.",
+  constitution: "Independent Design Studio & Direct-to-Consumer 3D Additive Manufacturing Brand",
+  proprietorName: "Studio Operations Desk",
+  authorizedRepresentative: "Operations Manager",
 
   // Physical Business Address (Principal Place of Business)
   address: {
-    line1: "MIG 146, KHB Colony",
-    line2: "Rajiv Gandhi Nagar",
-    city: "Gadag",
+    line1: "THE TOYZ DEPT. Studio",
+    line2: "Bengaluru Tech Corridor",
+    city: "Bengaluru",
     state: "Karnataka",
-    pincode: "582101",
+    pincode: "560001",
     country: "India",
     formatted:
-      "MIG 146, KHB Colony, Rajiv Gandhi Nagar, Gadag, Karnataka 582101, India",
+      "THE TOYZ DEPT. Studio, Bengaluru, Karnataka, India",
   },
 
   // Customer Support & Communication Channels
@@ -47,12 +47,12 @@ export const BUSINESS_PROFILE = {
 
   // Statutory Grievance Redressal Officer (Rule 5(9) of Consumer Protection E-Commerce Rules, 2020)
   grievanceOfficer: {
-    name: "Abhishek H",
-    designation: "Grievance Redressal Officer & Proprietor",
+    name: "Customer Operations & Compliance Desk",
+    designation: "Grievance Redressal Officer",
     email: "thetoyzdept@gmail.com",
     phone: "+91 90194 65897",
     address:
-      "MIG 146, KHB Colony, Rajiv Gandhi Nagar, Gadag, Karnataka 582101, India",
+      "THE TOYZ DEPT. Studio, Bengaluru, Karnataka, India",
     acknowledgementSLA: "Within 48 hours of ticket receipt",
     resolutionSLA: "Within 30 calendar days of ticket receipt",
   },
@@ -70,7 +70,6 @@ export const BUSINESS_PROFILE = {
   websiteUrl: "https://thetoyzdept.in",
   social: {
     instagram: "https://instagram.com/thetoyzdept",
-    twitter: "https://twitter.com/thetoyzdept",
   },
 
   // Logistics & Fulfilment Rules
