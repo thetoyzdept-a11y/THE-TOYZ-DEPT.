@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://thetoyzdept.in/</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/shop</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/survey</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/giveaway</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/track-order</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/about</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/shipping</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/returns</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/contact</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/pricing</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/terms</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/privacy</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/grievance-redressal</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/sample-invoice</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Categories -->
+  <url>
+    <loc>https://thetoyzdept.in/shop?category=collectibles</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/shop?category=desk-objects</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/shop?category=home-stuff</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product Drops -->
+  <url>
+    <loc>https://thetoyzdept.in/products/articulated-cyber-dragon</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/dragon-1.jpg</image:loc>
+      <image:title>Articulated Cyber Dragon</image:title>
+      <image:caption>48-segment fluid articulated dragon 3D printed in dual-tone silk PLA.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/mecha-flexi-rex</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/rex-1.jpg</image:loc>
+      <image:title>Mecha Flexi Rex</image:title>
+      <image:caption>Tactile desk dinosaur with interlocking joint articulation.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/articulated-crystal-serpent</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/serpent-1.jpg</image:loc>
+      <image:title>Articulated Crystal Serpent</image:title>
+      <image:caption>Faceted geometric snake with fluid interlocking joints.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/brutalist-concrete-desk-planter</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/planter-1.jpg</image:loc>
+      <image:title>Brutalist Concrete Desk Planter</image:title>
+      <image:caption>Architectural desk succulent planter with internal drainage channel.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/cyberpunk-cable-dock</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/dock-1.jpg</image:loc>
+      <image:title>Cyberpunk Cable Dock</image:title>
+      <image:caption>Weighted dual-channel cord organizer and pen dock.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/isometric-headphone-stand</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/stand-1.jpg</image:loc>
+      <image:title>Isometric Headphone Stand</image:title>
+      <image:caption>Brutalist headset cradle with heavy low-center base.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/modular-magnetic-wall-mounts</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/mount-1.jpg</image:loc>
+      <image:title>Modular Magnetic Wall Mounts</image:title>
+      <image:caption>Hexagonal floating mounts for controllers and headsets.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/kinetic-fidget-gear-cube</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/cube-1.jpg</image:loc>
+      <image:title>Kinetic Fidget Gear Cube</image:title>
+      <image:caption>Interlocking 8-gear tactile desktop fidget with micrometer tolerances.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/low-poly-geometric-wolf-bust</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/wolf-1.jpg</image:loc>
+      <image:title>Low-Poly Geometric Wolf Bust</image:title>
+      <image:caption>Sculptural faceted desk monolith printed in matte carbon black.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/dual-slot-magnetic-cable-caddy</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/caddy-1.jpg</image:loc>
+      <image:title>Dual-Slot Magnetic Cable Caddy</image:title>
+      <image:caption>Neodymium magnetic desk dock for charging cables.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://thetoyzdept.in/products/3d-printed-test-token</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://thetoyzdept.in/images/products/token-1.jpg</image:loc>
+      <image:title>3D Printed Test Token</image:title>
+      <image:caption>Micrometer layer resolution calibration coin (₹1 test item).</image:caption>
+    </image:image>
+  </url>
+</urlset>

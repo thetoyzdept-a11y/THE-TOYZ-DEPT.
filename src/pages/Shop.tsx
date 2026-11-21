@@ -53,6 +53,23 @@ export function ShopPage() {
     setSearchParams({});
   };
 
+  const getCategoryTitle = () => {
+    if (selectedCategory === "collectibles") return "3D Printed Articulated Toys & Beasts";
+    if (selectedCategory === "desk-objects") return "Tactile Fidget Toys & Desk Companions";
+    if (selectedCategory === "home-stuff") return "Brutalist Monoliths & Home Decor";
+    return "3D Printed Toys, Desk Drops & Tactile Artifacts";
+  };
+
+  const getCategoryDescription = () => {
+    if (selectedCategory === "collectibles")
+      return "Engineering-grade 3D printed articulated dragons, pocket dinosaurs, and faceted crystal serpents fabricated in Bengaluru with fluid print-in-place ball joints.";
+    if (selectedCategory === "desk-objects")
+      return "Kinetic fidget cubes, clicky fidgets, and weighted cable docks engineered to relieve corporate stress and boost tactile focus.";
+    if (selectedCategory === "home-stuff")
+      return "Architectural brutalist planters, headphone stands, and modular mounts 3D printed in durable bio-PLA+ and engineering PETG.";
+    return "Browse all 12 precision 3D printed drops, articulated creatures, and desk fidgets engineered in Bengaluru. Dispatched in 24-48 hours across India.";
+  };
+
   const getCategoryIcon = (slug: string) => {
     switch (slug) {
       case "collectibles":
@@ -95,9 +112,12 @@ export function ShopPage() {
             )}
           </div>
           <h1 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tight text-ink">
-            Store Drops & Archive<span className="text-coral">.</span>
+            {getCategoryTitle()}<span className="text-coral">.</span>
           </h1>
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-ink-muted uppercase">
+          <p className="font-body text-xs sm:text-sm text-ink-muted leading-relaxed max-w-2xl mt-1">
+            {getCategoryDescription()}
+          </p>
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-ink-muted uppercase pt-2">
             <span className="inline-flex items-center gap-1.5 bg-lime/20 border border-ink px-2 py-0.5 text-[10px] font-bold text-ink">
               <span className="w-1.5 h-1.5 rounded-full bg-lime border border-ink animate-pulse" />
               {products.length} Drops Live
@@ -326,6 +346,30 @@ export function ShopPage() {
           </div>
         )}
       </div>
+
+      {/* Schema.org CollectionPage / ItemList for Google Search Enhancements */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": getCategoryTitle(),
+            "description": getCategoryDescription(),
+            "url": `https://thetoyzdept.in/shop${selectedCategory ? `?category=${selectedCategory}` : ""}`,
+            "mainEntity": {
+              "@type": "ItemList",
+              "itemListElement": products.map((p, idx) => ({
+                "@type": "ListItem",
+                "position": idx + 1,
+                "url": `https://thetoyzdept.in/products/${p.slug}`,
+                "name": p.name,
+                "image": p.primary_image ? `https://thetoyzdept.in${p.primary_image}` : undefined,
+              })),
+            },
+          }),
+        }}
+      />
     </div>
   );
 }

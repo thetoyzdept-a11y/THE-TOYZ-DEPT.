@@ -13,16 +13,43 @@ import {
   Star,
   UploadCloud,
   ChevronRight,
+  ChevronDown,
   Truck,
   RotateCcw,
   Plus,
+  Minus,
   Box,
+  HelpCircle,
 } from "lucide-react";
+
+const HOME_FAQS = [
+  {
+    q: "What are 3D printed articulated toys and how do they move without assembly?",
+    a: "Our articulated dragons, dinosaurs, and kinetic serpents are engineered using advanced 'print-in-place' additive manufacturing. Each ball-and-socket and interlocking hinge is fabricated simultaneously on high-precision 3D printer beds with 0.16mm layer clearances. When the print finishes, the model bends, coils, and flexes fluidly right off the build plate with zero manual assembly or screws required."
+  },
+  {
+    q: "Why is THE TOYZ DEPT. strictly 100% prepaid with zero COD?",
+    a: "Cash on Delivery (COD) in India suffers a 35% return-to-origin (RTO) damage rate due to courier rejection and mishandling. Articulated 3D printed objects require deliberate care during transit. Eliminating COD eliminates transit damage, lets us keep collector prices 25% lower, and guarantees your drop is freshly sliced and dispatched via Shiprocket air express."
+  },
+  {
+    q: "How fast is shipping from your Bengaluru studio across India?",
+    a: "Every order is fabricated, quality-checked, and dispatched from our Bengaluru studio within 24 to 48 hours. We partner with Shiprocket, BlueDart, and Delhivery air networks to deliver in 2-3 business days to metros (Delhi, Mumbai, Hyderabad, Chennai) and 3-5 days across all 19,000+ Indian PIN codes. Orders above ₹999 unlock 100% Free Express Shipping."
+  },
+  {
+    q: "What materials do you use? Are they safe and eco-friendly?",
+    a: "We print exclusively in premium bio-based PLA+ (derived from renewable plant starches like corn and sugarcane) and tough industrial PETG. Our filaments are 100% non-toxic, odorless, durable, and feature silky dual-color micro-pigments that shift hue as you manipulate them in natural desk lighting."
+  },
+  {
+    q: "How can I participate in the Monthly Free Drop Giveaway?",
+    a: "Head to /survey and take our 2-minute Collector Survey. When you submit your feedback and vote on what we should 3D print next, you instantly receive a 15% discount coupon (SURVEY15) plus an automated raffle ticket for our monthly free articulated creature drop drawn live in our admin console!"
+  }
+];
 
 export function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -435,6 +462,165 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── SEO CATEGORY SHOWROOM: 3D PRINTED TOYS & DESK GEAR ─────── */}
+      <section className="py-16 sm:py-20 border-b-2 border-ink bg-cream-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="border-b-2 border-ink pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-ink text-lime text-xs font-mono font-bold uppercase tracking-wider mb-2">
+                <Cpu className="w-3.5 h-3.5" />
+                ADDITIVE MANUFACTURING DEPARTMENTS
+              </div>
+              <h2 className="font-display font-black text-2xl sm:text-4xl uppercase tracking-tight text-ink">
+                Engineered 3D Printed Toys &amp; Collectibles<span className="text-coral">.</span>
+              </h2>
+              <p className="font-mono text-xs sm:text-sm text-ink-muted uppercase mt-1 max-w-xl">
+                Explore our three primary additive manufacturing categories fabricated at our studio in Bengaluru
+              </p>
+            </div>
+            <Link to="/shop" className="btn-secondary text-xs font-bold uppercase self-start md:self-auto flex items-center gap-2">
+              <span>View Full 12-Drop Catalog</span> <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="card-brutal p-6 bg-cream border-2 border-ink space-y-4 hover:translate-x-1 hover:translate-y-1 transition-transform">
+              <div className="w-12 h-12 bg-lime border-2 border-ink flex items-center justify-center font-black text-2xl shadow-brutal-xs">
+                🐉
+              </div>
+              <h3 className="font-display font-black text-xl uppercase">
+                3D Printed Articulated Toys
+              </h3>
+              <p className="font-body text-xs sm:text-sm text-ink-muted leading-relaxed">
+                Featuring our flagship 48-segment Articulated Cyber Dragon, Mecha Flexi Rex, and faceted Crystal Serpents. Print-in-place ball joints that flex with liquid tactile satisfaction right off the build plate.
+              </p>
+              <div className="pt-3 border-t border-ink/10 flex items-center justify-between font-mono text-xs">
+                <span className="badge-lime text-[10px]">0.16mm Layer Precision</span>
+                <Link to="/shop?category=collectibles" className="font-bold text-coral hover:underline">
+                  Browse Beasts →
+                </Link>
+              </div>
+            </div>
+
+            <div className="card-brutal p-6 bg-cream border-2 border-ink space-y-4 hover:translate-x-1 hover:translate-y-1 transition-transform">
+              <div className="w-12 h-12 bg-coral text-cream border-2 border-ink flex items-center justify-center font-black text-2xl shadow-brutal-xs">
+                ⚡
+              </div>
+              <h3 className="font-display font-black text-xl uppercase">
+                Tactile Fidgets &amp; ADHD Companions
+              </h3>
+              <p className="font-body text-xs sm:text-sm text-ink-muted leading-relaxed">
+                Multi-gear kinetic fidget cubes, infinity twisting geometries, and satisfying tactile objects engineered with tight ceramic-tolerance clearances to banish meeting boredom and focus restless energy.
+              </p>
+              <div className="pt-3 border-t border-ink/10 flex items-center justify-between font-mono text-xs">
+                <span className="badge-lime text-[10px]">Dual-Tone Silk PLA+</span>
+                <Link to="/shop?category=desk-objects" className="font-bold text-coral hover:underline">
+                  Browse Fidgets →
+                </Link>
+              </div>
+            </div>
+
+            <div className="card-brutal p-6 bg-cream border-2 border-ink space-y-4 hover:translate-x-1 hover:translate-y-1 transition-transform">
+              <div className="w-12 h-12 bg-ink text-lime border-2 border-ink flex items-center justify-center font-black text-2xl shadow-brutal-xs">
+                📐
+              </div>
+              <h3 className="font-display font-black text-xl uppercase">
+                Brutalist Desk Gear &amp; Monoliths
+              </h3>
+              <p className="font-body text-xs sm:text-sm text-ink-muted leading-relaxed">
+                Dual-channel weighted cable organizers, isometric headphone cradles, magnetic wall mounts, and architectural concrete planters designed to elevate desk setups from generic to commanding.
+              </p>
+              <div className="pt-3 border-t border-ink/10 flex items-center justify-between font-mono text-xs">
+                <span className="badge-lime text-[10px]">Tough PETG Specs</span>
+                <Link to="/shop?category=home-stuff" className="font-bold text-coral hover:underline">
+                  Browse Gear →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── GOOGLE SEARCH ENHANCEMENTS: FREQUENTLY ASKED QUESTIONS ──── */}
+      <section className="py-16 sm:py-24 border-b-2 border-ink bg-cream">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-lime text-ink text-xs font-mono font-bold uppercase border border-ink shadow-brutal-xs">
+              <HelpCircle className="w-3.5 h-3.5" />
+              GOOGLE ENHANCED FAQS
+            </div>
+            <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tight text-ink">
+              Everything You Need To Know<span className="text-coral">.</span>
+            </h2>
+            <p className="font-mono text-xs sm:text-sm text-ink-muted uppercase max-w-lg mx-auto">
+              Clear, transparent answers about our 3D printing precision, shipping speeds, and prepaid guarantee
+            </p>
+          </div>
+
+          <div className="space-y-3 pt-4">
+            {HOME_FAQS.map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={idx}
+                  className="card-brutal bg-cream-light border-2 border-ink overflow-hidden transition-all shadow-brutal-sm"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-display font-black text-sm sm:text-base uppercase text-ink hover:text-coral transition-colors cursor-pointer"
+                  >
+                    <span>{faq.q}</span>
+                    <span className="p-1 bg-cream border border-ink flex-shrink-0">
+                      {isOpen ? <Minus className="w-4 h-4 text-ink" /> : <Plus className="w-4 h-4 text-ink" />}
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-4 pb-5 sm:px-5 sm:pb-6 pt-1 font-body text-xs sm:text-sm text-ink/80 leading-relaxed border-t border-ink/15 animate-in fade-in duration-150">
+                      <p>{faq.a}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="p-5 bg-lime/30 border-2 border-ink text-center space-y-2 font-mono text-xs">
+            <p className="font-bold text-ink uppercase">
+              Got a custom 3D printing question or corporate drop inquiry?
+            </p>
+            <p className="text-ink-muted">
+              Chat live with our Bengaluru studio desk on WhatsApp or ask our AI Concierge.
+            </p>
+            <div className="pt-2">
+              <Link to="/contact" className="btn-dark py-2 px-4 text-xs font-bold uppercase inline-flex items-center gap-1.5">
+                <span>Contact Studio Desk</span> <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Structured Schema.org FAQPage for Google Search Enhancements */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": HOME_FAQS.map((f) => ({
+              "@type": "Question",
+              "name": f.q,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": f.a,
+              },
+            })),
+          }),
+        }}
+      />
     </div>
   );
 }
