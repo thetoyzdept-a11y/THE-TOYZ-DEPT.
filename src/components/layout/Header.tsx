@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import { api } from "../../lib/api";
+import { formatINR } from "../../lib/utils";
 import {
   ShoppingBag,
   User,
@@ -16,6 +18,7 @@ import {
   Package,
   Heart,
   MapPin,
+  Sparkles,
 } from "lucide-react";
 
 export function Header() {
@@ -24,14 +27,52 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Global hotkey: Cmd+K / Ctrl+K to open search anywhere
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Automatically dismiss mobile drawer and search popup on ANY page transition or query change
   useEffect(() => {
     setMobileMenuOpen(false);
     setSearchOpen(false);
+    setSearchQuery("");
+    setSuggestions([]);
   }, [location.pathname, location.search]);
+
+  // Live Typo-Tolerant Auto-Suggest using DSA fuzzy search
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setSuggestionsLoading(true);
+      try {
+        const res = await api.getProductSuggestions(searchQuery.trim());
+        setSuggestions(res.suggestions || []);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setSuggestionsLoading(false);
+      }
+    }, 180);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,9 +301,14 @@ export function Header() {
             <h3 className="font-display font-black text-xl uppercase mb-1">
               Search Catalogue
             </h3>
-            <p className="font-mono text-xs text-ink-muted mb-4 uppercase">
-              Collectibles // Desk Tools // Architectural Home Objects
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="font-mono text-xs text-ink-muted uppercase">
+                Collectibles // Desk Tools // Architectural Home Objects
+              </p>
+              <span className="hidden sm:inline-block font-mono text-[10px] text-ink-muted bg-cream-dark px-2 py-0.5 border border-ink/20">
+                ESC to close • ⌘K
+              </span>
+            </div>
             <form onSubmit={handleSearch} className="flex gap-2">
               <input
                 type="text"
@@ -276,6 +322,68 @@ export function Header() {
                 Search
               </button>
             </form>
+
+            {/* Live DSA Fuzzy Search Suggestions */}
+            {searchQuery.trim().length >= 2 && (
+              <div className="mt-3 border-2 border-ink bg-cream-light divide-y divide-ink/15 max-h-72 overflow-y-auto shadow-brutal-sm">
+                {suggestionsLoading ? (
+                  <div className="p-3 text-center font-mono text-xs text-ink-muted uppercase">
+                    Scouring studio inventory...
+                  </div>
+                ) : suggestions.length === 0 ? (
+                  <div className="p-4 text-center">
+                    <p className="font-mono text-xs text-ink-muted">
+                      No exact drop found for "{searchQuery}". Hit Search to explore the full archive.
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="bg-lime/30 px-3 py-1 text-[10px] font-mono font-bold uppercase text-ink flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-coral" />
+                        <span>Instant Drops Found ({suggestions.length})</span>
+                      </span>
+                      <span>Typo-Tolerant Engine</span>
+                    </div>
+                    {suggestions.map((item) => (
+                      <Link
+                        key={item.id}
+                        to={`/products/${item.slug}`}
+                        onClick={() => setSearchOpen(false)}
+                        className="p-2.5 flex items-center justify-between hover:bg-cream transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-cream border border-ink flex-shrink-0 overflow-hidden">
+                            <img
+                              src={item.primaryImage || "/images/placeholder-product.svg"}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-display font-bold text-xs uppercase text-ink group-hover:text-coral transition-colors">
+                              {item.name}
+                            </p>
+                            <span className="font-mono text-[10px] text-ink-muted uppercase">
+                              {item.categoryName || "Drop"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="font-display font-black text-xs text-ink">
+                            {formatINR(item.basePrice || 0)}
+                          </p>
+                          <span className="badge-lime text-[8px] py-0 px-1 font-mono">
+                            {item.matchReason === "exact" ? "EXACT" : item.matchReason === "prefix" ? "PREFIX" : "FUZZY"}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <div className="mt-4 pt-4 border-t border-ink/20 flex flex-wrap gap-2 text-xs font-mono">
               <span className="text-ink-muted">Quick Tags:</span>
               <button

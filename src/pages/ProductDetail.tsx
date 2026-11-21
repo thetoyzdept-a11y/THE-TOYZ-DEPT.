@@ -182,8 +182,13 @@ export function ProductDetailPage() {
         description: product.description || "Precision engineered 3D printed tactile fidget drop from THE TOYZ DEPT.",
         image:
           product.images && product.images.length > 0
-            ? product.images.map((img: any) => `https://thetoyzdept.in${img.image_url || img}`)
-            : [`https://thetoyzdept.in/images/products/${product.slug}-1.jpg`],
+            ? product.images.map((img: any) => {
+                const u = typeof img === "string" ? img : img?.url || img?.image_url || "";
+                if (!u) return `https://thetoyzdept.in/images/placeholder-product.svg`;
+                if (u.startsWith("http")) return u;
+                return `https://thetoyzdept.in${u.startsWith("/") ? "" : "/"}${u}`;
+              })
+            : [`https://thetoyzdept.in/images/placeholder-product.svg`],
         sku: selectedVariant?.sku || product.slug?.toUpperCase() || "TTD-DROP",
         brand: {
           "@type": "Brand",

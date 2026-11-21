@@ -1837,41 +1837,151 @@ export function AdminDashboardPage() {
 
         {/* ── MODULE 5: INVENTORY & STOCK ─────────────────────────────── */}
         {activeModule === "inventory" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b-2 border-ink">
-              <h2 className="font-display font-black text-2xl uppercase">
-                Filament & Variant Inventory
-              </h2>
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-ink gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display font-black text-2xl uppercase">
+                    3D Print Queue & Inventory Radar ({inventory.length})
+                  </h2>
+                  <span className="badge-lime text-[10px] font-mono font-bold">DSA VELOCITY ENGINE</span>
+                </div>
+                <p className="font-mono text-xs text-ink-muted uppercase">
+                  Time-series sales velocity, days until runout, and recommended printer queue batches
+                </p>
+              </div>
             </div>
 
-            <div className="card-brutal bg-cream-light overflow-x-auto">
+            {/* Inventory KPI Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-ink-muted text-[10px] uppercase font-bold font-mono">Total SKUs</span>
+                  <p className="font-display font-black text-2xl text-ink">{inventory.length}</p>
+                </div>
+                <div className="w-10 h-10 bg-cream border-2 border-ink flex items-center justify-center">
+                  <Sliders className="w-5 h-5 text-ink" />
+                </div>
+              </div>
+
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-coral text-[10px] uppercase font-bold font-mono">Critical Runouts</span>
+                  <p className="font-display font-black text-2xl text-coral">
+                    {inventory.filter((i) => i.urgency === "CRITICAL_PRINT_QUEUE").length}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-coral/20 border-2 border-ink flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-coral" />
+                </div>
+              </div>
+
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-ink-muted text-[10px] uppercase font-bold font-mono">Restock Warnings</span>
+                  <p className="font-display font-black text-2xl text-lime-dark">
+                    {inventory.filter((i) => i.urgency === "RESTOCK_WARNING").length}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-lime border-2 border-ink flex items-center justify-center">
+                  <Package className="w-5 h-5 text-ink" />
+                </div>
+              </div>
+
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-ink-muted text-[10px] uppercase font-bold font-mono">Total Units on Shelf</span>
+                  <p className="font-display font-black text-2xl text-ink">
+                    {inventory.reduce((sum, i) => sum + (i.stock || 0), 0)}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-cream border-2 border-ink flex items-center justify-center">
+                  <Layers className="w-5 h-5 text-ink" />
+                </div>
+              </div>
+            </div>
+
+            <div className="card-brutal bg-cream-light overflow-x-auto border-2 border-ink">
               <table className="w-full text-left font-mono text-xs">
                 <thead className="bg-cream border-b-2 border-ink text-ink-muted uppercase">
                   <tr>
                     <th className="p-3">Object Specification</th>
-                    <th className="p-3">Variant Name</th>
-                    <th className="p-3">SKU</th>
-                    <th className="p-3">Current Stock</th>
-                    <th className="p-3">Threshold</th>
-                    <th className="p-3 text-right">Quick Update</th>
+                    <th className="p-3">Variant / SKU</th>
+                    <th className="p-3">On-Hand Stock</th>
+                    <th className="p-3">14D Run Rate</th>
+                    <th className="p-3">Days of Buffer</th>
+                    <th className="p-3">Recommended Print Batch</th>
+                    <th className="p-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-ink/10">
                   {inventory.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-cream/50">
-                      <td className="p-3 font-bold text-ink">{inv.product_name}</td>
-                      <td className="p-3">{inv.variant_name}</td>
-                      <td className="p-3 text-ink-muted">{inv.sku || "—"}</td>
-                      <td className="p-3 font-bold">
-                        <span className={inv.stock <= inv.low_stock_threshold ? "badge-coral" : "badge-lime"}>
+                    <tr key={inv.id} className="hover:bg-cream/50 transition-colors">
+                      <td className="p-3 font-bold text-ink">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={inv.primary_image || "/images/placeholder-product.svg"}
+                            alt={inv.product_name}
+                            className="w-8 h-8 object-cover border border-ink/40 flex-shrink-0"
+                          />
+                          <span>{inv.product_name}</span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <span className="font-bold">{inv.variant_name}</span>
+                        <span className="block text-[10px] text-ink-muted">{inv.sku || "—"}</span>
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={
+                            inv.urgency === "CRITICAL_PRINT_QUEUE"
+                              ? "badge-coral font-bold"
+                              : inv.urgency === "RESTOCK_WARNING"
+                              ? "bg-amber-200 text-ink border border-ink px-2 py-0.5 font-bold"
+                              : "badge-lime"
+                          }
+                        >
                           {inv.stock} Units
                         </span>
                       </td>
-                      <td className="p-3 text-ink-muted">{inv.low_stock_threshold} Units</td>
+                      <td className="p-3 text-ink">
+                        <span className="font-bold">{inv.dailyVelocity || 0}</span>
+                        <span className="text-[10px] text-ink-muted"> units/day</span>
+                      </td>
+                      <td className="p-3">
+                        {inv.daysRemaining !== null ? (
+                          <span
+                            className={
+                              inv.daysRemaining <= 3
+                                ? "text-coral font-bold"
+                                : inv.daysRemaining <= 7
+                                ? "text-amber-600 font-bold"
+                                : "text-lime-dark font-bold"
+                            }
+                          >
+                            ~{inv.daysRemaining} Days
+                          </span>
+                        ) : (
+                          <span className="text-ink-muted text-[10px]">Zero Recent Burn</span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        {inv.urgency === "CRITICAL_PRINT_QUEUE" ? (
+                          <span className="badge-coral text-[10px] font-bold">
+                            ⚡ Print {inv.recommendedPrintBatch} Units
+                          </span>
+                        ) : inv.urgency === "RESTOCK_WARNING" ? (
+                          <span className="bg-lime text-ink border border-ink px-2 py-0.5 text-[10px] font-bold">
+                            Queue {inv.recommendedPrintBatch} Units
+                          </span>
+                        ) : (
+                          <span className="text-ink-muted text-[10px]">Stock Optimal ✓</span>
+                        )}
+                      </td>
                       <td className="p-3 text-right">
                         <button
                           onClick={() => handleUpdateStock(inv.id, inv.stock)}
-                          className="px-2.5 py-1 bg-ink text-cream hover:bg-lime hover:text-ink text-[10px] uppercase font-bold"
+                          className="px-2.5 py-1 bg-ink text-cream hover:bg-lime hover:text-ink text-[10px] uppercase font-bold cursor-pointer transition-colors"
                         >
                           Adjust Count
                         </button>

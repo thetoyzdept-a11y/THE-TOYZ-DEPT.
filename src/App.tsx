@@ -36,7 +36,7 @@ import {
 } from "./pages/static";
 
 function ScrollToTop() {
-  const { pathname } = window.location;
+  const { pathname } = useLocation();
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);

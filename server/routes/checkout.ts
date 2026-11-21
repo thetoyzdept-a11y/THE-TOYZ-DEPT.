@@ -440,24 +440,32 @@ checkoutRouter.post("/verify", async (c) => {
     }
 
     const { keySecret } = getRazorpayCredentials(c);
+    const isProd = c.env.ENVIRONMENT === "production";
     let isValid = false;
 
-    if (isMock || !keySecret) {
-      // Development mock payment adapter (only if no secret configured or explicitly requested)
-      isValid = true;
+    if (!keySecret) {
+      if (isProd) {
+        return c.json({ error: "Razorpay credentials are not configured on production server." }, 503);
+      }
+      isValid = true; // Local development fallback when no Razorpay keys are configured
     } else {
-      if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
-        return c.json(
-          { error: "Missing required Razorpay fields (razorpayOrderId, razorpayPaymentId, razorpaySignature)" },
-          400
+      // In production or when Razorpay keys are configured, live HMAC signature verification is strictly enforced
+      if (isMock && !isProd) {
+        isValid = true;
+      } else {
+        if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+          return c.json(
+            { error: "Missing required Razorpay payment fields (razorpayOrderId, razorpayPaymentId, razorpaySignature)" },
+            400
+          );
+        }
+        isValid = await verifyRazorpaySignature(
+          razorpayOrderId,
+          razorpayPaymentId,
+          razorpaySignature,
+          keySecret
         );
       }
-      isValid = await verifyRazorpaySignature(
-        razorpayOrderId,
-        razorpayPaymentId,
-        razorpaySignature,
-        keySecret
-      );
     }
 
     if (!isValid) {

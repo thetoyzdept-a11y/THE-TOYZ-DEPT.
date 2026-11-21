@@ -2,10 +2,16 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { formatINR } from "../../lib/utils";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, Truck } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, Truck, Sparkles } from "lucide-react";
+
+const SMART_ADDONS = [
+  { id: "prod_008", name: "Kinetic Gear Cube", price: 39900, image: "/images/products/cube-1.jpg" },
+  { id: "prod_002", name: "Mecha Flexi Rex", price: 49900, image: "/images/products/rex-1.jpg" },
+  { id: "prod_005", name: "Cyberpunk Cable Dock", price: 59900, image: "/images/products/dock-1.jpg" },
+];
 
 export function CartDrawer() {
-  const { cart, isOpen, closeCart, updateQuantity, removeItem, refreshCart } = useCart();
+  const { cart, isOpen, closeCart, updateQuantity, removeItem, refreshCart, addToCart } = useCart();
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
@@ -87,6 +93,52 @@ export function CartDrawer() {
                   ✨ Free Express Shipping Unlocked! The universe approves.
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── 1-Click Smart Free Shipping Booster ─────────────────────── */}
+          {cart && cart.amountToFreeShipping > 0 && cart.items.length > 0 && (
+            <div className="bg-lime/20 border-b-2 border-ink p-3 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase text-ink">
+                <span className="flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-coral" />
+                  <span>1-Click Add to Skip ₹99 Delivery:</span>
+                </span>
+                <span className="badge-lime text-[9px] py-0 px-1 font-bold">FREE SHIPPING BOOSTER</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                {SMART_ADDONS.filter((addon) => !cart.items.some((it) => it.productId === addon.id))
+                  .slice(0, 2)
+                  .map((addon) => (
+                    <div
+                      key={addon.id}
+                      className="bg-cream border border-ink p-2 flex items-center justify-between gap-2 flex-1 min-w-[170px] shadow-brutal-xs"
+                    >
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={addon.image}
+                          alt={addon.name}
+                          className="w-8 h-8 object-cover border border-ink/40 flex-shrink-0"
+                        />
+                        <div>
+                          <p className="font-display font-bold text-[10px] uppercase truncate max-w-[85px]">
+                            {addon.name}
+                          </p>
+                          <p className="font-mono text-[10px] font-black text-ink">
+                            {formatINR(addon.price)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => addToCart({ productId: addon.id, quantity: 1 })}
+                        className="btn-primary py-1 px-2 text-[10px] font-mono font-bold uppercase cursor-pointer"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
 

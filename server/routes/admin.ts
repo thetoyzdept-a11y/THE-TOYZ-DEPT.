@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { Env, Variables } from "../types";
 import { requireAdmin, hashPassword, verifyPassword } from "../auth";
+import { edgeProductCache, edgeCategoryCache } from "../lib/cache";
 
 export const adminRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -175,6 +176,9 @@ adminRouter.post("/products", async (c) => {
         .run();
     }
 
+    edgeProductCache.clear();
+    edgeCategoryCache.clear();
+
     return c.json({ message: "Product created successfully", productId }, 201);
   } catch (err: any) {
     return c.json({ error: "Create Failed", message: err.message }, 500);
@@ -266,6 +270,9 @@ adminRouter.put("/products/:id", async (c) => {
       }
     }
 
+    edgeProductCache.clear();
+    edgeCategoryCache.clear();
+
     return c.json({ message: "Product updated successfully" });
   } catch (err: any) {
     return c.json({ error: "Update Failed", message: err.message }, 500);
@@ -279,6 +286,9 @@ adminRouter.delete("/products/:id", async (c) => {
     .prepare("UPDATE products SET status = 'archived', updated_at = datetime('now') WHERE id = ?")
     .bind(id)
     .run();
+
+  edgeProductCache.clear();
+  edgeCategoryCache.clear();
   return c.json({ message: "Product archived successfully" });
 });
 
@@ -497,21 +507,60 @@ adminRouter.get("/customers", async (c) => {
 
 // ── 6. Inventory Management ───────────────────────────────────────────
 
-// GET /api/admin/inventory
+// GET /api/admin/inventory (With Time-Series Run-Rate & 3D Print Queue Velocity)
 adminRouter.get("/inventory", async (c) => {
   const inventory = await c.env.DB
     .prepare(`
       SELECT 
         v.id, v.product_id, v.name as variant_name, v.sku, v.color, v.size,
         v.stock, v.low_stock_threshold, v.is_active, v.updated_at,
-        p.name as product_name, p.slug as product_slug, p.base_price
+        p.name as product_name, p.slug as product_slug, p.base_price,
+        (SELECT url FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) as primary_image,
+        COALESCE((
+          SELECT SUM(oi.quantity)
+          FROM order_items oi
+          JOIN orders o ON oi.order_id = o.id
+          WHERE (oi.variant_id = v.id OR (oi.variant_id IS NULL AND oi.product_id = v.product_id))
+            AND o.status NOT IN ('cancelled')
+            AND o.created_at >= datetime('now', '-14 days')
+        ), 0) as units_sold_14d,
+        COALESCE((
+          SELECT SUM(oi.quantity)
+          FROM order_items oi
+          JOIN orders o ON oi.order_id = o.id
+          WHERE (oi.variant_id = v.id OR (oi.variant_id IS NULL AND oi.product_id = v.product_id))
+            AND o.status NOT IN ('cancelled')
+            AND o.created_at >= datetime('now', '-30 days')
+        ), 0) as units_sold_30d
       FROM product_variants v
       JOIN products p ON v.product_id = p.id
       ORDER BY v.stock ASC, p.name ASC
     `)
     .all<any>();
 
-  return c.json({ inventory: inventory.results || [] });
+  const analyzedInventory = (inventory.results || []).map((item: any) => {
+    const dailyVelocity = (item.units_sold_14d || 0) / 14;
+    const daysRemaining = dailyVelocity > 0 ? Math.round(item.stock / dailyVelocity) : null;
+
+    let urgency: "CRITICAL_PRINT_QUEUE" | "RESTOCK_WARNING" | "HEALTHY" = "HEALTHY";
+    if (item.stock <= 2 || (daysRemaining !== null && daysRemaining <= 3)) {
+      urgency = "CRITICAL_PRINT_QUEUE";
+    } else if (item.stock <= (item.low_stock_threshold || 5) || (daysRemaining !== null && daysRemaining <= 7)) {
+      urgency = "RESTOCK_WARNING";
+    }
+
+    const recommendedPrintBatch = Math.max(8, Math.ceil(dailyVelocity * 14) + 5 - item.stock);
+
+    return {
+      ...item,
+      dailyVelocity: Number(dailyVelocity.toFixed(2)),
+      daysRemaining,
+      urgency,
+      recommendedPrintBatch: Math.max(0, recommendedPrintBatch),
+    };
+  });
+
+  return c.json({ inventory: analyzedInventory });
 });
 
 // PATCH /api/admin/inventory/:variantId
@@ -529,6 +578,7 @@ adminRouter.patch("/inventory/:variantId", async (c) => {
     .bind(stock, variantId)
     .run();
 
+  edgeProductCache.clear();
   return c.json({ message: "Stock updated successfully" });
 });
 

@@ -258,10 +258,28 @@ shippingRouter.post("/webhook", async (c) => {
     }
 
     if (newStatus) {
-      await c.env.DB
-        .prepare("UPDATE orders SET status = ?, updated_at = datetime('now') WHERE tracking_number = ?")
-        .bind(newStatus, awb)
-        .run();
+      const orderRow = await c.env.DB
+        .prepare("SELECT id, status FROM orders WHERE tracking_number = ? OR awb_code = ?")
+        .bind(awb, awb)
+        .first<{ id: string; status: string }>();
+
+      if (orderRow) {
+        await c.env.DB
+          .prepare("UPDATE orders SET status = ?, updated_at = datetime('now') WHERE id = ?")
+          .bind(newStatus, orderRow.id)
+          .run();
+
+        await c.env.DB
+          .prepare("INSERT INTO order_status_history (id, order_id, from_status, to_status, note) VALUES (?, ?, ?, ?, ?)")
+          .bind(
+            "osh_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16),
+            orderRow.id,
+            orderRow.status,
+            newStatus,
+            `Shiprocket courier milestone update: ${currentStatus || newStatus} (AWB: ${awb})`
+          )
+          .run();
+      }
     }
 
     return c.json({ success: true, processed: !!newStatus });

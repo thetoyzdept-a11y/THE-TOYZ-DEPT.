@@ -54,6 +54,20 @@ export const api = {
     return request<{ products: any[] }>(`/products${qs ? `?${qs}` : ""}`);
   },
   getProductBySlug: (slug: string) => request<{ product: any }>(`/products/${slug}`),
+  getProductSuggestions: (query: string) =>
+    request<{
+      query: string;
+      suggestions: Array<{
+        id: string;
+        name: string;
+        slug: string;
+        categoryName?: string;
+        basePrice?: number;
+        primaryImage?: string;
+        score: number;
+        matchReason: string;
+      }>;
+    }>(`/products/suggest?q=${encodeURIComponent(query)}`),
 
   // Cart
   getCart: (coupon?: string) => request<{ cart: any }>(`/cart${coupon ? `?coupon=${encodeURIComponent(coupon)}` : ""}`),
