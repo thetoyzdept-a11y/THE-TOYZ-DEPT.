@@ -86,6 +86,7 @@ export function TrackOrderPage() {
                 value={orderQuery}
                 onChange={(e) => setOrderQuery(e.target.value)}
                 placeholder="Order Reference (e.g. TTD-2026-8912)"
+                aria-label="Order reference number"
                 required
                 className="w-full bg-cream border-2 border-ink px-3.5 py-3 font-mono text-xs sm:text-sm uppercase font-bold text-ink placeholder:text-ink-muted/50 focus:outline-none focus:ring-2 focus:ring-lime"
               />

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { AlertCircle, UserPlus, Eye, EyeOff, ShieldCheck, Check } from "lucide-react";
+import { loadGoogleScript } from "../../lib/externalScripts";
 
 export function RegisterPage() {
   const [firstName, setFirstName] = useState("");
@@ -35,6 +36,10 @@ export function RegisterPage() {
       handleRedirectAfterAuth(user);
     }
   }, [user, loading]);
+
+  React.useEffect(() => {
+    loadGoogleScript();
+  }, []);
 
   // Password strength calculation
   const getPasswordStrength = (pass: string) => {
@@ -78,6 +83,7 @@ export function RegisterPage() {
     setGoogleLoading(true);
     setErrorMsg("");
 
+    await loadGoogleScript();
     const googleClientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     const win = window as any;
 
@@ -273,6 +279,7 @@ export function RegisterPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-3 text-ink-muted hover:text-ink cursor-pointer transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

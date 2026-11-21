@@ -1,0 +1,61 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "THE TOYZ DEPT.",
+    "identifier": "thetoyzdept.in",
+    "documentationUrl": "https://thetoyzdept.in/about",
+    "logoUrl": "https://thetoyzdept.in/logo.svg"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:thetoyzdept.in:agent:toyz-ai",
+      "displayName": "TOYZ-AI Desk Concierge",
+      "type": "text/markdown",
+      "url": "https://thetoyzdept.in/llms.txt",
+      "description": "Interactive AI concierge for 3D printed toys, articulated dragons, and tactile desk fidgets in India.",
+      "tags": [
+        "3d-printing",
+        "toys",
+        "dragons",
+        "fidgets",
+        "desk-gear",
+        "collectibles"
+      ],
+      "capabilities": [
+        "ProductDiscovery",
+        "OrderTracking",
+        "GiveawayInfo"
+      ],
+      "representativeQueries": [
+        "What 3D printed toys do you have in stock?",
+        "Do you sell articulated dragons in India?",
+        "What is the best tactile fidget toy for ADHD focus?",
+        "How fast do you ship 3D printed items from Bengaluru?"
+      ],
+      "updatedAt": "2026-11-21T00:00:00Z"
+    },
+    {
+      "identifier": "urn:air:thetoyzdept.in:catalog:store",
+      "displayName": "THE TOYZ DEPT. Product Catalog",
+      "type": "application/ld+json",
+      "url": "https://thetoyzdept.in/sitemap.xml",
+      "description": "Full additive manufacturing catalog featuring articulated dragons, kinetic gear cubes, and brutalist desk decor.",
+      "tags": [
+        "catalog",
+        "ecommerce",
+        "3d-printed-toys",
+        "india"
+      ],
+      "capabilities": [
+        "CatalogBrowsing",
+        "Pricing"
+      ],
+      "representativeQueries": [
+        "Browse 3D printed articulated dragon drops",
+        "Tactile desk fidget cubes price India",
+        "Brutalist desk accessories and planters Bengaluru"
+      ],
+      "updatedAt": "2026-11-21T00:00:00Z"
+    }
+  ]
+}

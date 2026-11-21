@@ -132,6 +132,7 @@ export function CartDrawer() {
                       <button
                         type="button"
                         onClick={() => addToCart({ productId: addon.id, quantity: 1 })}
+                        aria-label={`Add ${addon.name} to cart for free shipping booster`}
                         className="btn-primary py-1 px-2 text-[10px] font-mono font-bold uppercase cursor-pointer"
                       >
                         + Add
@@ -245,6 +246,7 @@ export function CartDrawer() {
                     value={couponInput}
                     onChange={(e) => setCouponInput(e.target.value)}
                     placeholder="Coupon (e.g. WELCOME10)"
+                    aria-label="Discount coupon code"
                     className="w-full bg-cream border border-ink px-3 py-1.5 text-xs font-mono uppercase focus:outline-none focus:border-lime"
                   />
                   <Tag className="w-3.5 h-3.5 text-ink-muted absolute right-2.5 top-2.5 pointer-events-none" />

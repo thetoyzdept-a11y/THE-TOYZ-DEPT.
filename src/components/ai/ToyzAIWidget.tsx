@@ -236,11 +236,13 @@ export function ToyzAIWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about dragons, prints, free gifts..."
+              aria-label="Ask TOYZ-AI a question"
               className="flex-1 bg-cream-light border-2 border-ink px-3 py-2 text-xs font-mono text-ink focus:outline-none focus:ring-1 focus:ring-lime"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
+              aria-label="Send message to TOYZ-AI"
               className="btn-primary px-3 py-2 text-xs font-mono font-black uppercase flex items-center justify-center disabled:opacity-40 cursor-pointer shadow-brutal-xs"
             >
               <Send className="w-3.5 h-3.5" />

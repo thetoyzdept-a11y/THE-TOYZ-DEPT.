@@ -469,12 +469,14 @@ export function ProductDetailPage() {
                   value={deliveryPincode}
                   onChange={(e) => setDeliveryPincode(e.target.value.replace(/[^0-9]/g, ""))}
                   placeholder="Enter 6-digit PIN (e.g. 560038)"
+                  aria-label="Enter 6-digit delivery pincode"
                   className="flex-1 bg-cream border-2 border-ink px-3 py-1.5 text-xs font-mono font-bold uppercase focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={handleCheckPincode}
                   disabled={pincodeLoading || deliveryPincode.length !== 6}
+                  aria-label="Check delivery pincode serviceability"
                   className="btn-dark py-1.5 px-4 text-[11px] uppercase font-mono disabled:opacity-40"
                 >
                   {pincodeLoading ? "Checking..." : "Check"}

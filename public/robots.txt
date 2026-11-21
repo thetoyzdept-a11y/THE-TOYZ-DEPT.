@@ -14,3 +14,6 @@ Disallow: /order-success/
 
 # Google XML Sitemaps
 Sitemap: https://thetoyzdept.in/sitemap.xml
+
+# Agentic Resource Discovery Protocol
+Agentmap: https://thetoyzdept.in/.well-known/ard.json

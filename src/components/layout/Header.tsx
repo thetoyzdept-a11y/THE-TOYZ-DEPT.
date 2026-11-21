@@ -99,7 +99,7 @@ export function Header() {
         </div>
         <div className="inline-flex gap-8 animate-marquee" aria-hidden="true">
           <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
-          <Link to="/survey" className="text-lime underline font-bold hover:text-cream">🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →</Link>
+          <span className="text-lime underline font-bold">🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →</span>
           <span>✦ +999 DESK AURA GUARANTEED</span>
           <span>✦ DISPATCHED FROM BENGALURU IN 24-48H</span>
           <span>✦ 100% ADHD APPROVED TACTILE FIDGETS</span>
@@ -295,6 +295,7 @@ export function Header() {
             <button
               onClick={() => setSearchOpen(false)}
               className="absolute top-4 right-4 p-1 hover:bg-cream-dark border border-transparent hover:border-ink transition-all"
+              aria-label="Close search modal"
             >
               <X className="w-6 h-6" />
             </button>
@@ -316,6 +317,7 @@ export function Header() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search dragon, planter, gear cube, flexi rex..."
                 className="flex-1 bg-cream-light border-2 border-ink px-4 py-3 font-body text-base font-medium focus:outline-none focus:ring-2 focus:ring-lime"
+                aria-label="Search drops catalog"
                 autoFocus
               />
               <button type="submit" className="btn-primary">
@@ -436,6 +438,7 @@ export function Header() {
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-1.5 hover:bg-cream-dark border border-ink"
+                  aria-label="Close navigation menu"
                 >
                   <X className="w-5 h-5" />
                 </button>

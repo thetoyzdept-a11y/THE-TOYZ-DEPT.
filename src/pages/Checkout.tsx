@@ -4,6 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { formatINR } from "../lib/utils";
+import { loadRazorpayScript } from "../lib/externalScripts";
 import {
   ShieldCheck,
   CreditCard,
@@ -67,6 +68,10 @@ export function CheckoutPage() {
   };
 
   useEffect(() => {
+    loadRazorpayScript();
+  }, []);
+
+  useEffect(() => {
     // If user has saved addresses, load default
     async function loadAddress() {
       if (user) {
@@ -128,6 +133,9 @@ export function CheckoutPage() {
       };
 
       const orderData = await api.createCheckoutOrder(orderPayload);
+
+      // Attempt to ensure Razorpay is ready
+      await loadRazorpayScript();
 
       // 2. Process Payment (Razorpay Live or Development Mock Adapter)
       if (orderData.isMockPayment || !(window as any).Razorpay) {

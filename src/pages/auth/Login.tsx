@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../lib/api";
 import { AlertCircle, Lock, Eye, EyeOff, ShieldCheck, CheckCircle2, ArrowRight, Sparkles, Layers, Box, Check } from "lucide-react";
+import { loadGoogleScript } from "../../lib/externalScripts";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -43,6 +44,7 @@ export function LoginPage() {
   }, [user, loading]);
 
   React.useEffect(() => {
+    loadGoogleScript();
     const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     if (!clientId) return;
 
@@ -99,6 +101,7 @@ export function LoginPage() {
     setGoogleLoading(true);
     setErrorMsg("");
 
+    await loadGoogleScript();
     const googleClientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     const win = window as any;
 
@@ -285,6 +288,7 @@ export function LoginPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-3 text-ink-muted hover:text-ink cursor-pointer transition-colors"
                 title={showPassword ? "Hide" : "Show"}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

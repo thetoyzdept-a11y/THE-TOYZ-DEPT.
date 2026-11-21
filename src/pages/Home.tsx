@@ -136,7 +136,9 @@ export function HomePage() {
                 <div className="aspect-square bg-cream-light border-2 border-ink overflow-hidden relative mb-3">
                   <img
                     src="/images/products/dragon-1.jpg"
-                    alt="Articulated Cyber Dragon"
+                    alt="Articulated Cyber Dragon 3D printed with fluid joints in emerald silk PLA+"
+                    width={600}
+                    height={600}
                     className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute bottom-2 left-2 bg-ink text-cream px-2 py-0.5 text-[10px] font-mono font-bold uppercase">
@@ -271,6 +273,8 @@ export function HomePage() {
                   <img
                     src={product.primary_image || "/images/placeholder-product.svg"}
                     alt={product.name}
+                    width={400}
+                    height={400}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
@@ -569,6 +573,8 @@ export function HomePage() {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-answer-${idx}`}
                     className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-display font-black text-sm sm:text-base uppercase text-ink hover:text-coral transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
@@ -578,7 +584,12 @@ export function HomePage() {
                   </button>
 
                   {isOpen && (
-                    <div className="px-4 pb-5 sm:px-5 sm:pb-6 pt-1 font-body text-xs sm:text-sm text-ink/80 leading-relaxed border-t border-ink/15 animate-in fade-in duration-150">
+                    <div
+                      id={`faq-answer-${idx}`}
+                      role="region"
+                      aria-labelledby={`faq-question-${idx}`}
+                      className="px-4 pb-5 sm:px-5 sm:pb-6 pt-1 font-body text-xs sm:text-sm text-ink/80 leading-relaxed border-t border-ink/15 animate-in fade-in duration-150"
+                    >
                       <p>{faq.a}</p>
                     </div>
                   )}

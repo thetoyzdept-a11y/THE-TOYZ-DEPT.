@@ -27,6 +27,20 @@ app.use("*", async (c, next) => {
   await next();
 });
 
+// Trust & Safety Security Headers Middleware (Lighthouse Best Practices & OWASP)
+app.use("*", async (c, next) => {
+  await next();
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("X-Frame-Options", "SAMEORIGIN");
+  c.header("Referrer-Policy", "strict-origin-when-cross-origin");
+  c.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  c.header(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://thetoyzdept.in https://api.razorpay.com https://accounts.google.com https://www.googleapis.com; frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://accounts.google.com; object-src 'none'; base-uri 'self';"
+  );
+});
+
 // CORS configuration for local development and production
 app.use(
   "*",
@@ -116,10 +130,25 @@ app.get("/api/assets/:key{.+}", async (c) => {
 });
 
 // Cloudflare Workers Static Assets Fallback
-// In production, when the route is not an API call, serve the compiled SPA
+// In production, when the route is not an API call, serve the compiled SPA with security headers
 app.all("*", async (c) => {
   if (c.env.ASSETS) {
-    return c.env.ASSETS.fetch(c.req.raw);
+    const assetRes = await c.env.ASSETS.fetch(c.req.raw);
+    const newHeaders = new Headers(assetRes.headers);
+    newHeaders.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+    newHeaders.set("X-Content-Type-Options", "nosniff");
+    newHeaders.set("X-Frame-Options", "SAMEORIGIN");
+    newHeaders.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    newHeaders.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    newHeaders.set(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://thetoyzdept.in https://api.razorpay.com https://accounts.google.com https://www.googleapis.com; frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://accounts.google.com; object-src 'none'; base-uri 'self';"
+    );
+    return new Response(assetRes.body, {
+      status: assetRes.status,
+      statusText: assetRes.statusText,
+      headers: newHeaders,
+    });
   }
   return c.text("THE TOYZ DEPT. API Server Running. Start frontend with `npm run dev`.", 200);
 });

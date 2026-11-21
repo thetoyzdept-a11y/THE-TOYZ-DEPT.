@@ -252,10 +252,12 @@ export function Footer() {
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     placeholder="you@email.com"
+                    aria-label="Email address for priority drops newsletter"
                     className="bg-cream/10 border border-cream/30 text-cream px-2.5 py-1.5 text-xs font-mono uppercase focus:outline-none focus:border-lime flex-1 min-w-0"
                   />
                   <button
                     type="submit"
+                    aria-label="Subscribe to newsletter"
                     className="px-3 py-1.5 bg-lime text-ink font-mono text-xs font-bold uppercase hover:bg-cream transition-colors cursor-pointer flex-shrink-0"
                   >
                     Join

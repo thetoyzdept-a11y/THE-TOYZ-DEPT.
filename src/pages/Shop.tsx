@@ -168,6 +168,7 @@ export function ShopPage() {
               value={searchQuery}
               onChange={(e) => updateParam("search", e.target.value)}
               placeholder="Search dragons, fidgets, planters, desk gear..."
+              aria-label="Search drops catalog"
               className="w-full bg-cream-light border-2 border-ink px-4 py-2.5 pl-10 font-mono text-xs text-ink placeholder:text-ink-muted/50 focus:outline-none focus:ring-2 focus:ring-lime shadow-brutal-sm"
             />
             <Search className="w-4 h-4 text-ink-muted absolute left-3.5 top-3" />
@@ -190,6 +191,7 @@ export function ShopPage() {
             <select
               value={selectedSort}
               onChange={(e) => updateParam("sort", e.target.value)}
+              aria-label="Sort drops catalog"
               className="bg-cream-light border-2 border-ink px-3 py-2 font-mono text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-lime cursor-pointer shadow-brutal-sm"
             >
               <option value="featured">Featured First</option>
@@ -207,7 +209,7 @@ export function ShopPage() {
             {selectedCategory && (
               <span className="inline-flex items-center gap-1.5 bg-lime text-ink px-2.5 py-1 border border-ink font-bold shadow-brutal-xs">
                 <span>Dept: {categories.find((c) => c.slug === selectedCategory)?.name || selectedCategory}</span>
-                <button onClick={() => updateParam("category", "")} className="hover:text-coral cursor-pointer">
+                <button onClick={() => updateParam("category", "")} aria-label="Remove category filter" className="hover:text-coral cursor-pointer">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </span>
@@ -215,7 +217,7 @@ export function ShopPage() {
             {searchQuery && (
               <span className="inline-flex items-center gap-1.5 bg-lime text-ink px-2.5 py-1 border border-ink font-bold shadow-brutal-xs">
                 <span>Query: "{searchQuery}"</span>
-                <button onClick={() => updateParam("search", "")} className="hover:text-coral cursor-pointer">
+                <button onClick={() => updateParam("search", "")} aria-label="Remove search query filter" className="hover:text-coral cursor-pointer">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </span>

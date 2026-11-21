@@ -639,6 +639,7 @@ export function CustomerSurveyPage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Arjun Mehta"
+                    aria-label="Your full name"
                     className="w-full bg-cream-light border-2 border-ink p-2.5 font-bold focus:outline-none focus:ring-2 focus:ring-lime"
                   />
                 </div>
@@ -653,6 +654,7 @@ export function CustomerSurveyPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="arjun@gmail.com"
+                    aria-label="Email address for winner notice"
                     className="w-full bg-cream-light border-2 border-ink p-2.5 font-bold focus:outline-none focus:ring-2 focus:ring-lime"
                   />
                 </div>
@@ -666,6 +668,7 @@ export function CustomerSurveyPage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+91 98765 43210"
+                    aria-label="WhatsApp or phone number"
                     className="w-full bg-cream-light border-2 border-ink p-2.5 focus:outline-none focus:ring-2 focus:ring-lime"
                   />
                   <p className="text-[10px] text-ink-muted mt-0.5">Used for instant SMS/WhatsApp win notification.</p>
@@ -682,6 +685,7 @@ export function CustomerSurveyPage() {
                       value={formData.instagram}
                       onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
                       placeholder="your_handle"
+                      aria-label="Instagram handle"
                       className="flex-1 bg-cream-light border-2 border-ink p-2.5 focus:outline-none focus:ring-2 focus:ring-lime"
                     />
                   </div>
