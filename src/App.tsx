@@ -16,6 +16,7 @@ import { ProductDetailPage } from "./pages/ProductDetail";
 import { CheckoutPage } from "./pages/Checkout";
 import { OrderSuccessPage } from "./pages/OrderSuccess";
 import { TrackOrderPage } from "./pages/TrackOrder";
+import { CustomerSurveyPage } from "./pages/CustomerSurvey";
 import { CustomerDashboardPage } from "./pages/customer/Dashboard";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboard";
 import { LoginPage } from "./pages/auth/Login";
@@ -143,6 +144,8 @@ function AppLayout() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
           <Route path="/track-order" element={<TrackOrderPage />} />
+          <Route path="/survey" element={<CustomerSurveyPage />} />
+          <Route path="/giveaway" element={<CustomerSurveyPage />} />
 
           {/* Auth */}
           <Route path="/login" element={<LoginPage />} />

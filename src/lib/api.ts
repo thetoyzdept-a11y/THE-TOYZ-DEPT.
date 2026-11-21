@@ -173,4 +173,29 @@ export const api = {
     request<any>("/shipping/sync-all-unsynced", { method: "POST" }),
   trackShiprocketAwb: (awb: string) =>
     request<any>(`/shipping/track/${encodeURIComponent(awb)}`),
+
+  // Customer Surveys & Monthly Giveaway
+  submitSurvey: (data: {
+    name: string;
+    email: string;
+    phone?: string;
+    instagram?: string;
+    favorite_category: string;
+    favorite_product?: string;
+    desired_colors?: string;
+    price_preference?: string;
+    product_ideas?: string;
+    rating?: number;
+    feedback?: string;
+  }) => request<any>("/survey", { method: "POST", body: JSON.stringify(data) }),
+  getAdminSurveys: () => request<{ surveys: any[]; stats: any }>("/admin/surveys"),
+  pickAdminSurveyWinner: () =>
+    request<{ success: boolean; winner: any; message: string }>("/admin/surveys/pick-winner", {
+      method: "POST",
+    }),
+  toggleAdminSurveyWinner: (id: string) =>
+    request<{ success: boolean; id: string; winner_selected: number; message: string }>(
+      `/admin/surveys/${id}/toggle-winner`,
+      { method: "PATCH" }
+    ),
 };

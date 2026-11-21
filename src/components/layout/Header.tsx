@@ -50,6 +50,7 @@ export function Header() {
       <div className="bg-ink text-cream py-2 border-b-2 border-ink overflow-hidden whitespace-nowrap select-none flex font-mono text-xs uppercase tracking-widest">
         <div className="inline-flex gap-8 animate-marquee">
           <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
+          <Link to="/survey" className="text-lime underline font-bold hover:text-cream">🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →</Link>
           <span>✦ +999 DESK AURA GUARANTEED</span>
           <span>✦ DISPATCHED FROM BENGALURU IN 24-48H</span>
           <span>✦ 100% ADHD APPROVED TACTILE FIDGETS</span>
@@ -57,6 +58,7 @@ export function Header() {
         </div>
         <div className="inline-flex gap-8 animate-marquee" aria-hidden="true">
           <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
+          <Link to="/survey" className="text-lime underline font-bold hover:text-cream">🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →</Link>
           <span>✦ +999 DESK AURA GUARANTEED</span>
           <span>✦ DISPATCHED FROM BENGALURU IN 24-48H</span>
           <span>✦ 100% ADHD APPROVED TACTILE FIDGETS</span>
@@ -131,6 +133,15 @@ export function Header() {
                 className="hover:text-coral transition-colors py-1 text-ink-muted hover:text-ink"
               >
                 Track Order
+              </Link>
+              <Link
+                to="/survey"
+                className="hover:text-coral transition-colors py-1 flex items-center gap-1.5 text-ink font-bold"
+              >
+                <span>Win Free Drop</span>
+                <span className="badge-coral text-[9px] py-0 px-1 font-mono">
+                  GIVEAWAY 🎁
+                </span>
               </Link>
             </nav>
 
@@ -363,6 +374,17 @@ export function Header() {
                 >
                   Track Your Drop
                   <ChevronRight className="w-4 h-4 text-ink-muted" />
+                </Link>
+                <Link
+                  to="/survey"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-3 px-3 bg-lime/20 border-2 border-ink text-ink font-bold transition-all shadow-brutal-xs"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>🎁</span>
+                    <span>Win A Free Drop (Survey)</span>
+                  </span>
+                  <span className="badge-coral text-[9px] font-mono">RAFFLE</span>
                 </Link>
               </nav>
 

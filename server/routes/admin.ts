@@ -828,3 +828,106 @@ adminRouter.delete("/coupons/:id", async (c) => {
     return c.json({ error: "Failed to delete coupon", message: err.message }, 500);
   }
 });
+
+// ── 11. Customer Surveys & Giveaway Management ─────────────────────
+
+// GET /api/admin/surveys
+adminRouter.get("/surveys", async (c) => {
+  try {
+    const surveys = await c.env.DB
+      .prepare("SELECT * FROM customer_surveys ORDER BY created_at DESC")
+      .all<any>();
+
+    const totalCount = surveys.results?.length || 0;
+    const winnersCount = surveys.results?.filter((s) => s.winner_selected === 1).length || 0;
+    const avgRating = totalCount > 0
+      ? (surveys.results?.reduce((sum, s) => sum + (s.rating || 5), 0) / totalCount).toFixed(1)
+      : "5.0";
+
+    // Category distribution breakdown
+    const categoryStats: Record<string, number> = {};
+    for (const s of surveys.results || []) {
+      if (s.favorite_category) {
+        categoryStats[s.favorite_category] = (categoryStats[s.favorite_category] || 0) + 1;
+      }
+    }
+
+    return c.json({
+      surveys: surveys.results || [],
+      stats: {
+        total: totalCount,
+        winners: winnersCount,
+        averageRating: parseFloat(avgRating),
+        categories: categoryStats,
+      },
+    });
+  } catch (err: any) {
+    return c.json({ error: "Failed to fetch survey responses", message: err.message }, 500);
+  }
+});
+
+// POST /api/admin/surveys/pick-winner
+adminRouter.post("/surveys/pick-winner", async (c) => {
+  try {
+    // Select a random participant who hasn't won yet
+    const candidate = await c.env.DB
+      .prepare("SELECT * FROM customer_surveys WHERE winner_selected = 0 ORDER BY RANDOM() LIMIT 1")
+      .first<any>();
+
+    if (!candidate) {
+      return c.json({ error: "No eligible survey participants available (all participants have already been selected as winners or no responses exist)." }, 400);
+    }
+
+    // Mark candidate as selected winner
+    await c.env.DB
+      .prepare("UPDATE customer_surveys SET winner_selected = 1 WHERE id = ?")
+      .bind(candidate.id)
+      .run();
+
+    return c.json({
+      success: true,
+      winner: {
+        id: candidate.id,
+        name: candidate.name,
+        email: candidate.email,
+        phone: candidate.phone,
+        instagram: candidate.instagram,
+        raffleCode: candidate.raffle_code,
+        favoriteProduct: candidate.favorite_product || candidate.favorite_category,
+      },
+      message: `🎉 Winner selected! Congratulations to ${candidate.name} (Raffle #${candidate.raffle_code})!`,
+    });
+  } catch (err: any) {
+    return c.json({ error: "Failed to pick random winner", message: err.message }, 500);
+  }
+});
+
+// PATCH /api/admin/surveys/:id/toggle-winner
+adminRouter.patch("/surveys/:id/toggle-winner", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const survey = await c.env.DB
+      .prepare("SELECT * FROM customer_surveys WHERE id = ?")
+      .bind(id)
+      .first<any>();
+
+    if (!survey) {
+      return c.json({ error: "Survey entry not found" }, 404);
+    }
+
+    const nextState = survey.winner_selected === 1 ? 0 : 1;
+    await c.env.DB
+      .prepare("UPDATE customer_surveys SET winner_selected = ? WHERE id = ?")
+      .bind(nextState, id)
+      .run();
+
+    return c.json({
+      success: true,
+      id,
+      winner_selected: nextState,
+      message: `Participant '${survey.name}' ${nextState === 1 ? "marked as Winner 🏆" : "restored to active participant pool"}.`,
+    });
+  } catch (err: any) {
+    return c.json({ error: "Failed to toggle winner status", message: err.message }, 500);
+  }
+});

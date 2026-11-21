@@ -169,3 +169,149 @@ complianceRouter.post("/grievance", async (c) => {
     return c.json({ error: "Failed to record grievance. Please contact the Grievance Officer directly at thetoyzdept@gmail.com." }, 500);
   }
 });
+
+/**
+ * POST /api/survey
+ * Public endpoint to submit customer product feedback & enter monthly free drop giveaway.
+ */
+complianceRouter.post("/survey", async (c) => {
+  try {
+    const body = (await c.req.json().catch(() => ({}))) as any;
+    const {
+      name,
+      email,
+      phone,
+      instagram,
+      favorite_category,
+      favorite_product,
+      desired_colors,
+      price_preference,
+      product_ideas,
+      rating,
+      feedback,
+    } = body;
+
+    // Validate essential fields
+    if (!name || typeof name !== "string" || name.trim().length < 2) {
+      return c.json({ error: "Please provide your name (minimum 2 characters)." }, 400);
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
+      return c.json({ error: "Please provide a valid email address so we can notify you if you win." }, 400);
+    }
+
+    if (!favorite_category || typeof favorite_category !== "string") {
+      return c.json({ error: "Please select your favorite product category." }, 400);
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
+    const cleanPhone = phone ? String(phone).trim() : null;
+    const cleanInstagram = instagram ? String(instagram).trim().replace(/^@/, "") : null;
+    const cleanCategory = String(favorite_category).trim();
+    const cleanProduct = favorite_product ? String(favorite_product).trim() : null;
+    const cleanColors = desired_colors ? String(desired_colors).trim() : null;
+    const cleanPrice = price_preference ? String(price_preference).trim() : null;
+    const cleanIdeas = product_ideas ? String(product_ideas).trim() : null;
+    const numRating = Number(rating) >= 1 && Number(rating) <= 5 ? Math.round(Number(rating)) : 5;
+    const cleanFeedback = feedback ? String(feedback).trim() : null;
+    const ip = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for") || "unknown";
+
+    // Check if user has already entered with this email
+    const existing = await c.env.DB
+      .prepare("SELECT id, raffle_code FROM customer_surveys WHERE email = ?")
+      .bind(cleanEmail)
+      .first<any>();
+
+    if (existing) {
+      // Update existing response so customer's latest thoughts are captured without duplicate entries
+      await c.env.DB
+        .prepare(`
+          UPDATE customer_surveys SET
+            name = ?,
+            phone = COALESCE(?, phone),
+            instagram = COALESCE(?, instagram),
+            favorite_category = ?,
+            favorite_product = COALESCE(?, favorite_product),
+            desired_colors = COALESCE(?, desired_colors),
+            price_preference = COALESCE(?, price_preference),
+            product_ideas = COALESCE(?, product_ideas),
+            rating = ?,
+            feedback = COALESCE(?, feedback),
+            ip_address = ?
+          WHERE id = ?
+        `)
+        .bind(
+          cleanName,
+          cleanPhone,
+          cleanInstagram,
+          cleanCategory,
+          cleanProduct,
+          cleanColors,
+          cleanPrice,
+          cleanIdeas,
+          numRating,
+          cleanFeedback,
+          ip,
+          existing.id
+        )
+        .run();
+
+      return c.json({
+        success: true,
+        message: `Welcome back! Your survey preferences have been updated and your Giveaway Raffle ticket (${existing.raffle_code}) is active!`,
+        raffleCode: existing.raffle_code,
+        couponCode: "SURVEY15",
+        couponDiscount: "15% OFF",
+        winnerPrize: "Free Collector 3D Print (Articulated Dragon or Desk Companion) + Free Express Shipping",
+        isExisting: true,
+      });
+    }
+
+    // Generate unique raffle code: DROP-WIN-XXXX-XX
+    const randomChars = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const randomSuffix = Math.random().toString(36).substring(2, 4).toUpperCase();
+    const raffleCode = `DROP-WIN-${randomChars}-${randomSuffix}`;
+    const surveyId = "srv_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+
+    await c.env.DB
+      .prepare(`
+        INSERT INTO customer_surveys (
+          id, name, email, phone, instagram, favorite_category, favorite_product,
+          desired_colors, price_preference, product_ideas, rating, feedback,
+          raffle_code, winner_selected, ip_address, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, datetime('now'))
+      `)
+      .bind(
+        surveyId,
+        cleanName,
+        cleanEmail,
+        cleanPhone,
+        cleanInstagram,
+        cleanCategory,
+        cleanProduct,
+        cleanColors,
+        cleanPrice,
+        cleanIdeas,
+        numRating,
+        cleanFeedback,
+        raffleCode,
+        ip
+      )
+      .run();
+
+    return c.json({
+      success: true,
+      message: "Survey submitted successfully! You're officially enrolled in this month's Free 3D Print Drop Giveaway.",
+      raffleCode,
+      couponCode: "SURVEY15",
+      couponDiscount: "15% OFF",
+      winnerPrize: "Free Collector 3D Print (Articulated Dragon or Desk Companion) + Free Express Shipping",
+      isExisting: false,
+    });
+  } catch (err: any) {
+    console.error("POST /api/survey error:", err);
+    return c.json({ error: "Failed to record survey response: " + err.message }, 500);
+  }
+});

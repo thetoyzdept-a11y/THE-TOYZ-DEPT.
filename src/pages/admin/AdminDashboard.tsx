@@ -41,6 +41,10 @@ import {
   Truck,
   Tag,
   Copy,
+  Gift,
+  Sparkles,
+  Award,
+  Star,
 } from "lucide-react";
 
 export const STUDIO_PHOTO_PRESETS = [
@@ -81,6 +85,7 @@ export function AdminDashboardPage() {
     "orders",
     "products",
     "coupons",
+    "surveys",
     "custom",
     "inventory",
     "customers",
@@ -135,6 +140,14 @@ export function AdminDashboardPage() {
   const [newCouponActive, setNewCouponActive] = useState(true);
   const [savingCoupon, setSavingCoupon] = useState(false);
   const [couponActionLoading, setCouponActionLoading] = useState<string | null>(null);
+
+  // Customer Surveys & Giveaway State
+  const [surveys, setSurveys] = useState<any[]>([]);
+  const [surveyStats, setSurveyStats] = useState<any>(null);
+  const [surveySearch, setSurveySearch] = useState("");
+  const [pickingWinner, setPickingWinner] = useState(false);
+  const [winnerModal, setWinnerModal] = useState<any | null>(null);
+  const [surveyActionLoading, setSurveyActionLoading] = useState<string | null>(null);
 
   // Search & Filter
   const [orderSearch, setOrderSearch] = useState("");
@@ -259,7 +272,7 @@ export function AdminDashboardPage() {
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
-      const [overviewRes, prodRes, ordRes, custReqRes, invRes, custRes, setRes, compRes, acctRes, cpnRes] = await Promise.all([
+      const [overviewRes, prodRes, ordRes, custReqRes, invRes, custRes, setRes, compRes, acctRes, cpnRes, srvRes] = await Promise.all([
         api.getAdminOverview(),
         api.getAdminProducts(),
         api.getAdminOrders(),
@@ -270,6 +283,7 @@ export function AdminDashboardPage() {
         api.getAdminComplianceRecords().catch(() => ({ inquiries: [], grievances: [] })),
         api.getAdminAccounts().catch(() => ({ admins: [] })),
         api.getAdminCoupons().catch(() => ({ coupons: [] })),
+        api.getAdminSurveys().catch(() => ({ surveys: [], stats: null })),
       ]);
 
       setMetrics(overviewRes.metrics);
@@ -284,6 +298,8 @@ export function AdminDashboardPage() {
       setGrievances(compRes.grievances || []);
       setAdminAccounts(acctRes.admins || []);
       setCoupons(cpnRes.coupons || []);
+      setSurveys(srvRes.surveys || []);
+      setSurveyStats(srvRes.stats || null);
     } catch (err) {
       console.error("Admin data load error", err);
     } finally {
@@ -573,6 +589,36 @@ export function AdminDashboardPage() {
     }
   };
 
+  const handlePickWinner = async () => {
+    if (!confirm("Are you ready to randomly draw a winner from all active survey participants?")) {
+      return;
+    }
+    setPickingWinner(true);
+    try {
+      const res = await api.pickAdminSurveyWinner();
+      setWinnerModal(res.winner);
+      await loadAllAdminData();
+    } catch (err: any) {
+      alert("Failed to pick winner: " + (err.message || "Unknown error"));
+    } finally {
+      setPickingWinner(false);
+    }
+  };
+
+  const handleToggleSurveyWinner = async (id: string) => {
+    setSurveyActionLoading(id);
+    try {
+      const res = await api.toggleAdminSurveyWinner(id);
+      setSurveys((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, winner_selected: res.winner_selected } : s))
+      );
+    } catch (err: any) {
+      alert("Failed to toggle winner: " + (err.message || "Unknown error"));
+    } finally {
+      setSurveyActionLoading(null);
+    }
+  };
+
   if (!isAdmin) return null;
 
   return (
@@ -617,6 +663,7 @@ export function AdminDashboardPage() {
             { id: "orders", label: `Orders (${orders.length})`, icon: Package },
             { id: "products", label: `Products (${products.length})`, icon: Layers },
             { id: "coupons", label: `Coupons (${coupons.length})`, icon: Tag },
+            { id: "surveys", label: `Surveys & Raffle (${surveys.length})`, icon: Gift },
             { id: "inventory", label: "Inventory & Stock", icon: Sliders },
             { id: "inquiries", label: `Inquiries (${inquiries.length + grievances.length})`, icon: Mail },
             { id: "security", label: "Security & Passwords", icon: ShieldCheck },
@@ -1292,6 +1339,293 @@ export function AdminDashboardPage() {
                           </tr>
                         );
                       })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODULE: CUSTOMER SURVEYS & MONTHLY GIVEAWAY ────────────── */}
+        {activeModule === "surveys" && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-ink gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display font-black text-2xl uppercase">
+                    Customer Surveys & Giveaway ({surveys.length})
+                  </h2>
+                  <span className="badge-lime text-[10px] font-mono font-bold">MONTHLY RAFFLE</span>
+                </div>
+                <p className="font-mono text-xs text-ink-muted uppercase">
+                  Collector feedback, product ideas, filament demands, and giveaway drawing console
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={pickingWinner || surveys.filter((s) => s.winner_selected === 0).length === 0}
+                  onClick={handlePickWinner}
+                  className="btn-primary py-2.5 px-4 text-xs font-black uppercase flex items-center gap-2 shadow-brutal hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 cursor-pointer"
+                >
+                  <Gift className="w-4 h-4 text-ink" />
+                  <span>{pickingWinner ? "Drawing Random Winner..." : "🎲 Draw Monthly Winner"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* KPI Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-ink-muted text-[10px] uppercase font-bold font-mono">Total Responses</span>
+                  <p className="font-display font-black text-2xl text-ink">{surveys.length}</p>
+                </div>
+                <div className="w-10 h-10 bg-cream border-2 border-ink flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-ink" />
+                </div>
+              </div>
+
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-ink-muted text-[10px] uppercase font-bold font-mono">Average Rating</span>
+                  <p className="font-display font-black text-2xl text-lime-dark flex items-center gap-1">
+                    <span>{surveyStats?.averageRating || 5.0}</span>
+                    <Star className="w-5 h-5 fill-lime-dark text-lime-dark" />
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-lime border-2 border-ink flex items-center justify-center">
+                  <Award className="w-5 h-5 text-ink" />
+                </div>
+              </div>
+
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-ink-muted text-[10px] uppercase font-bold font-mono">Winners Awarded</span>
+                  <p className="font-display font-black text-2xl text-coral">
+                    {surveys.filter((s) => s.winner_selected === 1).length}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-coral/20 border-2 border-ink flex items-center justify-center">
+                  <Gift className="w-5 h-5 text-coral" />
+                </div>
+              </div>
+
+              <div className="card-brutal p-4 bg-cream-light border-2 border-ink flex items-center justify-between">
+                <div>
+                  <span className="text-ink-muted text-[10px] uppercase font-bold font-mono">Active Ticket Pool</span>
+                  <p className="font-display font-black text-2xl text-ink">
+                    {surveys.filter((s) => s.winner_selected === 0).length}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-cream border-2 border-ink flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-ink" />
+                </div>
+              </div>
+            </div>
+
+            {/* Search Filter */}
+            <div className="flex gap-2 font-mono">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3 top-3 text-ink-muted" />
+                <input
+                  type="text"
+                  placeholder="Search participants by name, email, raffle code, product idea, or Instagram..."
+                  value={surveySearch}
+                  onChange={(e) => setSurveySearch(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 bg-cream-light border-2 border-ink text-xs uppercase font-mono focus:outline-none focus:ring-1 focus:ring-lime"
+                />
+              </div>
+              {surveySearch && (
+                <button
+                  type="button"
+                  onClick={() => setSurveySearch("")}
+                  className="btn-secondary py-2 px-3 text-xs uppercase"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* Survey Submissions Table */}
+            <div className="card-brutal bg-cream border-2 border-ink overflow-x-auto shadow-brutal">
+              <table className="w-full font-mono text-xs text-left border-collapse">
+                <thead className="bg-ink text-cream uppercase text-[11px] border-b-2 border-ink">
+                  <tr>
+                    <th className="p-3">Participant & Contact</th>
+                    <th className="p-3">Raffle Ticket</th>
+                    <th className="p-3">Favorite Category & Pick</th>
+                    <th className="p-3">Wishlist Colors & Budget</th>
+                    <th className="p-3">Dream Drop Ideas</th>
+                    <th className="p-3">Rating</th>
+                    <th className="p-3">Giveaway Status</th>
+                    <th className="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y-2 divide-ink/20">
+                  {surveys.filter((s) => {
+                    if (!surveySearch) return true;
+                    const q = surveySearch.toLowerCase();
+                    return (
+                      s.name?.toLowerCase().includes(q) ||
+                      s.email?.toLowerCase().includes(q) ||
+                      s.raffle_code?.toLowerCase().includes(q) ||
+                      s.instagram?.toLowerCase().includes(q) ||
+                      s.product_ideas?.toLowerCase().includes(q) ||
+                      s.favorite_category?.toLowerCase().includes(q)
+                    );
+                  }).length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-ink-muted font-mono">
+                        No survey responses found. When customers complete the survey at /survey, entries will appear here in real time.
+                      </td>
+                    </tr>
+                  ) : (
+                    surveys
+                      .filter((s) => {
+                        if (!surveySearch) return true;
+                        const q = surveySearch.toLowerCase();
+                        return (
+                          s.name?.toLowerCase().includes(q) ||
+                          s.email?.toLowerCase().includes(q) ||
+                          s.raffle_code?.toLowerCase().includes(q) ||
+                          s.instagram?.toLowerCase().includes(q) ||
+                          s.product_ideas?.toLowerCase().includes(q) ||
+                          s.favorite_category?.toLowerCase().includes(q)
+                        );
+                      })
+                      .map((srv) => (
+                        <tr key={srv.id} className="hover:bg-cream-light transition-colors">
+                          <td className="p-3">
+                            <span className="font-display font-black text-sm uppercase text-ink block">
+                              {srv.name}
+                            </span>
+                            <a
+                              href={`mailto:${srv.email}`}
+                              className="text-xs text-ink-muted hover:text-coral underline block"
+                            >
+                              {srv.email}
+                            </a>
+                            {srv.phone && (
+                              <a
+                                href={`tel:${srv.phone}`}
+                                className="text-[10px] text-ink-muted hover:text-ink block mt-0.5"
+                              >
+                                📞 {srv.phone}
+                              </a>
+                            )}
+                            {srv.instagram && (
+                              <a
+                                href={`https://instagram.com/${srv.instagram.replace(/^@/, "")}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[10px] text-coral hover:underline font-bold inline-flex items-center gap-1 mt-0.5"
+                              >
+                                <span>📸 @{srv.instagram.replace(/^@/, "")}</span>
+                                <span className="badge-coral text-[8px] py-0 px-1 font-mono">+1 TICKET</span>
+                              </a>
+                            )}
+                          </td>
+
+                          <td className="p-3">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-display font-black text-xs uppercase bg-cream-light border border-ink px-2 py-0.5">
+                                {srv.raffle_code}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(srv.raffle_code);
+                                  alert(`Copied raffle code ${srv.raffle_code}!`);
+                                }}
+                                className="p-1 hover:bg-lime border border-ink/40 text-ink cursor-pointer"
+                                title="Copy code"
+                              >
+                                <Copy className="w-3 h-3" />
+                              </button>
+                            </div>
+                            <span className="text-[10px] text-ink-muted mt-1 block">
+                              {formatDate(srv.created_at)}
+                            </span>
+                          </td>
+
+                          <td className="p-3">
+                            <span className="font-bold text-ink block text-xs">
+                              {srv.favorite_category}
+                            </span>
+                            {srv.favorite_product && (
+                              <span className="text-[11px] text-ink-muted block mt-0.5">
+                                Pick: {srv.favorite_product}
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="p-3 text-[11px]">
+                            {srv.desired_colors && (
+                              <p className="text-ink font-bold">
+                                🎨 {srv.desired_colors}
+                              </p>
+                            )}
+                            {srv.price_preference && (
+                              <p className="text-ink-muted mt-0.5">
+                                💰 {srv.price_preference}
+                              </p>
+                            )}
+                          </td>
+
+                          <td className="p-3 max-w-xs">
+                            {srv.product_ideas ? (
+                              <p className="text-xs text-ink/90 font-mono bg-cream-light p-2 border border-ink/20 line-clamp-3">
+                                "{srv.product_ideas}"
+                              </p>
+                            ) : (
+                              <span className="text-ink-muted text-[11px]">No specific idea entered</span>
+                            )}
+                          </td>
+
+                          <td className="p-3">
+                            <span className="inline-flex items-center gap-1 font-bold text-xs bg-lime/20 px-2 py-0.5 border border-ink text-ink">
+                              <Star className="w-3 h-3 fill-ink text-ink" />
+                              <span>{srv.rating || 5}/5</span>
+                            </span>
+                          </td>
+
+                          <td className="p-3">
+                            {srv.winner_selected === 1 ? (
+                              <span className="badge-lime text-[10px] font-black inline-flex items-center gap-1">
+                                <Award className="w-3.5 h-3.5 text-ink" />
+                                WINNER 🏆
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 bg-ink/10 text-ink-muted border border-ink/20 text-[10px] font-bold uppercase">
+                                Active Raffle
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="p-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                disabled={surveyActionLoading === srv.id}
+                                onClick={() => handleToggleSurveyWinner(srv.id)}
+                                className={`px-2 py-1 text-[10px] uppercase font-bold border border-ink transition-colors cursor-pointer ${
+                                  srv.winner_selected === 1
+                                    ? "bg-coral text-cream hover:bg-ink"
+                                    : "bg-lime text-ink hover:bg-ink hover:text-cream"
+                                } disabled:opacity-50`}
+                              >
+                                {surveyActionLoading === srv.id
+                                  ? "..."
+                                  : srv.winner_selected === 1
+                                  ? "Revoke"
+                                  : "Award 🏆"}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
                   )}
                 </tbody>
               </table>
@@ -2370,6 +2704,89 @@ export function AdminDashboardPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODAL: RAFFLE WINNER DRAWN CELEBRATION ─────────────────── */}
+        {winnerModal && (
+          <div className="fixed inset-0 z-50 bg-ink/80 flex items-center justify-center p-4">
+            <div className="card-brutal bg-cream border-4 border-ink p-6 sm:p-8 w-full max-w-lg space-y-5 shadow-brutal-xl animate-in zoom-in-95 duration-200">
+              <div className="text-center space-y-2 border-b-2 border-ink pb-4">
+                <div className="w-16 h-16 bg-lime border-2 border-ink rounded-full flex items-center justify-center mx-auto shadow-brutal-sm">
+                  <Award className="w-8 h-8 text-ink animate-bounce" />
+                </div>
+                <span className="badge-coral text-xs font-mono font-bold uppercase">GIVEAWAY DRAW COMPLETED</span>
+                <h3 className="font-display font-black text-2xl sm:text-3xl uppercase text-ink">
+                  Winner Selected! 🏆
+                </h3>
+                <p className="font-mono text-xs text-ink-muted">
+                  Randomly drawn from eligible survey participants in Cloudflare D1
+                </p>
+              </div>
+
+              <div className="p-4 bg-cream-light border-2 border-ink font-mono text-xs space-y-2">
+                <div className="flex justify-between border-b border-ink/20 pb-1.5">
+                  <span className="text-ink-muted uppercase">Winner Name:</span>
+                  <span className="font-display font-black text-sm uppercase text-ink">{winnerModal.name}</span>
+                </div>
+                <div className="flex justify-between border-b border-ink/20 pb-1.5">
+                  <span className="text-ink-muted uppercase">Email Address:</span>
+                  <a href={`mailto:${winnerModal.email}`} className="font-bold text-coral underline">
+                    {winnerModal.email}
+                  </a>
+                </div>
+                {winnerModal.phone && (
+                  <div className="flex justify-between border-b border-ink/20 pb-1.5">
+                    <span className="text-ink-muted uppercase">Phone / WhatsApp:</span>
+                    <a href={`https://wa.me/${winnerModal.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer" className="font-bold text-ink underline">
+                      {winnerModal.phone}
+                    </a>
+                  </div>
+                )}
+                {winnerModal.instagram && (
+                  <div className="flex justify-between border-b border-ink/20 pb-1.5">
+                    <span className="text-ink-muted uppercase">Instagram:</span>
+                    <a href={`https://instagram.com/${winnerModal.instagram.replace(/^@/, "")}`} target="_blank" rel="noreferrer" className="font-bold text-coral underline">
+                      @{winnerModal.instagram.replace(/^@/, "")}
+                    </a>
+                  </div>
+                )}
+                <div className="flex justify-between border-b border-ink/20 pb-1.5">
+                  <span className="text-ink-muted uppercase">Raffle Ticket Code:</span>
+                  <span className="font-black text-ink uppercase bg-lime px-2 py-0.5 border border-ink">
+                    {winnerModal.raffleCode}
+                  </span>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <span className="text-ink-muted uppercase">Favorite Product:</span>
+                  <span className="font-bold text-ink">{winnerModal.favoriteProduct || "Custom 3D Print Drop"}</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-lime/20 border-2 border-ink font-mono text-[11px] text-ink/80 space-y-1">
+                <p className="font-bold uppercase text-ink">Next Steps for Fulfillment:</p>
+                <p>1. Send an email or WhatsApp to the winner notifying them of their prize.</p>
+                <p>2. Confirm their preferred shipping address and choice of filament color.</p>
+                <p>3. Dispatch their free collector drop via Shiprocket express courier!</p>
+              </div>
+
+              <div className="flex gap-2 pt-2 border-t-2 border-ink">
+                <a
+                  href={`mailto:${winnerModal.email}?subject=${encodeURIComponent("🎉 Congratulations! You won THE TOYZ DEPT. Monthly 3D Print Giveaway!")}&body=${encodeURIComponent(`Hi ${winnerModal.name},\n\nGreat news! Your raffle ticket (#${winnerModal.raffleCode}) was randomly selected as this month's winner in THE TOYZ DEPT. Giveaway!\n\nPlease reply with your full delivery address and phone number so we can dispatch your free custom 3D print.\n\nCheers,\nTHE TOYZ DEPT. Studio`)}`}
+                  className="btn-primary flex-1 py-3 text-xs font-black uppercase text-center flex items-center justify-center gap-1.5"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>Email Winner Now</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setWinnerModal(null)}
+                  className="btn-secondary py-3 px-5 text-xs font-bold uppercase"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -43,6 +43,25 @@ export function OrderSuccessPage() {
             You will receive live tracking updates via SMS and email when your package ships.
           </div>
 
+          <div className="p-4 bg-lime/20 border-2 border-ink text-left space-y-2 font-mono text-xs">
+            <div className="flex items-center justify-between">
+              <span className="badge-coral text-[10px] font-bold uppercase">BONUS GIVEAWAY</span>
+              <span className="text-[10px] text-ink font-bold">15% COUPON UNLOCKED</span>
+            </div>
+            <p className="font-display font-black text-sm uppercase text-ink">
+              Win A Free 3D Print Drop In Our Monthly Draw! 🎁
+            </p>
+            <p className="text-[11px] text-ink-muted">
+              Help us choose our next batch drops by taking our 60-second survey. You'll receive an official raffle ticket to win a free collector piece shipped to your door!
+            </p>
+            <Link
+              to="/survey"
+              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase text-ink underline hover:text-coral pt-1"
+            >
+              <span>Take Survey & Claim Ticket →</span>
+            </Link>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Link to={`/track-order?ref=${orderNumber}`} className="btn-primary text-xs">
               <Package className="w-4 h-4" /> Track Status

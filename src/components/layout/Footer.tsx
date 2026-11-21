@@ -185,6 +185,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/survey" className="text-lime hover:underline font-bold flex items-center gap-1.5">
+                  <span>🎁</span>
+                  <span>Win A Free Drop (Survey)</span>
+                </Link>
+              </li>
+              <li>
                 <Link to="/sample-invoice" className="text-cream/80 hover:text-coral transition-colors">
                   Commercial Invoice
                 </Link>
