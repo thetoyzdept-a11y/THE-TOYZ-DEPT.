@@ -12,6 +12,7 @@ import { adminRouter } from "./routes/admin";
 import { razorpayRouter } from "./routes/razorpay";
 import { shippingRouter } from "./routes/shiprocket";
 import { complianceRouter } from "./routes/compliance";
+import { aiRouter } from "./routes/ai";
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -79,6 +80,7 @@ app.route("/api/customer", customerRouter);
 app.route("/api/admin", adminRouter);
 app.route("/api/shipping", shippingRouter);
 app.route("/api", complianceRouter); // Mounts /api/contact, /api/grievance, /api/business-profile
+app.route("/api/ai", aiRouter); // Mounts /api/ai/chat, /api/ai/survey-spark, /api/ai/admin/survey-insights
 
 // Direct Webhook aliases for external payment & logistics gateways
 app.post("/api/webhooks/razorpay", async (c) => {

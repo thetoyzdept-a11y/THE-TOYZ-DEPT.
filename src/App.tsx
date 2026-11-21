@@ -7,6 +7,7 @@ import { AdminHeader } from "./components/layout/AdminHeader";
 import { Footer } from "./components/layout/Footer";
 import { CartDrawer } from "./components/layout/CartDrawer";
 import { WhatsAppWidget } from "./components/layout/WhatsAppWidget";
+import { ToyzAIWidget } from "./components/ai/ToyzAIWidget";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 
 // Pages
@@ -205,6 +206,7 @@ function AppLayout() {
       )}
       <CartDrawer />
       <WhatsAppWidget />
+      <ToyzAIWidget />
     </div>
   );
 }

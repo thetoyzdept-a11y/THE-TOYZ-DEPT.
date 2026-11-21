@@ -97,6 +97,30 @@ export function CustomerSurveyPage() {
   const [copiedRaffle, setCopiedRaffle] = useState(false);
   const [copiedCoupon, setCopiedCoupon] = useState(false);
 
+  // AI Idea Sparker State
+  const [sparkPrompt, setSparkPrompt] = useState("");
+  const [sparkLoading, setSparkLoading] = useState(false);
+  const [sparkedIdea, setSparkedIdea] = useState<{
+    title: string;
+    concept: string;
+    suggestedColors: string;
+    tag: string;
+  } | null>(null);
+
+  const handleSparkIdea = async () => {
+    setSparkLoading(true);
+    try {
+      const res = await api.sparkAiSurveyIdea(sparkPrompt, formData.favorite_category);
+      if (res && res.idea) {
+        setSparkedIdea(res.idea);
+      }
+    } catch (err: any) {
+      alert("AI Idea Spark failed: " + (err.message || "Please try again"));
+    } finally {
+      setSparkLoading(false);
+    }
+  };
+
   const toggleColorChoice = (color: string) => {
     setFormData((prev) => {
       const exists = prev.desired_colors.includes(color);
@@ -468,17 +492,85 @@ export function CustomerSurveyPage() {
               </div>
             </div>
 
-            {/* QUESTION 5: Dream Drop Idea */}
+            {/* QUESTION 5: Dream Drop Idea with AI Concept Sparker */}
             <div className="card-brutal p-6 bg-cream-light space-y-4">
-              <div className="flex items-center gap-2 border-b-2 border-ink pb-2">
-                <span className="w-6 h-6 bg-ink text-cream font-bold text-xs flex items-center justify-center">5</span>
-                <h2 className="font-display font-black text-base uppercase text-ink">
-                  Your Dream Drop: What should we 3D print next?
-                </h2>
+              <div className="flex items-center justify-between border-b-2 border-ink pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 bg-ink text-cream font-bold text-xs flex items-center justify-center">5</span>
+                  <h2 className="font-display font-black text-base uppercase text-ink">
+                    Your Dream Drop: What should we 3D print next?
+                  </h2>
+                </div>
+                <span className="badge-lime text-[10px] font-mono font-bold flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-ink" />
+                  AI POWERED
+                </span>
               </div>
               <p className="text-[11px] text-ink-muted">
                 What kinetic gadget, articulated monster, desk tool, or brutalist concept do you wish existed? We build the best community ideas into real production drops!
               </p>
+
+              {/* AI Drop Sparker Input Bar */}
+              <div className="p-3 bg-cream border-2 border-ink shadow-brutal-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase font-bold text-ink flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-coral" />
+                    Need Inspiration? Ask AI To Spark A 3D Concept:
+                  </span>
+                  <span className="text-[9px] font-mono text-ink-muted">GPT-4O-MINI</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={sparkPrompt}
+                    onChange={(e) => setSparkPrompt(e.target.value)}
+                    placeholder="e.g. Steampunk scorpion, magnetic pen rest, mechanical fidget spinner..."
+                    className="flex-1 bg-cream-light border border-ink px-2.5 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-lime"
+                  />
+                  <button
+                    type="button"
+                    disabled={sparkLoading}
+                    onClick={handleSparkIdea}
+                    className="btn-primary py-1.5 px-3 text-xs font-mono font-bold uppercase flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-brutal-xs"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-ink" />
+                    <span>{sparkLoading ? "Sparking..." : "Spark Idea ✨"}</span>
+                  </button>
+                </div>
+
+                {sparkedIdea && (
+                  <div className="mt-2 p-3 bg-lime/20 border-2 border-ink space-y-2 animate-in fade-in duration-200">
+                    <div className="flex items-center justify-between">
+                      <span className="font-display font-black text-sm uppercase text-ink">
+                        {sparkedIdea.title}
+                      </span>
+                      <span className="badge-coral text-[9px] font-mono font-bold">
+                        {sparkedIdea.tag || "3D Drop Concept"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-ink/90 font-mono leading-relaxed">
+                      {sparkedIdea.concept}
+                    </p>
+                    {sparkedIdea.suggestedColors && (
+                      <p className="text-[10px] text-ink-muted font-mono font-bold">
+                        🎨 Recommended Palette: {sparkedIdea.suggestedColors}
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const formatted = `${sparkedIdea.title}: ${sparkedIdea.concept} (Palette: ${sparkedIdea.suggestedColors})`;
+                        setFormData((prev) => ({ ...prev, product_ideas: formatted }));
+                      }}
+                      className="btn-dark py-1 px-2.5 text-[10px] uppercase font-mono font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Check className="w-3 h-3 text-lime" />
+                      <span>Insert This Concept Into My Survey</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <textarea
                 rows={3}
                 value={formData.product_ideas}

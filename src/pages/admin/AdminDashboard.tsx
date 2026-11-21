@@ -148,6 +148,10 @@ export function AdminDashboardPage() {
   const [pickingWinner, setPickingWinner] = useState(false);
   const [winnerModal, setWinnerModal] = useState<any | null>(null);
   const [surveyActionLoading, setSurveyActionLoading] = useState<string | null>(null);
+  const [aiInsightsLoading, setAiInsightsLoading] = useState(false);
+  const [aiInsightsReport, setAiInsightsReport] = useState<{ totalAnalyzed: number; summary: string } | null>(null);
+  const [aiInsightsCopied, setAiInsightsCopied] = useState(false);
+  const [generatingProductCopy, setGeneratingProductCopy] = useState(false);
 
   // Search & Filter
   const [orderSearch, setOrderSearch] = useState("");
@@ -616,6 +620,41 @@ export function AdminDashboardPage() {
       alert("Failed to toggle winner: " + (err.message || "Unknown error"));
     } finally {
       setSurveyActionLoading(null);
+    }
+  };
+
+  const handleGenerateAiInsights = async () => {
+    setAiInsightsLoading(true);
+    try {
+      const res = await api.getAdminAiSurveyInsights();
+      setAiInsightsReport({
+        totalAnalyzed: res.totalAnalyzed || surveys.length,
+        summary: res.summary,
+      });
+    } catch (err: any) {
+      alert("AI Survey synthesis error: " + (err.message || "Failed to analyze surveys"));
+    } finally {
+      setAiInsightsLoading(false);
+    }
+  };
+
+  const handleGenerateProductCopy = async () => {
+    if (!newProdName.trim()) {
+      alert("Please enter a Product Name first so TOYZ-AI knows what to write about.");
+      return;
+    }
+    setGeneratingProductCopy(true);
+    try {
+      const res = await api.generateProductCopy({
+        name: newProdName,
+        category: newProdCategory,
+        material: newProdColor ? `${newProdMaterial} (${newProdColor})` : newProdMaterial,
+      });
+      setNewProdDesc(res.description);
+    } catch (err: any) {
+      alert("AI copy generation error: " + (err.message || "Failed to generate copy"));
+    } finally {
+      setGeneratingProductCopy(false);
     }
   };
 
@@ -1362,7 +1401,17 @@ export function AdminDashboardPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  disabled={aiInsightsLoading || surveys.length === 0}
+                  onClick={handleGenerateAiInsights}
+                  className="btn-secondary py-2.5 px-4 text-xs font-black uppercase flex items-center gap-2 shadow-brutal hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 cursor-pointer bg-cream"
+                >
+                  <Sparkles className="w-4 h-4 text-coral" />
+                  <span>{aiInsightsLoading ? "Synthesizing with AI..." : "🧠 AI Survey Insights"}</span>
+                </button>
+
                 <button
                   type="button"
                   disabled={pickingWinner || surveys.filter((s) => s.winner_selected === 0).length === 0}
@@ -1424,6 +1473,62 @@ export function AdminDashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* AI Survey Intelligence & Executive R&D Briefing */}
+            {aiInsightsReport && (
+              <div className="card-brutal p-5 bg-cream border-3 border-ink shadow-brutal-lg space-y-4 animate-in fade-in duration-150">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-ink gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-lime text-ink flex items-center justify-center border border-ink shadow-brutal-xs font-black">
+                      <Sparkles className="w-4 h-4 text-coral" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-black text-lg uppercase text-ink flex items-center gap-2">
+                        <span>Executive Product R&D Briefing</span>
+                        <span className="badge-lime text-[9px] font-mono font-bold">GPT-4O-MINI</span>
+                      </h3>
+                      <p className="font-mono text-[10px] text-ink-muted uppercase">
+                        AI synthesis of {aiInsightsReport.totalAnalyzed} collector responses from database
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(aiInsightsReport.summary);
+                        setAiInsightsCopied(true);
+                        setTimeout(() => setAiInsightsCopied(false), 2000);
+                      }}
+                      className="btn-dark py-1.5 px-3 text-[11px] font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-brutal-xs"
+                    >
+                      {aiInsightsCopied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-lime" />
+                          <span>COPIED BRIEFING!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>COPY BRIEFING</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAiInsightsReport(null)}
+                      className="btn-secondary py-1.5 px-3 text-[11px] font-mono font-bold cursor-pointer"
+                    >
+                      DISMISS
+                    </button>
+                  </div>
+                </div>
+
+                <div className="font-mono text-xs text-ink leading-relaxed whitespace-pre-wrap bg-cream-light p-4 border-2 border-ink shadow-inner">
+                  {aiInsightsReport.summary}
+                </div>
+              </div>
+            )}
 
             {/* Search Filter */}
             <div className="flex gap-2 font-mono">
@@ -2526,13 +2631,24 @@ export function AdminDashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold uppercase mb-1">Description</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold uppercase">Description</label>
+                    <button
+                      type="button"
+                      onClick={handleGenerateProductCopy}
+                      disabled={generatingProductCopy || !newProdName.trim()}
+                      className="text-[10px] font-mono font-bold text-ink bg-lime border border-ink px-2 py-0.5 shadow-brutal-xs hover:translate-x-0.5 hover:translate-y-0.5 flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                    >
+                      <Sparkles className="w-3 h-3 text-coral" />
+                      <span>{generatingProductCopy ? "Drafting..." : "✨ AI Auto-Write"}</span>
+                    </button>
+                  </div>
                   <textarea
                     value={newProdDesc}
                     onChange={(e) => setNewProdDesc(e.target.value)}
-                    rows={3}
+                    rows={4}
                     placeholder="Detailed specifications, joint mechanics, desk styling..."
-                    className="w-full bg-cream-light border-2 border-ink p-2"
+                    className="w-full bg-cream-light border-2 border-ink p-2 text-xs"
                   />
                 </div>
 

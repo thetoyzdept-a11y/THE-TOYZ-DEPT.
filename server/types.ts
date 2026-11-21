@@ -14,6 +14,7 @@ export interface Env {
   SHIPROCKET_PICKUP_LOCATION?: string;
   RESEND_API_KEY?: string;
   GOOGLE_CLIENT_ID?: string;
+  OPENAI_API_KEY?: string;
   ASSETS?: Fetcher;
 }
 

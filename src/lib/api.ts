@@ -198,4 +198,29 @@ export const api = {
       `/admin/surveys/${id}/toggle-winner`,
       { method: "PATCH" }
     ),
+
+  // OpenAI AI Features (gpt-4o-mini)
+  sendAiChat: (messages: Array<{ role: string; content: string }>, context?: any) =>
+    request<{ success: boolean; reply: string; model: string }>("/ai/chat", {
+      method: "POST",
+      body: JSON.stringify({ messages, context }),
+    }),
+  sparkAiSurveyIdea: (prompt?: string, favoriteCategory?: string) =>
+    request<{
+      success: boolean;
+      idea: { title: string; concept: string; suggestedColors: string; tag: string };
+    }>("/ai/survey-spark", {
+      method: "POST",
+      body: JSON.stringify({ prompt, favoriteCategory }),
+    }),
+  getAdminAiSurveyInsights: () =>
+    request<{ success: boolean; totalAnalyzed: number; summary: string }>(
+      "/ai/admin-survey-insights",
+      { method: "POST" }
+    ),
+  generateProductCopy: (data: { name: string; category?: string; material?: string }) =>
+    request<{ success: boolean; description: string }>("/ai/product-copy", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
