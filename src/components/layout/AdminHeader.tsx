@@ -77,20 +77,8 @@ export function AdminHeader() {
 
       {/* ── Main Admin Navigation Bar ─────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b-2 border-ink shadow-sm transition-all">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-18 gap-2">
-            {/* Mobile / Tablet Admin Menu Trigger */}
-            <div className="flex items-center lg:hidden flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => setAdminMenuOpen(true)}
-                className="p-2 -ml-1 text-ink hover:bg-cream-dark border-2 border-ink transition-colors cursor-pointer"
-                aria-label="Open Admin Menu"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-            </div>
-
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 gap-4">
             {/* Admin Brand Treatment (Guaranteed Never Wrap) */}
             <div className="flex items-center gap-3 flex-shrink-0">
               <Link to="/admin?tab=overview" className="group flex items-center gap-2.5 flex-shrink-0 whitespace-nowrap">
@@ -113,39 +101,23 @@ export function AdminHeader() {
               </Link>
             </div>
 
-            {/* Desktop Module Tabs (Fluid Horizontal Scrollable Strip with zero wrap) */}
-            <nav className="hidden lg:flex flex-1 min-w-0 mx-2 xl:mx-4 overflow-x-auto no-scrollbar items-center justify-center gap-1 py-1 whitespace-nowrap">
-              {navModules.map((mod) => {
-                const Icon = mod.icon;
-                const isActive = currentTab === mod.id;
-                return (
-                  <button
-                    key={mod.id}
-                    onClick={() => handleSelectModule(mod.id)}
-                    className={`px-2.5 py-1.5 border-2 text-[11px] font-mono font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0 whitespace-nowrap ${
-                      isActive
-                        ? "bg-ink text-lime border-ink shadow-brutal-sm"
-                        : "bg-cream text-ink border-transparent hover:border-ink hover:bg-cream-dark"
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span>{mod.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+            {/* Center Status Pill */}
+            <div className="hidden md:flex items-center gap-2 font-mono text-xs text-ink-muted">
+              <span className="w-2 h-2 rounded-full bg-lime border border-ink" />
+              <span className="uppercase font-bold tracking-wider text-ink text-[11px]">ADMINISTRATIVE CONSOLE</span>
+            </div>
 
             {/* Right Action Utilities */}
-            <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 whitespace-nowrap">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 whitespace-nowrap">
               {/* Jump to Public Storefront */}
               <Link
                 to="/"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-lime text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-sm hover:bg-ink hover:text-lime transition-all flex-shrink-0 whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lime text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-sm hover:bg-ink hover:text-lime transition-all flex-shrink-0 whitespace-nowrap"
                 title="Preview public storefront in new tab"
               >
-                <span>Store</span>
+                <span>Storefront View</span>
                 <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
               </Link>
 

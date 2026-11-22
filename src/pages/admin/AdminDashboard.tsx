@@ -700,72 +700,56 @@ export function AdminDashboardPage() {
   if (!isAdmin) return null;
 
   return (
-    <div className="bg-cream min-h-screen py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ── Admin Header ────────────────────────────────────────────── */}
-        <div className="bg-ink text-cream p-6 border-2 border-ink shadow-brutal-xl mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-lime text-ink flex items-center justify-center font-black text-xl border-2 border-ink shadow-brutal-sm">
-              <Shield className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-display font-black text-2xl uppercase tracking-wider text-cream">
-                  Operations Control
-                </h1>
-                <span className="badge-lime text-[10px]">ADMIN VERIFIED</span>
-              </div>
-              <p className="font-mono text-xs text-cream/60 uppercase">
-                THE TOYZ DEPT. // Production & Commerce Console
-              </p>
-            </div>
+    <div className="bg-cream min-h-screen py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* ── Single Unified Admin Navigation Bar ─────────────────────── */}
+        <div className="flex items-center justify-between gap-4 border-b-2 border-ink pb-3 flex-wrap">
+          {/* Scrollable Module Tabs */}
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar font-mono font-bold text-xs uppercase tracking-wider flex-1 min-w-0">
+            {[
+              { id: "overview", label: "Overview", icon: DollarSign },
+              { id: "ledger", label: `Balance Sheet (${transactions.length})`, icon: ArrowLeftRight },
+              { id: "orders", label: `Orders (${orders.length})`, icon: Package },
+              { id: "products", label: `Products (${products.length})`, icon: Layers },
+              { id: "coupons", label: `Coupons (${coupons.length})`, icon: Tag },
+              { id: "surveys", label: `Surveys (${surveys.length})`, icon: Gift },
+              { id: "inventory", label: "Inventory", icon: Sliders },
+              { id: "inquiries", label: `Inquiries (${inquiries.length + grievances.length})`, icon: Mail },
+              { id: "security", label: "Security", icon: ShieldCheck },
+              { id: "customers", label: `Customers (${customers.length})`, icon: Users },
+              { id: "settings", label: "Settings", icon: Settings },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeModule === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveModule(tab.id as any)}
+                  className={`px-3 py-2 border-2 flex items-center gap-1.5 flex-shrink-0 transition-all cursor-pointer whitespace-nowrap ${
+                    isActive
+                      ? "bg-ink text-lime border-ink shadow-brutal-sm"
+                      : "bg-cream-light text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? "text-lime" : ""}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="flex items-center gap-3">
-            <Link to="/" className="px-3 py-2 bg-cream text-ink text-xs font-mono font-bold uppercase hover:bg-lime transition-colors border border-cream">
-              Storefront View
-            </Link>
+          {/* Quick Ops Controls */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={loadAllAdminData}
-              className="p-2 bg-cream/10 hover:bg-cream/20 text-cream border border-cream/30 text-xs font-mono uppercase flex items-center gap-1.5 cursor-pointer"
+              disabled={loading}
+              className="px-3 py-2 bg-cream text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-xs hover:bg-lime transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Reload live database metrics"
             >
-              <RefreshCw className="w-4 h-4" /> Refresh Live Ops
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Refresh Ops</span>
             </button>
           </div>
-        </div>
-
-        {/* ── Navigation Tabs ─────────────────────────────────────────── */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-6 font-display font-bold text-xs uppercase tracking-wider">
-          {[
-            { id: "overview", label: "Overview & Revenue", icon: DollarSign },
-            { id: "ledger", label: `Balance Sheet (${transactions.length})`, icon: ArrowLeftRight },
-            { id: "orders", label: `Orders (${orders.length})`, icon: Package },
-            { id: "products", label: `Products (${products.length})`, icon: Layers },
-            { id: "coupons", label: `Coupons (${coupons.length})`, icon: Tag },
-            { id: "surveys", label: `Surveys & Raffle (${surveys.length})`, icon: Gift },
-            { id: "inventory", label: "Inventory & Stock", icon: Sliders },
-            { id: "inquiries", label: `Inquiries (${inquiries.length + grievances.length})`, icon: Mail },
-            { id: "security", label: "Security & Passwords", icon: ShieldCheck },
-            { id: "customers", label: `Customers (${customers.length})`, icon: Users },
-            { id: "settings", label: "Store Settings", icon: Settings },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeModule === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveModule(tab.id as any)}
-                className={`px-4 py-2.5 border-2 flex items-center gap-2 flex-shrink-0 transition-all cursor-pointer ${
-                  isActive
-                    ? "bg-ink text-cream border-ink shadow-brutal-sm"
-                    : "bg-cream-light text-ink border-ink hover:bg-cream-dark"
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${isActive ? "text-lime" : ""}`} />
-                {tab.label}
-              </button>
-            );
-          })}
         </div>
 
         {/* ── MODULE 1: OVERVIEW & ANALYTICS ──────────────────────────── */}

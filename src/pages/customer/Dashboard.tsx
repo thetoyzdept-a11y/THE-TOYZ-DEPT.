@@ -202,162 +202,82 @@ export function CustomerDashboardPage() {
   return (
     <div className="bg-cream min-h-screen py-10 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* ── Dashboard Header ────────────────────────────────────────── */}
-        <div className="border-b-2 border-ink pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="badge-lime text-xs">Customer Command Center</span>
-              <span className="badge-ink text-[10px] font-mono">Member ID: {user.id.slice(0, 10)}</span>
+        {/* ── Customer Account Header ─────────────────────────────────── */}
+        <div className="border-b-2 border-ink pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-ink border-2 border-ink text-lime flex items-center justify-center font-display font-black text-xl shadow-brutal-sm flex-shrink-0">
+              {displayName.slice(0, 2).toUpperCase()}
             </div>
-            <h1 className="font-display font-black text-3xl sm:text-4xl uppercase tracking-tight">
-              Welcome, {displayName}
-            </h1>
-            <p className="font-mono text-xs text-ink-muted uppercase mt-0.5">
-              Account: {user.email} • Priority Dispatch Active
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight">
+                  {displayName}
+                </h1>
+                <span className="badge-lime text-[10px] font-mono font-bold">VERIFIED COLLECTOR</span>
+              </div>
+              <p className="font-mono text-xs text-ink-muted">
+                {user.email} • Priority Dispatch Active
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <Link
+              to="/shop"
+              className="px-3 py-2 bg-cream text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-xs hover:bg-lime transition-all inline-flex items-center gap-1.5"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>Shop Drops</span>
+            </Link>
             {isAdmin && (
-              <Link to="/admin" className="btn-dark text-xs py-2 px-3">
-                <Shield className="w-3.5 h-3.5 text-lime" /> Admin Portal
+              <Link
+                to="/admin"
+                className="px-3 py-2 bg-ink text-lime border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-xs hover:bg-lime hover:text-ink transition-all inline-flex items-center gap-1.5"
+              >
+                <Shield className="w-3.5 h-3.5 text-coral" />
+                <span>Admin Console</span>
               </Link>
             )}
             <button
               onClick={() => logout()}
-              className="px-3 py-2 border-2 border-ink bg-cream-light hover:bg-coral hover:text-cream text-xs font-mono font-bold uppercase transition-colors"
+              className="px-3 py-2 border-2 border-ink bg-cream hover:bg-coral hover:text-cream text-xs font-mono font-bold uppercase transition-colors inline-flex items-center gap-1.5 cursor-pointer"
             >
-              Sign Out
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
 
-        {/* ── Customer Quick Metrics Overview ──────────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div
-            onClick={() => handleTabChange("orders")}
-            className="card-brutal p-4 bg-cream-light cursor-pointer hover:bg-lime/20 transition-all font-mono"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <Package className="w-4 h-4 text-ink-muted" />
-              <span className="text-xl font-display font-black text-ink">{orders.length}</span>
-            </div>
-            <p className="text-[10px] uppercase font-bold text-ink">Total Orders</p>
-            <p className="text-[9px] text-ink-muted">Invoices & Shipments</p>
-          </div>
-
-          <div
-            onClick={() => handleTabChange("wishlist")}
-            className="card-brutal p-4 bg-cream-light cursor-pointer hover:bg-lime/20 transition-all font-mono"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <Heart className="w-4 h-4 text-coral" />
-              <span className="text-xl font-display font-black text-ink">{wishlist.length}</span>
-            </div>
-            <p className="text-[10px] uppercase font-bold text-ink">Saved Wishlist</p>
-            <p className="text-[9px] text-ink-muted">Bookmarked Objects</p>
-          </div>
-
-          <div
-            onClick={() => handleTabChange("support")}
-            className="card-brutal p-4 bg-lime/20 border-2 border-ink cursor-pointer hover:bg-lime/30 transition-all font-mono"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <Truck className="w-4 h-4 text-lime-darker" />
-              <span className="badge-lime text-[9px] uppercase">Free &gt; ₹999</span>
-            </div>
-            <p className="text-[10px] uppercase font-bold text-ink">Express Shipping</p>
-            <p className="text-[9px] text-ink-muted">Shiprocket Partner Network</p>
-          </div>
+        {/* ── Customer Navigation Tabs (Visible Exactly Once, Zero Duplication) ── */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 border-b-2 border-ink">
+          {[
+            { id: "orders", label: `Orders (${orders.length})`, icon: Package },
+            { id: "addresses", label: `Addresses (${addresses.length})`, icon: MapPin },
+            { id: "wishlist", label: `Wishlist (${wishlist.length})`, icon: Heart },
+            { id: "profile", label: "Profile Settings", icon: User },
+            { id: "support", label: "Help & Dispatch Support", icon: Truck },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id as any)}
+                className={`px-4 py-2.5 border-2 text-xs font-mono font-bold uppercase flex items-center gap-2 flex-shrink-0 transition-all cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? "bg-ink text-cream border-ink shadow-brutal-sm"
+                    : "bg-cream-light text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 ${isActive ? "text-lime" : ""}`} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* ── Main Dashboard Layout ──────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Navigation Sidebar */}
-          <div className="lg:col-span-3 space-y-4">
-            <div className="card-brutal p-2 bg-cream-light space-y-1 font-display font-bold text-xs uppercase tracking-wider">
-              <button
-                onClick={() => handleTabChange("orders")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
-                  activeTab === "orders" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Package className="w-4 h-4" /> Orders & Invoices
-                </span>
-                <span className="font-mono text-[10px]">{orders.length}</span>
-              </button>
-
-              <button
-                onClick={() => handleTabChange("addresses")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
-                  activeTab === "addresses" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" /> Saved Addresses
-                </span>
-                <span className="font-mono text-[10px]">{addresses.length}</span>
-              </button>
-
-              <button
-                onClick={() => handleTabChange("wishlist")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
-                  activeTab === "wishlist" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Heart className="w-4 h-4" /> Saved Wishlist
-                </span>
-                <span className="font-mono text-[10px]">{wishlist.length}</span>
-              </button>
-
-              <button
-                onClick={() => handleTabChange("profile")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
-                  activeTab === "profile" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <User className="w-4 h-4" /> Profile Info
-                </span>
-              </button>
-
-              <button
-                onClick={() => handleTabChange("support")}
-                className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-all cursor-pointer ${
-                  activeTab === "support" ? "bg-ink text-cream" : "hover:bg-cream-dark text-ink"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Truck className="w-4 h-4" /> Operations & Support
-                </span>
-              </button>
-            </div>
-
-            {/* Operations Hub Summary Card */}
-            <div className="card-brutal p-4 bg-cream-light font-mono text-[11px] space-y-2 border-2 border-ink">
-              <span className="badge-lime text-[9px] uppercase">Fulfillment Desk</span>
-              <p className="font-bold text-ink uppercase">{BUSINESS_PROFILE.brandName}</p>
-              <p className="text-ink-muted text-[10px] leading-tight">
-                Dispatches from: {BUSINESS_PROFILE.address.city}, {BUSINESS_PROFILE.address.state}
-              </p>
-              <div className="pt-2 border-t border-ink/20 space-y-1">
-                <a
-                  href={`mailto:${BUSINESS_PROFILE.contact.email}`}
-                  className="flex items-center gap-1.5 text-lime-darker font-bold hover:underline"
-                >
-                  <Mail className="w-3 h-3" /> {BUSINESS_PROFILE.contact.email}
-                </a>
-                <p className="flex items-center gap-1.5 text-ink-muted text-[10px]">
-                  <Clock className="w-3 h-3" /> {BUSINESS_PROFILE.contact.supportHours}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tab Content Display Area */}
-          <div className="lg:col-span-9">
+        {/* Tab Content Display Area (Full Width, Spacious) */}
+        <div className="w-full">
             {/* ── 1. Orders Tab ─────────────────────────────────────── */}
             {activeTab === "orders" && (
               <div className="space-y-6">
@@ -759,7 +679,6 @@ export function CustomerDashboardPage() {
                 </div>
               </div>
             )}
-          </div>
         </div>
 
         {/* ── MODAL: ORDER DETAILS & RECEIPT ──────────────────────────── */}
