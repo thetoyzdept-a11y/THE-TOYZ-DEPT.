@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
-  Shield,
   Package,
   Layers,
   Sliders,
@@ -18,6 +17,7 @@ import {
   ChevronRight,
   Tag,
   Gift,
+  ArrowLeftRight,
 } from "lucide-react";
 
 export function AdminHeader() {
@@ -36,6 +36,7 @@ export function AdminHeader() {
 
   const navModules = [
     { id: "overview", label: "Overview", icon: DollarSign },
+    { id: "ledger", label: "Balance Sheet", icon: ArrowLeftRight },
     { id: "orders", label: "Orders", icon: Package },
     { id: "products", label: "Products", icon: Layers },
     { id: "coupons", label: "Coupons", icon: Tag },
@@ -56,9 +57,9 @@ export function AdminHeader() {
     <>
       {/* ── Top Ops Status Bar ────────────────────────────────────────── */}
       <div className="bg-ink text-cream py-1.5 px-4 border-b-2 border-ink flex items-center justify-between font-mono text-[11px] uppercase tracking-wider select-none overflow-x-auto whitespace-nowrap">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 text-lime font-bold">
-            <span className="w-2 h-2 rounded-full bg-lime animate-pulse border border-ink" />
+        <div className="flex items-center gap-4 flex-shrink-0">
+          <span className="flex items-center gap-1.5 text-lime font-bold flex-shrink-0">
+            <span className="w-2 h-2 rounded-full bg-lime animate-pulse border border-ink flex-shrink-0" />
             OPS RUNTIME: PRODUCTION
           </span>
           <span className="text-cream/50">•</span>
@@ -68,52 +69,52 @@ export function AdminHeader() {
           <span className="text-cream/50">•</span>
           <span className="text-cream/80">Razorpay Live</span>
         </div>
-        <div className="hidden sm:flex items-center gap-3 text-cream/70">
-          <span className="badge-coral text-[9px] py-0 px-1 font-bold">ADMIN CONSOLE</span>
-          <span>{user?.email}</span>
+        <div className="hidden md:flex items-center gap-3 text-cream/70 flex-shrink-0">
+          <span className="badge-coral text-[9px] py-0.5 px-1.5 font-bold">ADMIN CONSOLE</span>
+          <span className="font-mono text-xs">{user?.email}</span>
         </div>
       </div>
 
       {/* ── Main Admin Navigation Bar ─────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b-2 border-ink shadow-sm transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-18">
-            {/* Mobile Admin Menu Trigger */}
-            <div className="flex items-center xl:hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-18 gap-2">
+            {/* Mobile / Tablet Admin Menu Trigger */}
+            <div className="flex items-center lg:hidden flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setAdminMenuOpen(true)}
-                className="p-2 -ml-2 text-ink hover:bg-cream-dark border-2 border-transparent hover:border-ink transition-colors cursor-pointer"
+                className="p-2 -ml-1 text-ink hover:bg-cream-dark border-2 border-ink transition-colors cursor-pointer"
                 aria-label="Open Admin Menu"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Admin Brand Treatment */}
-            <div className="flex items-center gap-3">
-              <Link to="/admin?tab=overview" className="group flex items-center gap-2.5">
-                <div className="w-8 h-8 md:w-9 md:h-9 bg-ink border-2 border-ink flex items-center justify-center text-lime font-display font-black text-lg shadow-brutal-sm group-hover:bg-lime group-hover:text-ink transition-all">
+            {/* Admin Brand Treatment (Guaranteed Never Wrap) */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <Link to="/admin?tab=overview" className="group flex items-center gap-2.5 flex-shrink-0 whitespace-nowrap">
+                <div className="w-9 h-9 bg-ink border-2 border-ink flex items-center justify-center text-lime font-display font-black text-lg shadow-brutal-sm group-hover:bg-lime group-hover:text-ink transition-all flex-shrink-0">
                   T
                 </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-display font-black text-lg md:text-xl tracking-tighter uppercase leading-none">
+                <div className="flex flex-col flex-shrink-0 whitespace-nowrap">
+                  <div className="flex items-center gap-1.5 whitespace-nowrap">
+                    <span className="font-display font-black text-lg sm:text-xl tracking-tighter uppercase leading-none whitespace-nowrap">
                       THE TOYZ DEPT<span className="text-coral">.</span>
                     </span>
-                    <span className="badge-coral text-[9px] py-0 px-1.5 font-bold uppercase font-mono">
+                    <span className="badge-coral text-[9px] py-0.5 px-1.5 font-bold uppercase font-mono flex-shrink-0">
                       OPS
                     </span>
                   </div>
-                  <span className="font-mono text-[9px] tracking-widest text-ink-muted uppercase font-bold">
+                  <span className="font-mono text-[9px] tracking-widest text-ink-muted uppercase font-bold whitespace-nowrap leading-tight mt-0.5">
                     OPERATIONS CONTROL CENTER
                   </span>
                 </div>
               </Link>
             </div>
 
-            {/* Desktop Module Tabs (Zero clutter, direct 1-click access) */}
-            <nav className="hidden xl:flex items-center gap-1 font-mono text-xs font-bold uppercase">
+            {/* Desktop Module Tabs (Fluid Horizontal Scrollable Strip with zero wrap) */}
+            <nav className="hidden lg:flex flex-1 min-w-0 mx-2 xl:mx-4 overflow-x-auto no-scrollbar items-center justify-center gap-1 py-1 whitespace-nowrap">
               {navModules.map((mod) => {
                 const Icon = mod.icon;
                 const isActive = currentTab === mod.id;
@@ -121,13 +122,13 @@ export function AdminHeader() {
                   <button
                     key={mod.id}
                     onClick={() => handleSelectModule(mod.id)}
-                    className={`px-3 py-1.5 border-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-2.5 py-1.5 border-2 text-[11px] font-mono font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0 whitespace-nowrap ${
                       isActive
                         ? "bg-ink text-lime border-ink shadow-brutal-sm"
                         : "bg-cream text-ink border-transparent hover:border-ink hover:bg-cream-dark"
                     }`}
                   >
-                    <Icon className="w-3.5 h-3.5" />
+                    <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                     <span>{mod.label}</span>
                   </button>
                 );
@@ -135,26 +136,26 @@ export function AdminHeader() {
             </nav>
 
             {/* Right Action Utilities */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 whitespace-nowrap">
               {/* Jump to Public Storefront */}
               <Link
                 to="/"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lime text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-sm hover:bg-ink hover:text-lime transition-all"
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-lime text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-sm hover:bg-ink hover:text-lime transition-all flex-shrink-0 whitespace-nowrap"
                 title="Preview public storefront in new tab"
               >
-                <span>View Store</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Store</span>
+                <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
               </Link>
 
               {/* Sign Out */}
               <button
                 onClick={() => logout()}
-                className="p-1.5 sm:px-3 sm:py-1.5 border-2 border-ink bg-cream hover:bg-coral hover:text-cream text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="p-1.5 sm:px-3 sm:py-1.5 border-2 border-ink bg-cream hover:bg-coral hover:text-cream text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 cursor-pointer flex-shrink-0 whitespace-nowrap"
                 title="Sign out of operations console"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
@@ -164,7 +165,7 @@ export function AdminHeader() {
 
       {/* ── Admin Mobile Navigation Drawer ───────────────────────────── */}
       {adminMenuOpen && (
-        <div className="fixed inset-0 z-50 xl:hidden flex">
+        <div className="fixed inset-0 z-50 lg:hidden flex">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-ink/75 backdrop-blur-xs"
@@ -234,7 +235,7 @@ export function AdminHeader() {
                   logout();
                   setAdminMenuOpen(false);
                 }}
-                className="w-full text-center text-xs font-mono font-bold uppercase text-coral hover:bg-coral hover:text-cream border border-ink py-2 transition-colors"
+                className="w-full text-center text-xs font-mono font-bold uppercase text-coral hover:bg-coral hover:text-cream border border-ink py-2 transition-colors cursor-pointer"
               >
                 Sign Out of Ops
               </button>

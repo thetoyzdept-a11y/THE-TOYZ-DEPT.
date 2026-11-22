@@ -11,10 +11,28 @@ adminRouter.use("*", requireAdmin);
 
 // ── 1. Overview & Real Business Analytics ─────────────────────────────
 adminRouter.get("/overview", async (c) => {
-  // Real revenue calculated from captured payments
+  // Real revenue calculated strictly from captured sales minus refunds
   const revenueResult = await c.env.DB
-    .prepare("SELECT COALESCE(SUM(amount), 0) as total_revenue FROM payments WHERE status = 'captured'")
-    .first<{ total_revenue: number }>();
+    .prepare(`
+      SELECT 
+        COALESCE(SUM(CASE WHEN type = 'credit_order' THEN amount ELSE 0 END), 0) as gross_revenue,
+        COALESCE(SUM(CASE WHEN type = 'debit_refund' THEN amount ELSE 0 END), 0) as total_refunds
+      FROM financial_transactions
+    `)
+    .first<{ gross_revenue: number; total_refunds: number }>();
+
+  // Fallback to payments table if financial_transactions empty
+  let grossRevenue = revenueResult?.gross_revenue || 0;
+  let totalRefunds = revenueResult?.total_refunds || 0;
+
+  if (grossRevenue === 0) {
+    const paySum = await c.env.DB
+      .prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'captured'")
+      .first<{ total: number }>();
+    grossRevenue = paySum?.total || 0;
+  }
+
+  const netRevenue = Math.max(0, grossRevenue - totalRefunds);
 
   // Real order counts by status
   const orderStats = await c.env.DB
@@ -57,7 +75,9 @@ adminRouter.get("/overview", async (c) => {
 
   return c.json({
     metrics: {
-      totalRevenue: revenueResult?.total_revenue || 0,
+      totalRevenue: netRevenue,
+      grossRevenue,
+      totalRefunds,
       totalOrders: orderStats?.total_orders || 0,
       pendingOrders: orderStats?.pending_orders || 0,
       completedOrders: orderStats?.completed_orders || 0,
@@ -66,6 +86,48 @@ adminRouter.get("/overview", async (c) => {
       pendingCustomRequests: pendingCustomRequests?.count || 0,
     },
     recentOrders: recentOrders.results || [],
+  });
+});
+
+// GET /api/admin/transactions - Returns double-entry balance sheet & transaction ledger
+adminRouter.get("/transactions", async (c) => {
+  // Query all financial transactions in chronological order
+  const result = await c.env.DB
+    .prepare("SELECT * FROM financial_transactions ORDER BY created_at ASC")
+    .all<any>();
+
+  const rawTxList = result.results || [];
+  let runningBalance = 0;
+  let grossRevenue = 0;
+  let totalRefunds = 0;
+
+  const transactionsWithBalance = rawTxList.map((tx: any) => {
+    if (tx.type === "credit_order") {
+      runningBalance += tx.amount;
+      grossRevenue += tx.amount;
+    } else if (tx.type === "debit_refund") {
+      runningBalance -= tx.amount;
+      totalRefunds += tx.amount;
+    }
+    return {
+      ...tx,
+      runningBalance,
+    };
+  });
+
+  // Reverse to show newest transactions first with calculated running balances
+  const transactions = [...transactionsWithBalance].reverse();
+
+  return c.json({
+    summary: {
+      grossRevenue,
+      totalRefunds,
+      netSettledBalance: runningBalance,
+      totalTransactions: transactions.length,
+      creditCount: transactions.filter((t) => t.type === "credit_order").length,
+      debitCount: transactions.filter((t) => t.type === "debit_refund").length,
+    },
+    transactions,
   });
 });
 
@@ -379,16 +441,11 @@ adminRouter.patch("/orders/:id/status", async (c) => {
   }
 
   const currentOrder = await c.env.DB
-    .prepare("SELECT status FROM orders WHERE id = ?")
+    .prepare("SELECT * FROM orders WHERE id = ?")
     .bind(id)
-    .first<{ status: string }>();
+    .first<any>();
 
   if (!currentOrder) return c.json({ error: "Order not found" }, 404);
-
-  let shippedAtUpdate = "";
-  let deliveredAtUpdate = "";
-  if (status === "shipped") shippedAtUpdate = ", shipped_at = datetime('now')";
-  if (status === "delivered") deliveredAtUpdate = ", delivered_at = datetime('now')";
 
   await c.env.DB
     .prepare(`
@@ -396,13 +453,71 @@ adminRouter.patch("/orders/:id/status", async (c) => {
         status = ?,
         tracking_number = COALESCE(?, tracking_number),
         tracking_url = COALESCE(?, tracking_url),
+        shipped_at = CASE WHEN ? = 'shipped' THEN datetime('now') ELSE shipped_at END,
+        delivered_at = CASE WHEN ? = 'delivered' THEN datetime('now') ELSE delivered_at END,
+        payment_status = CASE WHEN ? = 'refunded' THEN 'refunded' ELSE payment_status END,
         updated_at = datetime('now')
-        ${shippedAtUpdate}
-        ${deliveredAtUpdate}
       WHERE id = ?
     `)
-    .bind(status, trackingNumber || null, trackingUrl || null, id)
+    .bind(status, trackingNumber || null, trackingUrl || null, status, status, status, id)
     .run();
+
+  // If refunding, record debit on balance sheet and restock
+  if (status === "refunded" && currentOrder.status !== "refunded") {
+    const refundId = "ref_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    await c.env.DB
+      .prepare("UPDATE payments SET status = 'refunded', refund_amount = amount, refund_id = ?, updated_at = datetime('now') WHERE order_id = ?")
+      .bind(refundId, id)
+      .run();
+
+    // Check if debit transaction already recorded
+    const existingDebit = await c.env.DB
+      .prepare("SELECT id FROM financial_transactions WHERE order_id = ? AND type = 'debit_refund'")
+      .bind(id)
+      .first();
+
+    if (!existingDebit) {
+      const txId = "tx_ref_" + crypto.randomUUID().replace(/-/g, "").slice(0, 14);
+      await c.env.DB
+        .prepare(`
+          INSERT INTO financial_transactions (
+            id, order_id, order_number, customer_name, customer_email, type, amount, gateway, gateway_refund_id, note
+          ) VALUES (?, ?, ?, ?, ?, 'debit_refund', ?, 'razorpay', ?, ?)
+        `)
+        .bind(
+          txId,
+          id,
+          currentOrder.order_number,
+          currentOrder.shipping_name || "Customer",
+          currentOrder.shipping_email || null,
+          currentOrder.total_amount,
+          refundId,
+          note || `Refund issued for order #${currentOrder.order_number}`
+        )
+        .run()
+        .catch((e: any) => console.warn("Refund ledger record error:", e));
+    }
+
+    // Restock variant inventory
+    const items = await c.env.DB
+      .prepare("SELECT variant_id, product_id, quantity FROM order_items WHERE order_id = ?")
+      .bind(id)
+      .all<any>();
+
+    for (const it of (items.results || [])) {
+      if (it.variant_id) {
+        await c.env.DB
+          .prepare("UPDATE product_variants SET stock = stock + ?, updated_at = datetime('now') WHERE id = ?")
+          .bind(it.quantity, it.variant_id)
+          .run();
+      } else if (it.product_id) {
+        await c.env.DB
+          .prepare("UPDATE product_variants SET stock = stock + ?, updated_at = datetime('now') WHERE id = (SELECT id FROM product_variants WHERE product_id = ? AND is_active = 1 LIMIT 1)")
+          .bind(it.quantity, it.product_id)
+          .run();
+      }
+    }
+  }
 
   await c.env.DB
     .prepare(`
@@ -413,6 +528,107 @@ adminRouter.patch("/orders/:id/status", async (c) => {
     .run();
 
   return c.json({ message: "Order status updated successfully", status });
+});
+
+// POST /api/admin/orders/:id/refund - Process explicit refund & return
+adminRouter.post("/orders/:id/refund", async (c) => {
+  const adminUser = c.get("user")!;
+  const id = c.req.param("id");
+  const body = await c.req.json().catch(() => ({}));
+  const { reason, restock = true } = body;
+
+  const order = await c.env.DB
+    .prepare("SELECT * FROM orders WHERE id = ?")
+    .bind(id)
+    .first<any>();
+
+  if (!order) {
+    return c.json({ error: "Order not found" }, 404);
+  }
+
+  if (order.status === "refunded") {
+    return c.json({ error: "Order has already been refunded" }, 400);
+  }
+
+  const refundAmount = body.amount !== undefined ? parseInt(body.amount, 10) : order.total_amount;
+  if (isNaN(refundAmount) || refundAmount <= 0) {
+    return c.json({ error: "Invalid refund amount" }, 400);
+  }
+
+  const refundId = "ref_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+
+  // 1. Update order status and payment status
+  await c.env.DB
+    .prepare("UPDATE orders SET status = 'refunded', payment_status = 'refunded', updated_at = datetime('now') WHERE id = ?")
+    .bind(id)
+    .run();
+
+  // 2. Update payment record
+  await c.env.DB
+    .prepare("UPDATE payments SET status = 'refunded', refund_amount = ?, refund_id = ?, updated_at = datetime('now') WHERE order_id = ?")
+    .bind(refundAmount, refundId, id)
+    .run();
+
+  // 3. Record debit entry in financial ledger
+  const txId = "tx_ref_" + crypto.randomUUID().replace(/-/g, "").slice(0, 14);
+  await c.env.DB
+    .prepare(`
+      INSERT INTO financial_transactions (
+        id, order_id, order_number, customer_name, customer_email, type, amount, gateway, gateway_refund_id, note
+      ) VALUES (?, ?, ?, ?, ?, 'debit_refund', ?, 'razorpay', ?, ?)
+    `)
+    .bind(
+      txId,
+      id,
+      order.order_number,
+      order.shipping_name || "Customer",
+      order.shipping_email || null,
+      refundAmount,
+      refundId,
+      reason || `Refund issued for order #${order.order_number}`
+    )
+    .run();
+
+  // 4. Optionally restock inventory
+  if (restock) {
+    const items = await c.env.DB
+      .prepare("SELECT variant_id, product_id, quantity FROM order_items WHERE order_id = ?")
+      .bind(id)
+      .all<any>();
+
+    for (const it of (items.results || [])) {
+      if (it.variant_id) {
+        await c.env.DB
+          .prepare("UPDATE product_variants SET stock = stock + ?, updated_at = datetime('now') WHERE id = ?")
+          .bind(it.quantity, it.variant_id)
+          .run();
+      } else if (it.product_id) {
+        await c.env.DB
+          .prepare("UPDATE product_variants SET stock = stock + ?, updated_at = datetime('now') WHERE id = (SELECT id FROM product_variants WHERE product_id = ? AND is_active = 1 LIMIT 1)")
+          .bind(it.quantity, it.product_id)
+          .run();
+      }
+    }
+  }
+
+  // 5. Record order history
+  await c.env.DB
+    .prepare("INSERT INTO order_status_history (id, order_id, from_status, to_status, note, changed_by) VALUES (?, ?, ?, 'refunded', ?, ?)")
+    .bind(
+      "osh_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16),
+      id,
+      order.status,
+      `Refund processed: -₹${(refundAmount / 100).toFixed(2)}${reason ? " (" + reason + ")" : ""}`,
+      adminUser.userId
+    )
+    .run();
+
+  return c.json({
+    success: true,
+    message: `Refund of ₹${(refundAmount / 100).toFixed(2)} recorded successfully in balance sheet.`,
+    refundId,
+    refundAmount,
+  });
 });
 
 // ── 4. Custom 3D Printing Requests & Quotations ───────────────────────

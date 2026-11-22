@@ -13,6 +13,8 @@ interface CartItem {
   quantity: number;
   totalPrice: number;
   availableStock: number;
+  isOutOfStock?: boolean;
+  isStockExceeded?: boolean;
 }
 
 interface Cart {
@@ -26,6 +28,7 @@ interface Cart {
   total: number;
   freeShippingThreshold: number;
   amountToFreeShipping: number;
+  hasStockIssue?: boolean;
 }
 
 interface CartContextType {

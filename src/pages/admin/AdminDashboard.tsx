@@ -45,6 +45,9 @@ import {
   Sparkles,
   Award,
   Star,
+  ArrowLeftRight,
+  RotateCcw,
+  X,
 } from "lucide-react";
 
 export const STUDIO_PHOTO_PRESETS = [
@@ -82,6 +85,7 @@ export function AdminDashboardPage() {
   // Active Admin Module synced with URL search query and path
   const VALID_MODULES = [
     "overview",
+    "ledger",
     "orders",
     "products",
     "coupons",
@@ -148,6 +152,17 @@ export function AdminDashboardPage() {
   const [pickingWinner, setPickingWinner] = useState(false);
   const [winnerModal, setWinnerModal] = useState<any | null>(null);
   const [surveyActionLoading, setSurveyActionLoading] = useState<string | null>(null);
+
+  // Transactions & Ledger State (Double-Entry Balance Sheet)
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactionSummary, setTransactionSummary] = useState<any>(null);
+  const [ledgerSearch, setLedgerSearch] = useState("");
+  const [ledgerTypeFilter, setLedgerTypeFilter] = useState<"all" | "credit_order" | "debit_refund">("all");
+  const [refundModalOrder, setRefundModalOrder] = useState<any | null>(null);
+  const [refundAmountInput, setRefundAmountInput] = useState("");
+  const [refundReason, setRefundReason] = useState("");
+  const [refundRestock, setRefundRestock] = useState(true);
+  const [refundingLoading, setRefundingLoading] = useState(false);
   const [aiInsightsLoading, setAiInsightsLoading] = useState(false);
   const [aiInsightsReport, setAiInsightsReport] = useState<{ totalAnalyzed: number; summary: string } | null>(null);
   const [aiInsightsCopied, setAiInsightsCopied] = useState(false);
@@ -276,7 +291,7 @@ export function AdminDashboardPage() {
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
-      const [overviewRes, prodRes, ordRes, custReqRes, invRes, custRes, setRes, compRes, acctRes, cpnRes, srvRes] = await Promise.all([
+      const [overviewRes, prodRes, ordRes, custReqRes, invRes, custRes, setRes, compRes, acctRes, cpnRes, srvRes, txRes] = await Promise.all([
         api.getAdminOverview(),
         api.getAdminProducts(),
         api.getAdminOrders(),
@@ -288,6 +303,7 @@ export function AdminDashboardPage() {
         api.getAdminAccounts().catch(() => ({ admins: [] })),
         api.getAdminCoupons().catch(() => ({ coupons: [] })),
         api.getAdminSurveys().catch(() => ({ surveys: [], stats: null })),
+        api.getAdminTransactions().catch(() => ({ summary: null, transactions: [] })),
       ]);
 
       setMetrics(overviewRes.metrics);
@@ -304,10 +320,33 @@ export function AdminDashboardPage() {
       setCoupons(cpnRes.coupons || []);
       setSurveys(srvRes.surveys || []);
       setSurveyStats(srvRes.stats || null);
+      setTransactions(txRes?.transactions || []);
+      setTransactionSummary(txRes?.summary || null);
     } catch (err) {
       console.error("Admin data load error", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleProcessRefundSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!refundModalOrder) return;
+    setRefundingLoading(true);
+    try {
+      const amountPaise = Math.round(parseFloat(refundAmountInput) * 100);
+      const res = await api.refundAdminOrder(refundModalOrder.id, {
+        amount: amountPaise,
+        reason: refundReason,
+        restock: refundRestock,
+      });
+      alert(`Success! Refund processed.\n${res.message}`);
+      setRefundModalOrder(null);
+      await loadAllAdminData();
+    } catch (err: any) {
+      alert("Refund Error: " + err.message);
+    } finally {
+      setRefundingLoading(false);
     }
   };
 
@@ -699,6 +738,7 @@ export function AdminDashboardPage() {
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6 font-display font-bold text-xs uppercase tracking-wider">
           {[
             { id: "overview", label: "Overview & Revenue", icon: DollarSign },
+            { id: "ledger", label: `Balance Sheet (${transactions.length})`, icon: ArrowLeftRight },
             { id: "orders", label: `Orders (${orders.length})`, icon: Package },
             { id: "products", label: `Products (${products.length})`, icon: Layers },
             { id: "coupons", label: `Coupons (${coupons.length})`, icon: Tag },
@@ -715,7 +755,7 @@ export function AdminDashboardPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveModule(tab.id as any)}
-                className={`px-4 py-2.5 border-2 flex items-center gap-2 flex-shrink-0 transition-all ${
+                className={`px-4 py-2.5 border-2 flex items-center gap-2 flex-shrink-0 transition-all cursor-pointer ${
                   isActive
                     ? "bg-ink text-cream border-ink shadow-brutal-sm"
                     : "bg-cream-light text-ink border-ink hover:bg-cream-dark"
@@ -734,11 +774,23 @@ export function AdminDashboardPage() {
             {/* Metric KPI Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <div className="card-brutal p-5 bg-cream-light space-y-1">
-                <p className="font-mono text-xs uppercase text-ink-muted">Total Captured Revenue</p>
+                <p className="font-mono text-xs uppercase text-ink-muted font-bold">Net Settled Revenue</p>
                 <p className="font-display font-black text-2xl sm:text-3xl text-ink">
                   {formatINR(metrics.totalRevenue)}
                 </p>
-                <span className="badge-lime text-[10px]">Total Revenue 💰</span>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="badge-lime text-[10px] font-mono font-bold">PAID & SETTLED</span>
+                  <button
+                    onClick={() => setActiveModule("ledger" as any)}
+                    className="text-[10px] font-mono font-bold text-coral underline hover:text-ink cursor-pointer"
+                  >
+                    Ledger →
+                  </button>
+                </div>
+                <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-[10px] font-mono">
+                  <span className="text-lime-darker font-bold">+{formatINR(metrics.grossRevenue || metrics.totalRevenue)}</span>
+                  <span className="text-coral font-bold">-{formatINR(metrics.totalRefunds || 0)}</span>
+                </div>
               </div>
 
               <div className="card-brutal p-5 bg-cream-light space-y-1">
@@ -820,6 +872,238 @@ export function AdminDashboardPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODULE: BALANCE SHEET & FINANCIAL TRANSACTIONS LEDGER ────── */}
+        {activeModule === "ledger" && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-ink gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display font-black text-2xl uppercase">
+                    Financial Ledger & Balance Sheet
+                  </h2>
+                  <span className="badge-lime text-[10px]">AUDITED REAL-TIME</span>
+                </div>
+                <p className="font-mono text-xs text-ink-muted uppercase">
+                  Verified cashflow ledger: gross captured sales (+), processed refunds (-), and running net balance
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={loadAllAdminData}
+                  className="px-3.5 py-2 bg-cream text-ink border-2 border-ink font-mono text-xs font-bold uppercase shadow-brutal-sm hover:bg-lime transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Refresh Ledger</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Financial Summary KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {/* Gross Captured Sales */}
+              <div className="card-brutal p-5 bg-cream-light border-2 border-ink space-y-1">
+                <p className="font-mono text-xs uppercase text-ink-muted font-bold">Gross Captured Sales</p>
+                <p className="font-display font-black text-2xl sm:text-3xl text-ink">
+                  +{formatINR(transactionSummary?.grossRevenue || metrics?.grossRevenue || 0)}
+                </p>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="badge-lime text-[10px] font-mono font-bold">+ CREDIT (PAID)</span>
+                  <span className="font-mono text-[10px] text-ink-muted font-bold">{transactionSummary?.creditCount || 0} Orders</span>
+                </div>
+              </div>
+
+              {/* Total Returns & Refunds */}
+              <div className="card-brutal p-5 bg-cream-light border-2 border-ink space-y-1">
+                <p className="font-mono text-xs uppercase text-ink-muted font-bold">Returns & Refunds</p>
+                <p className="font-display font-black text-2xl sm:text-3xl text-coral">
+                  -{formatINR(transactionSummary?.totalRefunds || metrics?.totalRefunds || 0)}
+                </p>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="badge-coral text-[10px] font-mono font-bold">- DEBIT (RETURN)</span>
+                  <span className="font-mono text-[10px] text-ink-muted font-bold">{transactionSummary?.debitCount || 0} Debits</span>
+                </div>
+              </div>
+
+              {/* Net Settled Balance */}
+              <div className="card-brutal p-5 bg-ink text-cream border-2 border-ink space-y-1">
+                <p className="font-mono text-xs uppercase text-cream/70 font-bold">Net Settled Balance</p>
+                <p className="font-display font-black text-2xl sm:text-3xl text-lime">
+                  {formatINR(transactionSummary?.netSettledBalance || metrics?.totalRevenue || 0)}
+                </p>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="badge-lime text-[10px] font-mono font-bold">NET CASH</span>
+                  <span className="font-mono text-[10px] text-cream/60">Gross − Refunds</span>
+                </div>
+              </div>
+
+              {/* Completed Transactions */}
+              <div className="card-brutal p-5 bg-cream-light border-2 border-ink space-y-1">
+                <p className="font-mono text-xs uppercase text-ink-muted font-bold">Total Ledger Entries</p>
+                <p className="font-display font-black text-2xl sm:text-3xl text-ink">
+                  {transactions.length}
+                </p>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="font-mono text-[10px] text-ink-muted uppercase font-bold">100% PREPAID RAZORPAY</span>
+                  <span className="font-mono text-[10px] text-lime-darker font-bold">Settled</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter and Search Bar */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 flex items-center gap-2 bg-cream-light p-2.5 border-2 border-ink">
+                <Search className="w-4 h-4 text-ink-muted ml-1 flex-shrink-0" />
+                <input
+                  type="text"
+                  value={ledgerSearch}
+                  onChange={(e) => setLedgerSearch(e.target.value)}
+                  placeholder="Filter by Order # (e.g. TTD-2026-6330), customer name, or payment ID..."
+                  className="bg-transparent w-full font-mono text-xs focus:outline-none text-ink"
+                />
+                {ledgerSearch && (
+                  <button onClick={() => setLedgerSearch("")} className="text-xs font-mono font-bold text-coral px-2 cursor-pointer">Clear</button>
+                )}
+              </div>
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 font-mono text-xs">
+                {[
+                  { id: "all", label: `All (${transactions.length})` },
+                  { id: "credit_order", label: `Sales / Credits (${transactionSummary?.creditCount || 0})` },
+                  { id: "debit_refund", label: `Refunds / Debits (${transactionSummary?.debitCount || 0})` },
+                ].map((flt) => (
+                  <button
+                    key={flt.id}
+                    onClick={() => setLedgerTypeFilter(flt.id as any)}
+                    className={`px-3 py-2 text-[10px] uppercase font-bold border-2 transition-all flex-shrink-0 cursor-pointer ${
+                      ledgerTypeFilter === flt.id
+                        ? "bg-ink text-cream border-ink shadow-brutal-sm"
+                        : "bg-cream-light text-ink border-ink/40 hover:border-ink"
+                    }`}
+                  >
+                    {flt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Ledger Balance Sheet Table */}
+            <div className="card-brutal bg-cream-light overflow-x-auto border-2 border-ink">
+              <table className="w-full text-left font-mono text-xs">
+                <thead className="bg-cream border-b-2 border-ink text-ink-muted uppercase">
+                  <tr>
+                    <th className="p-3">Date & Time</th>
+                    <th className="p-3">Order Ref</th>
+                    <th className="p-3">Customer</th>
+                    <th className="p-3">Type</th>
+                    <th className="p-3">Gateway Ref</th>
+                    <th className="p-3 text-right">Transaction Amount</th>
+                    <th className="p-3 text-right">Running Net Balance</th>
+                    <th className="p-3">Audit Note</th>
+                    <th className="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ink/10">
+                  {transactions
+                    .filter((tx) => {
+                      const matchesType = ledgerTypeFilter === "all" || tx.type === ledgerTypeFilter;
+                      if (!ledgerSearch) return matchesType;
+                      const q = ledgerSearch.toLowerCase();
+                      const matchesSearch =
+                        (tx.order_number && tx.order_number.toLowerCase().includes(q)) ||
+                        (tx.customer_name && tx.customer_name.toLowerCase().includes(q)) ||
+                        (tx.customer_email && tx.customer_email.toLowerCase().includes(q)) ||
+                        (tx.gateway_payment_id && tx.gateway_payment_id.toLowerCase().includes(q)) ||
+                        (tx.gateway_refund_id && tx.gateway_refund_id.toLowerCase().includes(q)) ||
+                        (tx.note && tx.note.toLowerCase().includes(q));
+                      return matchesType && matchesSearch;
+                    })
+                    .map((tx) => (
+                      <tr key={tx.id} className="hover:bg-cream/50 transition-colors">
+                        <td className="p-3 text-[11px] text-ink-muted whitespace-nowrap">
+                          {formatDate(tx.created_at)}
+                        </td>
+                        <td className="p-3 font-bold">
+                          <button
+                            onClick={() => {
+                              if (tx.order_id) handleViewOrderDetails(tx.order_id);
+                            }}
+                            className="text-ink hover:text-coral underline font-bold cursor-pointer"
+                          >
+                            {tx.order_number}
+                          </button>
+                        </td>
+                        <td className="p-3">
+                          <p className="font-bold text-ink">{tx.customer_name || "Customer"}</p>
+                          <p className="text-[10px] text-ink-muted">{tx.customer_email}</p>
+                        </td>
+                        <td className="p-3 whitespace-nowrap">
+                          {tx.type === "credit_order" ? (
+                            <span className="badge-lime text-[10px] font-bold py-0.5 px-2 inline-flex items-center gap-1">
+                              + CREDIT: SALE
+                            </span>
+                          ) : (
+                            <span className="badge-coral text-[10px] font-bold py-0.5 px-2 inline-flex items-center gap-1">
+                              - DEBIT: REFUND
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-3 text-[11px] text-ink-muted font-mono whitespace-nowrap">
+                          {tx.gateway_payment_id ? (
+                            <span className="text-lime-darker font-bold">{tx.gateway_payment_id}</span>
+                          ) : tx.gateway_refund_id ? (
+                            <span className="text-coral font-bold">{tx.gateway_refund_id}</span>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                        <td className="p-3 text-right font-bold text-sm whitespace-nowrap">
+                          {tx.type === "credit_order" ? (
+                            <span className="text-lime-darker font-display font-black">
+                              +{formatINR(tx.amount)}
+                            </span>
+                          ) : (
+                            <span className="text-coral font-display font-black">
+                              -{formatINR(tx.amount)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-3 text-right font-display font-black text-sm text-ink whitespace-nowrap">
+                          {formatINR(tx.runningBalance)}
+                        </td>
+                        <td className="p-3 text-[11px] text-ink-muted max-w-xs truncate" title={tx.note}>
+                          {tx.note || "Standard transaction"}
+                        </td>
+                        <td className="p-3 text-right whitespace-nowrap">
+                          {tx.type === "credit_order" && (
+                            <button
+                              onClick={() => {
+                                const relatedOrder = orders.find((o) => o.id === tx.order_id || o.order_number === tx.order_number);
+                                setRefundModalOrder(relatedOrder || { id: tx.order_id, order_number: tx.order_number, total_amount: tx.amount, shipping_name: tx.customer_name, shipping_email: tx.customer_email });
+                                setRefundAmountInput(((tx.amount || 0) / 100).toString());
+                                setRefundReason("");
+                                setRefundRestock(true);
+                              }}
+                              className="px-2 py-1 bg-coral/10 text-coral hover:bg-coral hover:text-white text-[10px] uppercase font-bold border border-coral inline-flex items-center gap-1 cursor-pointer transition-colors"
+                              title="Process return / refund"
+                            >
+                              <RotateCcw className="w-3 h-3" /> Refund
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              {transactions.length === 0 && (
+                <div className="p-12 text-center text-ink-muted font-mono text-xs">
+                  No financial transactions recorded yet. Transactions will automatically appear here once payments are captured.
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1148,6 +1432,20 @@ export function AdminDashboardPage() {
                           >
                             Status
                           </button>
+                          {ord.status !== "refunded" && (ord.payment_status === "captured" || ord.status !== "pending") && (
+                            <button
+                              onClick={() => {
+                                setRefundModalOrder(ord);
+                                setRefundAmountInput(((ord.total_amount || 0) / 100).toString());
+                                setRefundReason("");
+                                setRefundRestock(true);
+                              }}
+                              className="px-2 py-1 bg-coral/10 text-coral hover:bg-coral hover:text-white text-[10px] uppercase font-bold border border-coral inline-flex items-center gap-1 cursor-pointer transition-colors"
+                              title="Process return & refund"
+                            >
+                              <RotateCcw className="w-3 h-3" /> Refund
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -3369,6 +3667,121 @@ export function AdminDashboardPage() {
                     className="btn-secondary py-2 text-xs uppercase"
                   >
                     Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── Refund & Return Processing Modal ── */}
+        {refundModalOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/75 backdrop-blur-xs">
+            <div className="relative w-full max-w-lg bg-cream border-2 border-ink shadow-brutal-xl p-6 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b-2 border-ink">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-coral text-cream flex items-center justify-center font-bold border border-ink">
+                    <RotateCcw className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-lg uppercase leading-tight">
+                      Issue Customer Return & Refund
+                    </h3>
+                    <p className="font-mono text-[10px] text-ink-muted uppercase">
+                      Order #{refundModalOrder.order_number}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setRefundModalOrder(null)}
+                  className="p-1.5 hover:bg-cream-dark border border-ink cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-3 bg-coral/10 border-2 border-coral font-mono text-xs space-y-1">
+                <p className="font-bold text-coral-dark uppercase">Balance Sheet Impact:</p>
+                <p className="text-ink text-[11px]">
+                  Confirming this action will immediately deduct the refund amount from your total net revenue balance sheet, update the order status to &quot;Refunded&quot;, and log a debit transaction.
+                </p>
+              </div>
+
+              <form onSubmit={handleProcessRefundSubmit} className="space-y-4 font-mono text-xs">
+                <div>
+                  <label className="block font-bold uppercase text-ink mb-1">
+                    Customer Name & Email:
+                  </label>
+                  <input
+                    type="text"
+                    disabled
+                    value={`${refundModalOrder.shipping_name || "Customer"} (${refundModalOrder.shipping_email || refundModalOrder.customer_email || "N/A"})`}
+                    className="w-full bg-cream-light border border-ink px-3 py-2 text-ink opacity-80"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase text-ink mb-1">
+                    Refund Amount (₹ INR):
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2 font-bold text-ink">₹</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="1"
+                      required
+                      value={refundAmountInput}
+                      onChange={(e) => setRefundAmountInput(e.target.value)}
+                      className="w-full bg-cream border-2 border-ink pl-7 pr-3 py-2 font-mono font-bold text-ink focus:outline-none focus:border-coral"
+                    />
+                  </div>
+                  <p className="text-[10px] text-ink-muted mt-0.5">
+                    Full Order Total: {formatINR(refundModalOrder.total_amount || 0)}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase text-ink mb-1">
+                    Reason for Return / Refund:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 48h unboxing defect reported / Transit damage / Customer cancellation"
+                    value={refundReason}
+                    onChange={(e) => setRefundReason(e.target.value)}
+                    className="w-full bg-cream border border-ink px-3 py-2 text-ink focus:outline-none focus:border-ink"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 p-2 bg-cream-light border border-ink">
+                  <input
+                    type="checkbox"
+                    id="refundRestockCheck"
+                    checked={refundRestock}
+                    onChange={(e) => setRefundRestock(e.target.checked)}
+                    className="w-4 h-4 cursor-pointer"
+                  />
+                  <label htmlFor="refundRestockCheck" className="text-xs cursor-pointer select-none">
+                    <strong>Restock item units</strong> back into studio inventory (+stock)
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t-2 border-ink">
+                  <button
+                    type="button"
+                    onClick={() => setRefundModalOrder(null)}
+                    className="px-4 py-2 bg-cream border border-ink hover:bg-cream-dark uppercase font-bold cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={refundingLoading}
+                    className="px-4 py-2 bg-coral text-white border-2 border-ink hover:bg-ink font-bold uppercase shadow-brutal-sm cursor-pointer disabled:opacity-50"
+                  >
+                    {refundingLoading ? "Processing Refund..." : `Confirm Refund (-₹${refundAmountInput})`}
                   </button>
                 </div>
               </form>

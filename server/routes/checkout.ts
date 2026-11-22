@@ -62,13 +62,15 @@ checkoutRouter.post("/create-order", async (c) => {
 
     const shipping = parsed.data;
 
-    // Get Cart Items directly from database to enforce server-authoritative pricing!
+    // Get Cart Items directly from database to enforce server-authoritative pricing & inventory!
     const itemsResult = await c.env.DB
       .prepare(`
         SELECT 
           ci.id, ci.product_id, ci.variant_id, ci.quantity,
           p.name as product_name, p.base_price,
-          v.name as variant_name, v.price_modifier, v.stock
+          COALESCE(v.name, 'Standard') as variant_name, 
+          COALESCE(v.price_modifier, 0) as price_modifier,
+          COALESCE(v.stock, (SELECT stock FROM product_variants WHERE product_id = p.id AND is_active = 1 LIMIT 1), 0) as stock
         FROM cart_items ci
         JOIN products p ON ci.product_id = p.id
         LEFT JOIN product_variants v ON ci.variant_id = v.id
@@ -84,10 +86,17 @@ checkoutRouter.post("/create-order", async (c) => {
 
     // Verify stock for all items
     for (const item of items) {
-      if (item.stock !== null && item.stock < item.quantity) {
+      const available = Math.max(0, typeof item.stock === "number" ? item.stock : 0);
+      if (available <= 0) {
         return c.json({
           error: "Stock unavailable",
-          message: `Item "${item.product_name} (${item.variant_name || "Standard"})" is out of stock.`,
+          message: `"${item.product_name}" is currently out of stock. Please remove it from your tray to proceed.`,
+        }, 400);
+      }
+      if (available < item.quantity) {
+        return c.json({
+          error: "Stock unavailable",
+          message: `"${item.product_name}" only has ${available} unit${available === 1 ? "" : "s"} available in studio stock, but you requested ${item.quantity}. Please update your tray.`,
         }, 400);
       }
     }
@@ -331,9 +340,9 @@ export async function fulfillPaidOrder(
       .bind(razorpayPaymentId, orderId)
       .run();
 
-    // Deduct stock in variants
+    // Deduct stock in variants atomically
     const orderItemsRes = await env.DB
-      .prepare("SELECT variant_id, quantity FROM order_items WHERE order_id = ?")
+      .prepare("SELECT variant_id, product_id, quantity FROM order_items WHERE order_id = ?")
       .bind(orderId)
       .all<any>();
 
@@ -343,6 +352,11 @@ export async function fulfillPaidOrder(
           .prepare("UPDATE product_variants SET stock = MAX(0, stock - ?), updated_at = datetime('now') WHERE id = ?")
           .bind(it.quantity, it.variant_id)
           .run();
+      } else if (it.product_id) {
+        await env.DB
+          .prepare("UPDATE product_variants SET stock = MAX(0, stock - ?), updated_at = datetime('now') WHERE id = (SELECT id FROM product_variants WHERE product_id = ? AND is_active = 1 LIMIT 1)")
+          .bind(it.quantity, it.product_id)
+          .run();
       }
     }
 
@@ -351,6 +365,33 @@ export async function fulfillPaidOrder(
       .prepare("INSERT INTO order_status_history (id, order_id, from_status, to_status, note) VALUES (?, ?, 'pending', 'payment_confirmed', 'Payment verified and captured successfully.')")
       .bind("osh_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16), orderId)
       .run();
+
+    // Customer email resolution
+    const customerEmail =
+      order.shipping_email ||
+      order.user_email ||
+      (order.shipping_address_2 && order.shipping_address_2.includes("@") ? order.shipping_address_2 : null);
+
+    // Record verified transaction in financial_transactions ledger
+    const txId = "tx_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    await env.DB
+      .prepare(`
+        INSERT INTO financial_transactions (
+          id, order_id, order_number, customer_name, customer_email, type, amount, gateway, gateway_payment_id, note
+        ) VALUES (?, ?, ?, ?, ?, 'credit_order', ?, 'razorpay', ?, ?)
+      `)
+      .bind(
+        txId,
+        orderId,
+        order.order_number,
+        order.shipping_name || "Customer",
+        customerEmail || order.shipping_email || null,
+        order.total_amount,
+        razorpayPaymentId,
+        `Captured payment for order #${order.order_number}`
+      )
+      .run()
+      .catch((err: any) => console.warn("Financial ledger record error:", err));
 
     // Increment coupon used_count if a coupon code was redeemed
     if (order.coupon_code) {

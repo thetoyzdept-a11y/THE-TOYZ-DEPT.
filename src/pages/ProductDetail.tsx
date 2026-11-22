@@ -363,7 +363,10 @@ export function ProductDetailPage() {
                     <button
                       key={v.id}
                       type="button"
-                      onClick={() => setSelectedVariant(v)}
+                      onClick={() => {
+                        setSelectedVariant(v);
+                        setQuantity((q) => Math.min(q, Math.max(1, v.stock || 1)));
+                      }}
                       className={`p-3 text-left border-2 font-mono text-xs transition-all ${
                         selectedVariant?.id === v.id
                           ? "bg-ink text-cream border-ink shadow-brutal-sm"

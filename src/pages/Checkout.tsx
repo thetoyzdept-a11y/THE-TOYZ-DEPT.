@@ -392,6 +392,11 @@ export function CheckoutPage() {
                         <div>
                           <p className="font-display font-bold text-xs uppercase line-clamp-1">{item.productName}</p>
                           <p className="font-mono text-[10px] text-ink-muted">Qty: {item.quantity} • {item.variantName || "Standard"}</p>
+                          {item.availableStock !== undefined && item.quantity > item.availableStock && (
+                            <p className="font-mono text-[10px] text-coral font-bold mt-0.5">
+                              ⚠️ Only {item.availableStock} in studio stock!
+                            </p>
+                          )}
                         </div>
                       </div>
                       <span className="font-display font-bold text-xs text-ink">{formatINR(item.totalPrice)}</span>
@@ -475,6 +480,13 @@ export function CheckoutPage() {
                   </div>
                 </div>
 
+                {cart.hasStockIssue && (
+                  <div className="p-3 bg-coral/20 border-2 border-coral text-coral-dark font-mono text-xs font-bold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>Inventory Limit Reached: One or more items exceed studio inventory. Please open your tray and reduce quantity to proceed.</span>
+                  </div>
+                )}
+
                 {errorMsg && (
                   <div className="p-3 bg-coral/20 border-2 border-coral text-coral-dark font-mono text-xs font-bold flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -515,11 +527,11 @@ export function CheckoutPage() {
                 {/* Pay Button */}
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="btn-primary w-full py-4 text-sm"
+                  disabled={loading || cart.hasStockIssue}
+                  className="btn-primary w-full py-4 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Lock className="w-4 h-4" />
-                  {loading ? "Verifying with Razorpay..." : `Pay ${formatINR(cart.total)}`}
+                  {loading ? "Verifying with Razorpay..." : cart.hasStockIssue ? "Insufficient Inventory" : `Pay ${formatINR(cart.total)}`}
                 </button>
 
                 <p className="font-mono text-[10px] text-ink-muted text-center uppercase tracking-wider">

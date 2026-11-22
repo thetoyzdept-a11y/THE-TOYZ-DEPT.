@@ -217,8 +217,10 @@ export function CartDrawer() {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-1 hover:bg-cream-dark text-ink"
+                          disabled={item.availableStock !== undefined && item.quantity >= item.availableStock}
+                          className="p-1 hover:bg-cream-dark text-ink disabled:opacity-25 disabled:cursor-not-allowed"
                           aria-label="Increase quantity"
+                          title={item.availableStock !== undefined && item.quantity >= item.availableStock ? "Max available stock reached" : "Add one more"}
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -229,6 +231,25 @@ export function CartDrawer() {
                         {formatINR(item.totalPrice)}
                       </span>
                     </div>
+
+                    {/* Stock Indicators */}
+                    {item.availableStock !== undefined && (
+                      <div className="mt-1 font-mono text-[10px] font-bold">
+                        {item.availableStock <= 0 ? (
+                          <span className="text-coral uppercase tracking-wider">
+                            ● Out of stock
+                          </span>
+                        ) : item.quantity > item.availableStock ? (
+                          <span className="text-coral block bg-coral/10 p-1 border border-coral uppercase">
+                            ⚠️ Exceeds stock (Only {item.availableStock} available)
+                          </span>
+                        ) : item.availableStock <= 3 ? (
+                          <span className="text-amber-800 uppercase">
+                            ⚡ Only {item.availableStock} left in stock
+                          </span>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))
@@ -299,10 +320,18 @@ export function CartDrawer() {
                 </div>
               </div>
 
+              {/* Stock Warning Alert */}
+              {cart.hasStockIssue && (
+                <div className="p-2.5 bg-coral/20 border-2 border-coral text-coral-dark font-mono text-[11px] font-bold">
+                  ⚠️ Some items exceed studio inventory. Please reduce quantities to available stock before checkout.
+                </div>
+              )}
+
               {/* Checkout Button */}
               <button
                 onClick={handleCheckoutClick}
-                className="btn-primary w-full py-3.5 text-sm cursor-pointer"
+                disabled={cart.hasStockIssue}
+                className="btn-primary w-full py-3.5 text-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Lock In The Drop 🚀
                 <ArrowRight className="w-4 h-4" />

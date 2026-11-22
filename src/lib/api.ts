@@ -128,6 +128,23 @@ export const api = {
   getAdminOrderDetails: (id: string) => request<{ order: any }>(`/admin/orders/${id}`),
   updateAdminOrderStatus: (id: string, data: { status: string; note?: string; trackingNumber?: string; trackingUrl?: string }) =>
     request<any>(`/admin/orders/${id}/status`, { method: "PATCH", body: JSON.stringify(data) }),
+  refundAdminOrder: (id: string, data?: { amount?: number; reason?: string; restock?: boolean }) =>
+    request<{ success: boolean; message: string; refundId: string; refundAmount: number }>(`/admin/orders/${id}/refund`, {
+      method: "POST",
+      body: JSON.stringify(data || {}),
+    }),
+  getAdminTransactions: () =>
+    request<{
+      summary: {
+        grossRevenue: number;
+        totalRefunds: number;
+        netSettledBalance: number;
+        totalTransactions: number;
+        creditCount: number;
+        debitCount: number;
+      };
+      transactions: any[];
+    }>("/admin/transactions"),
   getAdminCustomRequests: () => request<{ requests: any[] }>("/admin/custom-requests"),
   sendAdminQuotation: (data: any) => request<any>("/admin/quotations", { method: "POST", body: JSON.stringify(data) }),
   getAdminCustomers: () => request<{ customers: any[] }>("/admin/customers"),

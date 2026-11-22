@@ -22,7 +22,9 @@ async function getFullCart(db: D1Database, cartId: string, couponCode?: string |
       SELECT 
         ci.id, ci.cart_id, ci.product_id, ci.variant_id, ci.quantity,
         p.name as product_name, p.slug as product_slug, p.base_price,
-        v.name as variant_name, v.price_modifier, v.stock,
+        COALESCE(v.name, 'Standard') as variant_name, 
+        COALESCE(v.price_modifier, 0) as price_modifier,
+        COALESCE(v.stock, (SELECT stock FROM product_variants WHERE product_id = p.id AND is_active = 1 LIMIT 1), 0) as stock,
         (SELECT url FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) as product_image
       FROM cart_items ci
       JOIN products p ON ci.product_id = p.id
@@ -35,6 +37,7 @@ async function getFullCart(db: D1Database, cartId: string, couponCode?: string |
   const items = (itemsResult.results || []).map((item: any) => {
     const unitPrice = item.base_price + (item.price_modifier || 0);
     const totalPrice = unitPrice * item.quantity;
+    const availableStock = Math.max(0, typeof item.stock === "number" ? item.stock : 0);
     return {
       id: item.id,
       productId: item.product_id,
@@ -46,7 +49,9 @@ async function getFullCart(db: D1Database, cartId: string, couponCode?: string |
       unitPrice,
       quantity: item.quantity,
       totalPrice,
-      availableStock: item.stock !== null ? item.stock : 999,
+      availableStock,
+      isOutOfStock: availableStock <= 0,
+      isStockExceeded: item.quantity > availableStock,
     };
   });
 
@@ -103,6 +108,7 @@ async function getFullCart(db: D1Database, cartId: string, couponCode?: string |
     total,
     freeShippingThreshold: freeThreshold,
     amountToFreeShipping: Math.max(0, freeThreshold - subtotal),
+    hasStockIssue: items.some((it: any) => it.quantity > it.availableStock || it.availableStock <= 0),
   };
 }
 
@@ -143,24 +149,43 @@ cartRouter.post("/items", async (c) => {
 
     // Check product exists and active
     const product = await c.env.DB
-      .prepare("SELECT id, status FROM products WHERE id = ?")
+      .prepare("SELECT id, name, status FROM products WHERE id = ?")
       .bind(productId)
-      .first<{ id: string; status: string }>();
+      .first<{ id: string; name: string; status: string }>();
 
     if (!product || product.status !== "active") {
       return c.json({ error: "Product not available" }, 400);
     }
 
-    // Check stock if variant specified
-    if (variantId) {
+    // Determine variant and check available stock
+    let targetVariantId: string | null = variantId || null;
+    let availableStock = 0;
+
+    if (targetVariantId) {
       const variant = await c.env.DB
         .prepare("SELECT id, stock, is_active FROM product_variants WHERE id = ? AND product_id = ?")
-        .bind(variantId, productId)
+        .bind(targetVariantId, productId)
         .first<{ id: string; stock: number; is_active: number }>();
 
-      if (!variant || !variant.is_active || variant.stock < quantity) {
-        return c.json({ error: "Insufficient stock for selected variant." }, 400);
+      if (!variant || !variant.is_active) {
+        return c.json({ error: "Selected variant is unavailable." }, 400);
       }
+      availableStock = Math.max(0, variant.stock);
+    } else {
+      // Find the first active variant for this product
+      const defaultVariant = await c.env.DB
+        .prepare("SELECT id, stock, is_active FROM product_variants WHERE product_id = ? AND is_active = 1 ORDER BY created_at ASC LIMIT 1")
+        .bind(productId)
+        .first<{ id: string; stock: number; is_active: number }>();
+
+      if (defaultVariant) {
+        targetVariantId = defaultVariant.id;
+        availableStock = Math.max(0, defaultVariant.stock);
+      }
+    }
+
+    if (availableStock <= 0) {
+      return c.json({ error: `"${product.name}" is currently out of stock.` }, 400);
     }
 
     // Ensure cart exists
@@ -172,8 +197,17 @@ cartRouter.post("/items", async (c) => {
     // Check if already in cart
     const existingItem = await c.env.DB
       .prepare("SELECT id, quantity FROM cart_items WHERE cart_id = ? AND product_id = ? AND (variant_id = ? OR (variant_id IS NULL AND ? IS NULL))")
-      .bind(cartId, productId, variantId || null, variantId || null)
+      .bind(cartId, productId, targetVariantId, targetVariantId)
       .first<{ id: string; quantity: number }>();
+
+    const existingQty = existingItem?.quantity || 0;
+    const totalRequested = existingQty + quantity;
+
+    if (totalRequested > availableStock) {
+      return c.json({
+        error: `Studio inventory limit reached. Only ${availableStock} unit${availableStock === 1 ? "" : "s"} of "${product.name}" in stock (${existingQty} already in your tray).`
+      }, 400);
+    }
 
     if (existingItem) {
       await c.env.DB
@@ -184,7 +218,7 @@ cartRouter.post("/items", async (c) => {
       const itemId = "cit_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
       await c.env.DB
         .prepare("INSERT INTO cart_items (id, cart_id, product_id, variant_id, quantity) VALUES (?, ?, ?, ?, ?)")
-        .bind(itemId, cartId, productId, variantId || null, quantity)
+        .bind(itemId, cartId, productId, targetVariantId, quantity)
         .run();
     }
 
@@ -213,6 +247,31 @@ cartRouter.patch("/items/:id", async (c) => {
       .bind(itemId, cartId)
       .run();
   } else {
+    // Verify item exists and check stock
+    const item = await c.env.DB
+      .prepare(`
+        SELECT 
+          ci.id, ci.product_id, ci.variant_id, p.name as product_name,
+          COALESCE(v.stock, (SELECT stock FROM product_variants WHERE product_id = p.id AND is_active = 1 LIMIT 1), 0) as stock
+        FROM cart_items ci
+        JOIN products p ON ci.product_id = p.id
+        LEFT JOIN product_variants v ON ci.variant_id = v.id
+        WHERE ci.id = ? AND ci.cart_id = ?
+      `)
+      .bind(itemId, cartId)
+      .first<any>();
+
+    if (!item) {
+      return c.json({ error: "Cart item not found" }, 404);
+    }
+
+    const availableStock = Math.max(0, item.stock != null ? item.stock : 0);
+    if (quantity > availableStock) {
+      return c.json({
+        error: `Insufficient stock for "${item.product_name}". Only ${availableStock} unit${availableStock === 1 ? "" : "s"} available.`
+      }, 400);
+    }
+
     await c.env.DB
       .prepare("UPDATE cart_items SET quantity = ?, updated_at = datetime('now') WHERE id = ? AND cart_id = ?")
       .bind(quantity, itemId, cartId)
