@@ -11,8 +11,6 @@ import {
   Menu,
   X,
   Shield,
-  Layers,
-  FileCode,
   LogOut,
   ChevronRight,
   Package,
@@ -85,175 +83,229 @@ export function Header() {
 
   const cartCount = cart?.itemCount || 0;
 
+  // Gracefully normalize user display name so "THE" from thetoyzdept is never shown raw
+  const accountDisplayName =
+    user?.firstName &&
+    user.firstName.trim().toLowerCase() !== "the" &&
+    user.firstName.trim().length > 1
+      ? user.firstName
+      : "Account";
+
+  // Active navigation helper
+  const isCurrent = (path: string, exactSearch = "") => {
+    if (exactSearch) {
+      return location.pathname === path && location.search.includes(exactSearch);
+    }
+    return location.pathname === path && !location.search;
+  };
+
   return (
     <>
       {/* ── Top Announcement Ticker ──────────────────────────────────── */}
-      <div className="bg-ink text-cream py-2 border-b-2 border-ink overflow-hidden whitespace-nowrap select-none flex font-mono text-xs uppercase tracking-widest">
-        <div className="inline-flex gap-8 animate-marquee">
+      <div className="bg-ink text-cream py-1.5 sm:py-2 border-b-2 border-ink overflow-hidden whitespace-nowrap select-none flex font-mono text-[11px] sm:text-xs uppercase tracking-widest">
+        <div className="inline-flex gap-8 sm:gap-12 animate-marquee">
           <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
-          <Link to="/survey" className="text-lime underline font-bold hover:text-cream">🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →</Link>
-          <span>✦ +999 DESK AURA GUARANTEED</span>
+          <Link to="/survey" className="text-lime underline font-bold hover:text-cream">
+            🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →
+          </Link>
           <span>✦ DISPATCHED FROM BENGALURU IN 24-48H</span>
           <span>✦ 100% ADHD APPROVED TACTILE FIDGETS</span>
-          <span>✦ ZERO BORING CORPORATE MERCH</span>
+          <span>✦ 0.12MM LAYER PRECISION</span>
+          <span>✦ 100% PREPAID STUDIO // ZERO COD</span>
         </div>
-        <div className="inline-flex gap-8 animate-marquee" aria-hidden="true">
+        <div className="inline-flex gap-8 sm:gap-12 animate-marquee" aria-hidden="true">
           <span className="text-lime font-bold">⚡ FREE EXPRESS SHIPPING ABOVE ₹999</span>
-          <span className="text-lime underline font-bold">🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →</span>
-          <span>✦ +999 DESK AURA GUARANTEED</span>
+          <span className="text-lime underline font-bold">
+            🎁 WIN A FREE DROP // TAKE 2-MIN SURVEY →
+          </span>
           <span>✦ DISPATCHED FROM BENGALURU IN 24-48H</span>
           <span>✦ 100% ADHD APPROVED TACTILE FIDGETS</span>
-          <span>✦ ZERO BORING CORPORATE MERCH</span>
+          <span>✦ 0.12MM LAYER PRECISION</span>
+          <span>✦ 100% PREPAID STUDIO // ZERO COD</span>
         </div>
       </div>
 
-      {/* ── Main Navigation Header ───────────────────────────────────── */}
+      {/* ── Main Navigation Header (Clean, Premium, Architectural) ───── */}
       <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b-2 border-ink shadow-sm transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Mobile menu toggle */}
-            <div className="flex items-center lg:hidden">
+          <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
+            
+            {/* Left: Mobile menu toggle + Brand Wordmark */}
+            <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 -ml-2 text-ink hover:bg-cream-dark border-2 border-transparent hover:border-ink transition-colors cursor-pointer"
+                className="lg:hidden p-2 text-ink hover:bg-cream-dark border-2 border-ink shadow-brutal-xs cursor-pointer transition-colors"
                 aria-label="Open navigation menu"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               </button>
-            </div>
 
-            {/* Brand Wordmark Treatment */}
-            <div className="flex items-center">
-              <Link to="/" className="group flex items-center gap-2.5">
-                <div className="w-8 h-8 md:w-9 md:h-9 bg-ink border-2 border-ink flex items-center justify-center text-lime font-display font-black text-lg shadow-brutal-sm group-hover:bg-lime group-hover:text-ink group-hover:rotate-6 transition-all duration-200">
+              {/* Brand Wordmark (Guaranteed Never-Wrap Architecture) */}
+              <Link
+                to="/"
+                className="group flex items-center gap-2.5 sm:gap-3 flex-shrink-0 whitespace-nowrap"
+                aria-label="THE TOYZ DEPT. Home"
+              >
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-ink border-2 border-ink flex items-center justify-center text-lime font-display font-black text-base sm:text-lg shadow-brutal-xs group-hover:bg-lime group-hover:text-ink group-hover:-rotate-3 transition-all duration-150 flex-shrink-0">
                   T
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-display font-black text-xl md:text-2xl tracking-tighter uppercase leading-none group-hover:text-coral transition-colors">
+                <div className="flex flex-col leading-none">
+                  <span className="font-display font-black text-lg sm:text-2xl tracking-tighter uppercase leading-none whitespace-nowrap group-hover:text-coral transition-colors">
                     THE TOYZ DEPT<span className="text-coral">.</span>
                   </span>
-                  <span className="font-mono text-[9px] md:text-[10px] tracking-widest text-ink-muted uppercase font-bold">
-                    EST. 2026 // BENGALURU
+                  <span className="font-mono text-[8px] sm:text-[9px] tracking-widest text-ink-muted uppercase font-bold mt-1 leading-none whitespace-nowrap">
+                    BENGALURU // EST. 2026
                   </span>
                 </div>
               </Link>
             </div>
 
-            {/* Desktop Navigation (Sleek, unique, non-redundant) */}
-            <nav className="hidden lg:flex items-center gap-8 font-display font-bold text-xs uppercase tracking-wider">
+            {/* Center: Desktop Navigation (Refined, Non-Crowded, High-End) */}
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-8 font-display font-bold text-xs uppercase tracking-wider whitespace-nowrap">
               <Link
                 to="/shop"
-                className="hover:text-coral transition-colors py-1 flex items-center gap-2 group"
+                className={`py-1.5 transition-colors border-b-2 ${
+                  isCurrent("/shop")
+                    ? "text-coral border-coral font-black"
+                    : "text-ink border-transparent hover:text-coral hover:border-ink/30"
+                }`}
               >
-                <span>Store Drops</span>
-                <span className="badge-lime text-[9px] py-0 px-1 font-mono group-hover:bg-ink group-hover:text-lime transition-colors">
-                  12 Drops
-                </span>
+                Store Drops
               </Link>
+
               <Link
                 to="/shop?category=collectibles"
-                className="hover:text-coral transition-colors py-1 flex items-center gap-2 group"
+                className={`py-1.5 transition-colors border-b-2 ${
+                  isCurrent("/shop", "category=collectibles")
+                    ? "text-coral border-coral font-black"
+                    : "text-ink border-transparent hover:text-coral hover:border-ink/30"
+                }`}
               >
-                <span>Collectibles</span>
+                Collectibles
               </Link>
+
               <Link
                 to="/shop?category=desk-objects"
-                className="hover:text-coral transition-colors py-1 flex items-center gap-2 group"
+                className={`py-1.5 transition-colors border-b-2 ${
+                  isCurrent("/shop", "category=desk-objects")
+                    ? "text-coral border-coral font-black"
+                    : "text-ink border-transparent hover:text-coral hover:border-ink/30"
+                }`}
               >
-                <span>Desk Gear</span>
+                Desk Gear
               </Link>
+
               <Link
                 to="/about"
-                className="hover:text-coral transition-colors py-1"
+                className={`py-1.5 transition-colors border-b-2 ${
+                  isCurrent("/about")
+                    ? "text-coral border-coral font-black"
+                    : "text-ink border-transparent hover:text-coral hover:border-ink/30"
+                }`}
               >
-                Our Studio
+                Studio
               </Link>
+
               <Link
                 to="/track-order"
-                className="hover:text-coral transition-colors py-1 text-ink-muted hover:text-ink"
+                className={`py-1.5 transition-colors border-b-2 ${
+                  isCurrent("/track-order")
+                    ? "text-coral border-coral font-black"
+                    : "text-ink-muted border-transparent hover:text-ink hover:border-ink/30"
+                }`}
               >
                 Track Order
               </Link>
+
               <Link
                 to="/survey"
-                className="hover:text-coral transition-colors py-1 flex items-center gap-1.5 text-ink font-bold"
+                className={`py-1.5 flex items-center gap-1.5 transition-colors border-b-2 ${
+                  isCurrent("/survey")
+                    ? "text-coral border-coral font-black"
+                    : "text-ink border-transparent hover:text-coral"
+                }`}
               >
                 <span>Win Free Drop</span>
-                <span className="badge-coral text-[9px] py-0 px-1 font-mono">
-                  GIVEAWAY 🎁
-                </span>
+                <span className="text-coral animate-bounce">🎁</span>
               </Link>
             </nav>
 
-            {/* Action Icons */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              {/* Search Toggle */}
+            {/* Right: Action Utilities Toolbar */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              
+              {/* Quick Search Button */}
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
-                className="p-2 text-ink hover:bg-cream-dark border-2 border-transparent hover:border-ink transition-all"
+                className="flex items-center gap-2 p-2 sm:px-2.5 sm:py-1.5 bg-cream hover:bg-cream-dark border-2 border-ink shadow-brutal-xs transition-all cursor-pointer"
                 aria-label="Search catalogue"
+                title="Search studio catalog (⌘K)"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-4 h-4 text-ink" />
+                <span className="hidden xl:inline font-mono text-[11px] text-ink-muted uppercase font-bold">
+                  Search...
+                </span>
+                <kbd className="hidden xl:inline font-mono text-[9px] bg-cream-dark px-1 py-0.5 border border-ink/20 text-ink-muted font-bold">
+                  ⌘K
+                </kbd>
               </button>
 
-              {/* Admin Portal Shortcut if Admin */}
+              {/* Admin Portal Shortcut (If Logged in as Admin) */}
               {isAdmin && (
                 <Link
                   to="/admin"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink text-lime border-2 border-ink text-xs font-mono font-bold tracking-wider uppercase shadow-brutal-sm hover:bg-lime hover:text-ink transition-all"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-ink text-lime border-2 border-ink text-xs font-mono font-bold tracking-wider uppercase shadow-brutal-xs hover:bg-lime hover:text-ink transition-all"
+                  title="Administrative Operations Portal"
                 >
                   <Shield className="w-3.5 h-3.5" />
-                  Admin
+                  <span>Admin</span>
                 </Link>
               )}
 
-              {/* Account Dropdown / Link */}
+              {/* Account Trigger & Dropdown */}
               {user ? (
                 <div className="relative group">
                   <Link
                     to="/account"
-                    className="flex items-center gap-1.5 p-2 text-ink hover:bg-cream-dark border-2 border-transparent hover:border-ink transition-all"
+                    className="flex items-center gap-2 px-2.5 py-1.5 bg-cream hover:bg-cream-dark border-2 border-ink shadow-brutal-xs text-ink transition-all cursor-pointer"
                     aria-label="Customer Account"
                   >
-                    <User className="w-5 h-5" />
-                    <span className="hidden md:inline font-mono text-xs font-bold uppercase truncate max-w-[80px]">
-                      {user.firstName}
+                    <User className="w-4 h-4 text-ink" />
+                    <span className="hidden md:inline font-mono text-xs font-bold uppercase truncate max-w-[85px]">
+                      {accountDisplayName}
                     </span>
+                    <span className="w-2 h-2 rounded-full bg-lime border border-ink" title="Active session" />
                   </Link>
 
                   {/* Dropdown Menu */}
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-cream-light border-2 border-ink shadow-brutal-lg hidden group-hover:block z-50">
-                    <div className="p-3 border-b-2 border-ink bg-cream">
-                      <p className="font-display font-bold text-xs uppercase truncate">
-                        {user.firstName} {user.lastName}
+                  <div className="absolute right-0 top-full mt-1.5 w-52 bg-cream border-2 border-ink shadow-brutal-lg hidden group-hover:block z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="p-3 border-b-2 border-ink bg-cream-light">
+                      <p className="font-display font-bold text-xs uppercase truncate text-ink">
+                        {user.firstName} {user.lastName || ""}
                       </p>
                       <p className="font-mono text-[10px] text-ink-muted truncate">{user.email}</p>
                     </div>
-                    <div className="py-1 font-display text-xs font-bold uppercase tracking-wider">
-                      <Link to="/account?tab=orders" className="block px-4 py-2 hover:bg-lime transition-colors">
-                        Orders & Invoices
+                    <div className="py-1 font-display text-xs font-bold uppercase tracking-wider divide-y divide-ink/10">
+                      <Link to="/account?tab=orders" className="flex items-center gap-2 px-4 py-2 hover:bg-lime transition-colors">
+                        <Package className="w-3.5 h-3.5 text-ink-muted" /> Orders & Invoices
                       </Link>
-                      <Link to="/account?tab=wishlist" className="block px-4 py-2 hover:bg-lime transition-colors">
-                        Saved Wishlist
+                      <Link to="/account?tab=wishlist" className="flex items-center gap-2 px-4 py-2 hover:bg-lime transition-colors">
+                        <Heart className="w-3.5 h-3.5 text-coral" /> Saved Wishlist
                       </Link>
-                      <Link to="/account?tab=addresses" className="block px-4 py-2 hover:bg-lime transition-colors">
-                        Saved Addresses
-                      </Link>
-                      <Link to="/account?tab=profile" className="block px-4 py-2 hover:bg-lime transition-colors">
-                        Profile Info
+                      <Link to="/account?tab=addresses" className="flex items-center gap-2 px-4 py-2 hover:bg-lime transition-colors">
+                        <MapPin className="w-3.5 h-3.5 text-ink-muted" /> Saved Addresses
                       </Link>
                       {isAdmin && (
-                        <Link to="/admin" className="block px-4 py-2 bg-ink text-lime hover:bg-lime hover:text-ink transition-colors border-t border-ink">
-                          Admin Portal
+                        <Link to="/admin" className="flex items-center gap-2 px-4 py-2 bg-ink text-lime hover:bg-lime hover:text-ink transition-colors">
+                          <Shield className="w-3.5 h-3.5" /> Admin Portal
                         </Link>
                       )}
                       <button
                         onClick={() => logout()}
-                        className="w-full text-left px-4 py-2 text-coral hover:bg-coral hover:text-cream border-t border-ink transition-colors flex items-center justify-between cursor-pointer"
+                        className="w-full text-left px-4 py-2 text-coral hover:bg-coral hover:text-cream transition-colors flex items-center justify-between cursor-pointer"
                       >
-                        Sign Out
+                        <span>Sign Out</span>
                         <LogOut className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -262,26 +314,30 @@ export function Header() {
               ) : (
                 <Link
                   to="/login"
-                  className="p-2 text-ink hover:bg-cream-dark border-2 border-transparent hover:border-ink transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-cream hover:bg-lime border-2 border-ink shadow-brutal-xs text-ink font-mono text-xs font-bold uppercase transition-all"
                   aria-label="Sign In"
                 >
-                  <User className="w-5 h-5" />
+                  <User className="w-4 h-4 text-ink" />
+                  <span className="hidden sm:inline">Sign In</span>
                 </Link>
               )}
 
-              {/* Cart Drawer Trigger */}
+              {/* Cart Drawer Trigger Button */}
               <button
                 type="button"
                 onClick={openCart}
-                className="relative p-2 bg-ink text-cream border-2 border-ink hover:bg-lime hover:text-ink shadow-brutal-sm transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 bg-ink text-cream hover:bg-lime hover:text-ink border-2 border-ink shadow-brutal-xs hover:translate-x-0.5 hover:translate-y-0.5 transition-all cursor-pointer"
                 aria-label={`Shopping bag with ${cartCount} items`}
               >
-                <ShoppingBag className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-coral text-cream font-mono font-bold text-[10px] w-5 h-5 flex items-center justify-center border-2 border-ink shadow-sm">
-                    {cartCount}
-                  </span>
-                )}
+                <ShoppingBag className="w-4 h-4" />
+                <span className="font-mono text-xs font-black uppercase hidden sm:inline">BAG</span>
+                <span
+                  className={`font-mono text-[10px] font-black px-1.5 py-0.2 border border-ink ${
+                    cartCount > 0 ? "bg-coral text-cream animate-pulse" : "bg-lime text-ink"
+                  }`}
+                >
+                  {cartCount}
+                </span>
               </button>
             </div>
           </div>
@@ -414,19 +470,19 @@ export function Header() {
         </div>
       )}
 
-      {/* ── Mobile Drawer Navigation ─────────────────────────────────── */}
+      {/* ── Mobile Drawer Navigation (Architectural & Fluid) ─────────── */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-ink/75"
+            className="fixed inset-0 bg-ink/75 backdrop-blur-xs"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Drawer content */}
-          <div className="relative w-full max-w-xs bg-cream h-full border-r-2 border-ink shadow-brutal-xl flex flex-col justify-between p-6 z-10 overflow-y-auto">
+          <div className="relative w-full max-w-xs bg-cream h-full border-r-2 border-ink shadow-brutal-xl flex flex-col justify-between p-6 z-10 overflow-y-auto animate-in slide-in-from-left duration-200">
             <div>
-              <div className="flex items-center justify-between pb-6 border-b-2 border-ink">
+              <div className="flex items-center justify-between pb-5 border-b-2 border-ink">
                 <Link
                   to="/"
                   onClick={() => setMobileMenuOpen(false)}
@@ -437,7 +493,7 @@ export function Header() {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 hover:bg-cream-dark border border-ink"
+                  className="p-1.5 hover:bg-cream-dark border-2 border-ink shadow-brutal-xs cursor-pointer"
                   aria-label="Close navigation menu"
                 >
                   <X className="w-5 h-5" />
@@ -445,57 +501,82 @@ export function Header() {
               </div>
 
               {/* Navigation Links */}
-              <nav className="mt-6 flex flex-col gap-2 font-display font-bold text-base uppercase tracking-wider">
+              <nav className="mt-6 flex flex-col gap-2 font-display font-bold text-sm uppercase tracking-wider">
                 <Link
                   to="/shop"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                  className={`flex items-center justify-between py-3 px-3 border-2 transition-all ${
+                    isCurrent("/shop")
+                      ? "bg-ink text-lime border-ink shadow-brutal-xs"
+                      : "bg-cream-light text-ink border-ink/30 hover:bg-lime hover:border-ink"
+                  }`}
                 >
                   <span>Store Drops</span>
                   <span className="badge-lime text-[10px] font-mono">12 Drops</span>
                 </Link>
+
                 <Link
                   to="/shop?category=collectibles"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                  className={`flex items-center justify-between py-3 px-3 border-2 transition-all ${
+                    isCurrent("/shop", "category=collectibles")
+                      ? "bg-ink text-lime border-ink shadow-brutal-xs"
+                      : "bg-cream-light text-ink border-ink/30 hover:bg-lime hover:border-ink"
+                  }`}
                 >
                   <span>🐉 Collectibles</span>
                   <ChevronRight className="w-4 h-4 text-ink-muted" />
                 </Link>
+
                 <Link
                   to="/shop?category=desk-objects"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                  className={`flex items-center justify-between py-3 px-3 border-2 transition-all ${
+                    isCurrent("/shop", "category=desk-objects")
+                      ? "bg-ink text-lime border-ink shadow-brutal-xs"
+                      : "bg-cream-light text-ink border-ink/30 hover:bg-lime hover:border-ink"
+                  }`}
                 >
-                  <span>⚡ Desk Gear & Fidgets</span>
+                  <span>⚡ Desk Gear</span>
                   <ChevronRight className="w-4 h-4 text-ink-muted" />
                 </Link>
+
                 <Link
                   to="/about"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                  className={`flex items-center justify-between py-3 px-3 border-2 transition-all ${
+                    isCurrent("/about")
+                      ? "bg-ink text-lime border-ink shadow-brutal-xs"
+                      : "bg-cream-light text-ink border-ink/30 hover:bg-lime hover:border-ink"
+                  }`}
                 >
-                  Our Studio
+                  <span>Our Studio</span>
                   <ChevronRight className="w-4 h-4 text-ink-muted" />
                 </Link>
+
                 <Link
                   to="/track-order"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 hover:bg-lime border border-transparent hover:border-ink transition-all"
+                  className={`flex items-center justify-between py-3 px-3 border-2 transition-all ${
+                    isCurrent("/track-order")
+                      ? "bg-ink text-lime border-ink shadow-brutal-xs"
+                      : "bg-cream-light text-ink border-ink/30 hover:bg-lime hover:border-ink"
+                  }`}
                 >
-                  Track Your Drop
+                  <span>Track Drop</span>
                   <ChevronRight className="w-4 h-4 text-ink-muted" />
                 </Link>
+
                 <Link
                   to="/survey"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 bg-lime/20 border-2 border-ink text-ink font-bold transition-all shadow-brutal-xs"
+                  className="flex items-center justify-between py-3 px-3 bg-lime/30 border-2 border-ink text-ink font-bold transition-all shadow-brutal-xs hover:bg-lime"
                 >
                   <span className="flex items-center gap-2">
                     <span>🎁</span>
-                    <span>Win A Free Drop (Survey)</span>
+                    <span>Win A Free Drop</span>
                   </span>
-                  <span className="badge-coral text-[9px] font-mono">RAFFLE</span>
+                  <span className="badge-coral text-[9px] font-mono">GIVEAWAY</span>
                 </Link>
               </nav>
 
@@ -506,23 +587,23 @@ export function Header() {
                   <Link
                     to="/shop?category=collectibles"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-2 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px]"
+                    className="px-2.5 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px] font-bold"
                   >
-                    🐉 Collectibles
+                    🐉 Dragons
                   </Link>
                   <Link
                     to="/shop?category=desk-objects"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-2 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px]"
+                    className="px-2.5 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px] font-bold"
                   >
-                    ⚡ Desk Gear
+                    ⚡ Fidgets
                   </Link>
                   <Link
                     to="/shop?category=home-stuff"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-2 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px]"
+                    className="px-2.5 py-1 bg-cream-light border border-ink text-ink hover:bg-lime text-[11px] font-bold"
                   >
-                    🏠 Decor
+                    🏠 Monoliths
                   </Link>
                 </div>
               </div>
@@ -568,28 +649,6 @@ export function Header() {
                   >
                     <span className="flex items-center gap-2">
                       <Heart className="w-4 h-4 text-coral" /> Saved Wishlist
-                    </span>
-                    <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
-                  </Link>
-
-                  <Link
-                    to="/account?tab=addresses"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between p-2 bg-cream hover:bg-lime border border-ink/40 font-bold uppercase transition-colors"
-                  >
-                    <span className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" /> Saved Addresses
-                    </span>
-                    <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
-                  </Link>
-
-                  <Link
-                    to="/account?tab=profile"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between p-2 bg-cream hover:bg-lime border border-ink/40 font-bold uppercase transition-colors"
-                  >
-                    <span className="flex items-center gap-2">
-                      <User className="w-4 h-4" /> Profile Details
                     </span>
                     <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
                   </Link>
