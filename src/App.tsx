@@ -133,7 +133,7 @@ function AppLayout() {
 
   return (
     <div className="flex flex-col min-h-screen bg-cream text-ink">
-      {isAdminPage ? <AdminHeader /> : <Header />}
+      {isAdminPage ? null : <Header />}
       <main className="flex-1">
         <Routes>
           {/* Storefront */}

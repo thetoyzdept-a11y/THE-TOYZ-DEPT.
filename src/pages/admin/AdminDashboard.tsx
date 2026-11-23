@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { api } from "../../lib/api";
 import { formatINR, formatDate, getOrderStatusBadge, getCustomRequestStatusBadge } from "../../lib/utils";
 import { BUSINESS_PROFILE } from "../../config/business";
+import { AdminHeader } from "../../components/layout/AdminHeader";
 import {
   Shield,
   DollarSign,
@@ -700,58 +701,25 @@ export function AdminDashboardPage() {
   if (!isAdmin) return null;
 
   return (
-    <div className="bg-cream min-h-screen py-6 sm:py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* ── Single Unified Admin Navigation Bar ─────────────────────── */}
-        <div className="flex items-center justify-between gap-4 border-b-2 border-ink pb-3 flex-wrap">
-          {/* Scrollable Module Tabs */}
-          <div className="flex gap-1.5 overflow-x-auto no-scrollbar font-mono font-bold text-xs uppercase tracking-wider flex-1 min-w-0">
-            {[
-              { id: "overview", label: "Overview", icon: DollarSign },
-              { id: "ledger", label: `Balance Sheet (${transactions.length})`, icon: ArrowLeftRight },
-              { id: "orders", label: `Orders (${orders.length})`, icon: Package },
-              { id: "products", label: `Products (${products.length})`, icon: Layers },
-              { id: "coupons", label: `Coupons (${coupons.length})`, icon: Tag },
-              { id: "surveys", label: `Surveys (${surveys.length})`, icon: Gift },
-              { id: "inventory", label: "Inventory", icon: Sliders },
-              { id: "inquiries", label: `Inquiries (${inquiries.length + grievances.length})`, icon: Mail },
-              { id: "security", label: "Security", icon: ShieldCheck },
-              { id: "customers", label: `Customers (${customers.length})`, icon: Users },
-              { id: "settings", label: "Settings", icon: Settings },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeModule === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveModule(tab.id as any)}
-                  className={`px-3 py-2 border-2 flex items-center gap-1.5 flex-shrink-0 transition-all cursor-pointer whitespace-nowrap ${
-                    isActive
-                      ? "bg-ink text-lime border-ink shadow-brutal-sm"
-                      : "bg-cream-light text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? "text-lime" : ""}`} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+    <div className="bg-cream min-h-screen">
+      {/* ── Single Master Admin Navigation Header (Visible Exactly Once) ── */}
+      <AdminHeader
+        activeModule={activeModule}
+        setActiveModule={setActiveModule}
+        counts={{
+          orders: orders.length,
+          products: products.length,
+          transactions: transactions.length,
+          coupons: coupons.length,
+          surveys: surveys.length,
+          inquiries: inquiries.length + grievances.length,
+          customers: customers.length,
+        }}
+        loading={loading}
+        onRefresh={loadAllAdminData}
+      />
 
-          {/* Quick Ops Controls */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={loadAllAdminData}
-              disabled={loading}
-              className="px-3 py-2 bg-cream text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-xs hover:bg-lime transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-              title="Reload live database metrics"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">Refresh Ops</span>
-            </button>
-          </div>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         {/* ── MODULE 1: OVERVIEW & ANALYTICS ──────────────────────────── */}
         {activeModule === "overview" && metrics && (
           <div className="space-y-8 animate-in fade-in duration-150">

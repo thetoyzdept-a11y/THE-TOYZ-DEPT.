@@ -200,22 +200,22 @@ export function CustomerDashboardPage() {
       : user.firstName || user.email?.split("@")[0] || "Collector";
 
   return (
-    <div className="bg-cream min-h-screen py-10 sm:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* ── Customer Account Header ─────────────────────────────────── */}
-        <div className="border-b-2 border-ink pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="bg-cream min-h-screen py-6 sm:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* ── Customer Account Header (Clean, Simple, Professional) ─────── */}
+        <div className="card-brutal p-5 sm:p-6 bg-cream-light flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-ink border-2 border-ink text-lime flex items-center justify-center font-display font-black text-xl shadow-brutal-sm flex-shrink-0">
+            <div className="w-12 h-12 bg-ink border-2 border-ink text-lime flex items-center justify-center font-display font-black text-xl shadow-brutal-xs flex-shrink-0">
               {displayName.slice(0, 2).toUpperCase()}
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-display font-black text-xl sm:text-2xl uppercase tracking-tight">
                   {displayName}
                 </h1>
                 <span className="badge-lime text-[10px] font-mono font-bold">VERIFIED COLLECTOR</span>
               </div>
-              <p className="font-mono text-xs text-ink-muted">
+              <p className="font-mono text-xs text-ink-muted mt-0.5">
                 {user.email} • Priority Dispatch Active
               </p>
             </div>
@@ -224,10 +224,17 @@ export function CustomerDashboardPage() {
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <Link
               to="/shop"
-              className="px-3 py-2 bg-cream text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-xs hover:bg-lime transition-all inline-flex items-center gap-1.5"
+              className="px-3 py-2 bg-lime text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-xs hover:bg-ink hover:text-lime transition-all inline-flex items-center gap-1.5"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
               <span>Shop Drops</span>
+            </Link>
+            <Link
+              to="/track-order"
+              className="px-3 py-2 bg-cream text-ink border-2 border-ink text-xs font-mono font-bold uppercase shadow-brutal-xs hover:bg-cream-dark transition-all inline-flex items-center gap-1.5"
+            >
+              <Truck className="w-3.5 h-3.5" />
+              <span>Track Drop</span>
             </Link>
             {isAdmin && (
               <Link
@@ -239,6 +246,7 @@ export function CustomerDashboardPage() {
               </Link>
             )}
             <button
+              type="button"
               onClick={() => logout()}
               className="px-3 py-2 border-2 border-ink bg-cream hover:bg-coral hover:text-cream text-xs font-mono font-bold uppercase transition-colors inline-flex items-center gap-1.5 cursor-pointer"
             >
@@ -248,28 +256,69 @@ export function CustomerDashboardPage() {
           </div>
         </div>
 
-        {/* ── Customer Navigation Tabs (Visible Exactly Once, Zero Duplication) ── */}
+        {/* ── Quick Account Stats ───────────────────────────────────────── */}
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 font-mono">
+          <button
+            type="button"
+            onClick={() => handleTabChange("orders")}
+            className={`card-brutal p-3 sm:p-4 text-left transition-all cursor-pointer ${
+              activeTab === "orders" ? "bg-ink text-cream border-ink" : "bg-cream-light hover:bg-cream-dark text-ink"
+            }`}
+          >
+            <span className="text-[10px] uppercase font-bold text-ink-muted block">Total Orders</span>
+            <span className={`font-display font-black text-xl sm:text-2xl ${activeTab === "orders" ? "text-lime" : "text-ink"}`}>
+              {orders.length}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("addresses")}
+            className={`card-brutal p-3 sm:p-4 text-left transition-all cursor-pointer ${
+              activeTab === "addresses" ? "bg-ink text-cream border-ink" : "bg-cream-light hover:bg-cream-dark text-ink"
+            }`}
+          >
+            <span className="text-[10px] uppercase font-bold text-ink-muted block">Saved Addresses</span>
+            <span className={`font-display font-black text-xl sm:text-2xl ${activeTab === "addresses" ? "text-lime" : "text-ink"}`}>
+              {addresses.length}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("wishlist")}
+            className={`card-brutal p-3 sm:p-4 text-left transition-all cursor-pointer ${
+              activeTab === "wishlist" ? "bg-ink text-cream border-ink" : "bg-cream-light hover:bg-cream-dark text-ink"
+            }`}
+          >
+            <span className="text-[10px] uppercase font-bold text-ink-muted block">Saved Wishlist</span>
+            <span className={`font-display font-black text-xl sm:text-2xl ${activeTab === "wishlist" ? "text-lime" : "text-ink"}`}>
+              {wishlist.length}
+            </span>
+          </button>
+        </div>
+
+        {/* ── Customer Navigation Tabs (Visible Exactly Once) ──────────── */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 border-b-2 border-ink">
           {[
-            { id: "orders", label: `Orders (${orders.length})`, icon: Package },
+            { id: "orders", label: `My Orders (${orders.length})`, icon: Package },
             { id: "addresses", label: `Addresses (${addresses.length})`, icon: MapPin },
             { id: "wishlist", label: `Wishlist (${wishlist.length})`, icon: Heart },
-            { id: "profile", label: "Profile Settings", icon: User },
-            { id: "support", label: "Help & Dispatch Support", icon: Truck },
+            { id: "profile", label: "Profile", icon: User },
+            { id: "support", label: "Support & Dispatch", icon: Truck },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => handleTabChange(tab.id as any)}
-                className={`px-4 py-2.5 border-2 text-xs font-mono font-bold uppercase flex items-center gap-2 flex-shrink-0 transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3.5 py-2 border-2 text-xs font-mono font-bold uppercase flex items-center gap-1.5 flex-shrink-0 transition-all cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? "bg-ink text-cream border-ink shadow-brutal-sm"
+                    ? "bg-ink text-lime border-ink shadow-brutal-xs"
                     : "bg-cream-light text-ink border-ink/40 hover:border-ink hover:bg-cream-dark"
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? "text-lime" : ""}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? "text-lime" : "text-ink-muted"}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -597,84 +646,89 @@ export function CustomerDashboardPage() {
             {/* ── 6. Operations & Support Tab ───────────────────────── */}
             {activeTab === "support" && (
               <div className="space-y-6 font-mono text-xs">
-                <div className="border-b-2 border-ink pb-3">
-                  <h2 className="font-display font-black text-xl uppercase">
-                    Fulfillment, Logistics & Support Hub
-                  </h2>
-                  <p className="text-xs text-ink-muted mt-1">
-                    Authentic commercial logistics, direct support escalation, and statutory consumer redressal
-                  </p>
+                <div className="border-b-2 border-ink pb-3 flex items-center justify-between">
+                  <div>
+                    <h2 className="font-display font-black text-xl uppercase">
+                      Dispatch & Customer Support Hub
+                    </h2>
+                    <p className="text-xs text-ink-muted mt-0.5">
+                      Priority express logistics, studio helpline, and 100% order resolution
+                    </p>
+                  </div>
+                  <span className="badge-lime text-[10px] font-bold uppercase hidden sm:inline-block">
+                    Bengaluru Studio
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Fulfillment Hub Card */}
-                  <div className="card-brutal p-6 bg-cream-light space-y-4">
-                    <div className="border-b border-ink/15 pb-2 flex items-center justify-between">
-                      <h3 className="font-display font-black text-base uppercase flex items-center gap-2">
-                        <Truck className="w-4 h-4 text-lime-darker" /> Dispatch & Manufacturing
-                      </h3>
-                      <span className="badge-lime text-[10px] uppercase">Karnataka Hub</span>
-                    </div>
-
-                    <div className="space-y-2 text-ink">
-                      <p>
-                        <strong className="uppercase">Operating Brand:</strong> {BUSINESS_PROFILE.brandName}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {/* Card 1: Logistics */}
+                  <div className="card-brutal p-5 bg-cream-light space-y-3 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 border-b border-ink/15 pb-2">
+                        <Truck className="w-4 h-4 text-lime-darker" />
+                        <h3 className="font-display font-black text-sm uppercase">Express Dispatch</h3>
+                      </div>
+                      <p className="text-ink-muted text-[11px] leading-relaxed">
+                        Precision crafted in Bengaluru and dispatched within <strong>24-48 hours</strong> via our Shiprocket network (Bluedart, Delhivery, DTDC).
                       </p>
-                      <p>
-                        <strong className="uppercase">Legal Entity:</strong> {BUSINESS_PROFILE.legalEntityName} (Sole Proprietor)
-                      </p>
-                      <p>
-                        <strong className="uppercase">Principal Place of Business:</strong>
-                        <span className="block text-ink-muted mt-0.5">{BUSINESS_PROFILE.address.formatted}</span>
-                      </p>
-                      <p>
-                        <strong className="uppercase">Logistics Partner:</strong> Shiprocket National Courier Network (Bluedart, Delhivery, DTDC, XpressBees)
+                      <p className="text-[11px] font-bold text-ink">
+                        ⚡ Free shipping nationwide on orders ₹999+.
                       </p>
                     </div>
-
-                    <div className="p-3 bg-lime/20 border border-ink text-[11px]">
-                      <strong>Free Shipping Benefit:</strong> All orders over ₹999 qualify for complimentary express standard delivery across India.
-                    </div>
+                    <Link
+                      to="/track-order"
+                      className="px-3 py-2 bg-ink text-cream hover:bg-lime hover:text-ink text-center text-xs font-bold uppercase transition-colors"
+                    >
+                      Track Active Parcel →
+                    </Link>
                   </div>
 
-                  {/* Customer Care & Grievance Card */}
-                  <div className="card-brutal p-6 bg-cream-light space-y-4">
-                    <div className="border-b border-ink/15 pb-2 flex items-center justify-between">
-                      <h3 className="font-display font-black text-base uppercase flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-coral" /> Customer Care Desk
-                      </h3>
-                      <span className="badge-dark text-[10px] uppercase">Active Support</span>
-                    </div>
-
+                  {/* Card 2: Help & WhatsApp */}
+                  <div className="card-brutal p-5 bg-cream-light space-y-3 flex flex-col justify-between">
                     <div className="space-y-2">
-                      <p>
-                        <strong className="uppercase">Direct Support Email:</strong>{" "}
-                        <a href={`mailto:${BUSINESS_PROFILE.contact.email}`} className="text-lime-darker font-bold hover:underline">
-                          {BUSINESS_PROFILE.contact.email}
-                        </a>
+                      <div className="flex items-center gap-2 border-b border-ink/15 pb-2">
+                        <Mail className="w-4 h-4 text-coral" />
+                        <h3 className="font-display font-black text-sm uppercase">Collector Care</h3>
+                      </div>
+                      <p className="text-ink-muted text-[11px] leading-relaxed">
+                        Direct communication with the workshop founders for order changes or urgent requests.
                       </p>
-                      <p>
-                        <strong className="uppercase">Helpline / WhatsApp:</strong>{" "}
-                        <a href={`tel:${BUSINESS_PROFILE.contact.phone}`} className="font-bold hover:underline">
-                          {BUSINESS_PROFILE.contact.phone}
-                        </a>
-                      </p>
-                      <p>
-                        <strong className="uppercase">Support Hours:</strong> {BUSINESS_PROFILE.contact.supportHours}
-                      </p>
-                      <p>
-                        <strong className="uppercase">Grievance Officer:</strong> {BUSINESS_PROFILE.grievanceOfficer.name} (Designation: {BUSINESS_PROFILE.grievanceOfficer.designation})
-                      </p>
+                      <div className="space-y-1 text-[11px]">
+                        <p><strong>WhatsApp:</strong> {BUSINESS_PROFILE.contact.phone}</p>
+                        <p><strong>Email:</strong> {BUSINESS_PROFILE.contact.email}</p>
+                        <p className="text-ink-muted">{BUSINESS_PROFILE.contact.supportHours}</p>
+                      </div>
                     </div>
+                    <a
+                      href={`https://wa.me/919108294742?text=${encodeURIComponent("Hi Toyz Dept! I need assistance with my order.")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-2 bg-lime text-ink hover:bg-ink hover:text-lime text-center text-xs font-bold uppercase transition-colors"
+                    >
+                      Chat on WhatsApp ↗
+                    </a>
+                  </div>
 
-                    <div className="pt-2 flex flex-col gap-2">
-                      <Link to="/contact" className="btn-dark py-2 text-xs uppercase text-center">
-                        Open Contact Ticket
-                      </Link>
-                      <Link to="/grievance-redressal" className="btn-secondary py-2 text-xs uppercase text-center text-coral">
-                        Statutory Grievance Redressal
-                      </Link>
+                  {/* Card 3: Quality Guarantee */}
+                  <div className="card-brutal p-5 bg-cream-light space-y-3 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 border-b border-ink/15 pb-2">
+                        <CheckCircle2 className="w-4 h-4 text-lime-darker" />
+                        <h3 className="font-display font-black text-sm uppercase">100% Quality Promise</h3>
+                      </div>
+                      <p className="text-ink-muted text-[11px] leading-relaxed">
+                        Every single item undergoes strict 0.12mm layer inspection. Any transit damage is fully replaced or refunded immediately.
+                      </p>
+                      <p className="text-[11px] text-ink-muted">
+                        Report transit issues within 48h with a quick unboxing clip for priority resolution.
+                      </p>
                     </div>
+                    <Link
+                      to="/contact"
+                      className="px-3 py-2 bg-cream border border-ink text-center text-xs font-bold uppercase hover:bg-cream-dark transition-colors"
+                    >
+                      Submit Ticket / Report
+                    </Link>
                   </div>
                 </div>
               </div>
